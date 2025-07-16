@@ -1212,7 +1212,7 @@ body, html {
 /* General scrollbar styles for all scrollable elements */
 * {
   scrollbar-width: thin;
-  scrollbar-color: grey rgba(26, 26, 26, 0.8);
+  scrollbar-color: #2f2b2b8c rgba(26, 26, 26, 0.8);
 }
 
 /* Enhanced scrollbar for all webkit browsers */

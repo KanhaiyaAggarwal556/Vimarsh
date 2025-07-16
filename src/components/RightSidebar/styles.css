@@ -155,9 +155,9 @@
   .feature-item{padding:0.5rem;font-size:0.9rem}
   .search-results{padding:0.5rem}
   .search-term-display{font-size:0.9rem;padding:0.5rem;margin-bottom:1rem}
-  .mobile-header-icons-container{max-width: 0px;}
+  .mobile-header-icons-container{display:none;}
   .mobile-header-icons{gap:0}
-  .mobile-search-icon,.mobile-user-icon{width:36px !important;height:48px !important;padding:5px !important}
+  .mobile-search-icon,.mobile-user-icon{width:36px !important;height:48px !important;padding:5px !important; margin-top:15px !important}
   .mobile-search-icon svg,.mobile-user-icon svg{width:24px;height:24px}
   .mobile-feature-panel-button{width:52px;height:52px;bottom:16px;right:16px}
   .mobile-feature-panel-content{max-height:85vh}

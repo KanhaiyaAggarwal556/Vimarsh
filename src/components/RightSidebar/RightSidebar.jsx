@@ -1,4 +1,4 @@
-// RightSidebar.jsx - Updated to hide search bar on /search page
+// RightSidebar.jsx - Updated to hide mobile header icons on non-home pages
 import React, { useState, useEffect, useRef } from 'react';
 import { Search as SearchIcon, User, Grid3X3, X } from 'lucide-react';
 import Search from './Search';
@@ -43,6 +43,9 @@ const RightSidebar = () => {
     handleLogout
   } = useAuth();
 
+  // Check if we're on the home page
+  const isOnHomePage = location.pathname === '/' || location.pathname === '/home';
+  
   // Check if we're on the search page
   const isOnSearchPage = location.pathname === '/search';
 
@@ -233,8 +236,11 @@ const RightSidebar = () => {
   if (isMobile) {
     return (
       <>
-        {/* Mobile Header Icons - Only show search icon when search bar should be visible */}
-        <div className="mobile-header-icons-container">
+        {/* Mobile Header Icons - Only show on home page */}
+        <div 
+          className="mobile-header-icons-container"
+          style={{ display: isOnHomePage ? 'block' : 'none' }}
+        >
           <div className="mobile-header-spacer"></div>
           
           <div className="mobile-header-icons">

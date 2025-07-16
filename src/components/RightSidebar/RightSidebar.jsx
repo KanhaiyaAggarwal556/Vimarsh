@@ -337,7 +337,7 @@ const RightSidebar = () => {
         </div>
 
         {/* Mobile Feature Panel Button - Only show when search bar should be visible */}
-        {shouldShowSearchBar && (
+        {/* {shouldShowSearchBar && (
           <div className="mobile-feature-panel-wrapper" ref={mobileFeaturePanelRef}>
             <button
               className="mobile-feature-panel-button"
@@ -381,7 +381,7 @@ const RightSidebar = () => {
               </div>
             )}
           </div>
-        )}
+        )} */}
 
         {/* ChatBot for Mobile */}
         <ChatBot

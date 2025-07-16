@@ -123,7 +123,7 @@ export default function UsersProvider({ children }) {
     try {
       // Note: You'll need to implement DELETE /api/users/:userId in your backend
       const response = await fetch(
-        `https://twooter-backend.onrender.com/api/users`,
+        `https://twooter-backend.onrender.com/api/users/${userId}`,
         {
           method: "DELETE",
         }
@@ -156,7 +156,7 @@ export default function UsersProvider({ children }) {
     const signal = controller.signal;
     setFetching(true);
 
-    fetch("http://localhost:3000/api/users", { signal })
+    fetch("https://twooter-backend.onrender.com/api/users", { signal })
       .then((res) => res.json())
       .then((data) => {
         // Handle the API response - users are returned directly as array

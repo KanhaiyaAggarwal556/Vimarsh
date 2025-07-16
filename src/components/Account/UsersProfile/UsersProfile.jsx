@@ -5,7 +5,7 @@ import HomeSection from "../../Post/view_post/Posts/Sections/HomeSection";
 import UserAvatar from "../../Post/view_post/Single_Post/UI/UserAvatar";
 
 export default function UsersProfile() {
-  const { userList, fetching, getUserById } = useContext(UserListData);
+  const { fetching, getUserById } = useContext(UserListData);
   const pathSegments = window.location.pathname
     .split("/")
     .filter((segment) => segment !== "");

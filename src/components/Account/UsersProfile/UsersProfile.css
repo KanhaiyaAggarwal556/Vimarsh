@@ -5,30 +5,21 @@ body, html {
   padding: 0;
 }
 
-/* User Profile Container - Ensure full black background */
+/* User Profile Container - Remove conflicting height constraints */
 .user-profile-container {
   position: relative;
   width: 100%;
   max-width: 50%;
   margin: 0 auto;
   background-color: #000;
-  min-height: 100vh;
+  /* REMOVED: min-height: 100vh; */
   box-sizing: border-box;
   padding: 0;
-  overflow-x: hidden;
+  /* REMOVED: overflow-x: hidden; */
 }
 
-/* Add a wrapper to ensure black background extends beyond content */
-.user-profile-container::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #000;
-  z-index: -1;
-}
+/* REMOVED: Unnecessary fixed pseudo-element that was causing scroll issues */
+/* .user-profile-container::before { ... } */
 
 .user-profile-container::-webkit-scrollbar {
   width: 8px;
@@ -54,7 +45,7 @@ body, html {
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
-  min-height: 100vh;
+  /* REMOVED: min-height: 100vh; */
   background-color: #000;
 }
 
@@ -65,6 +56,7 @@ body, html {
   align-items: center;
   justify-content: center;
   height: 100vh;
+  max-width: 100% !important  ;
   color: #fff;
   background-color: #000;
 }
@@ -120,7 +112,7 @@ body, html {
   position: absolute;
   bottom: 5px;
   right: 5px;
-  background: #1da1f2;
+  background: #1da7f2;
   color: #fff;
   width: 20px;
   height: 20px;
@@ -276,15 +268,14 @@ body, html {
 }
 
 .nav-tab.active {
-  color: #1da1f2;
-  border-bottom-color: #1da1f2;
+  color: #1a6fe5f0;
+  border-bottom-color: #1d68f2b6;
 }
 
-/* Tab Content */
+/* Tab Content - FIXED: Removed fixed min-height that was causing scroll issues */
 .tab-content {
-  padding: 20px;
   background-color: #000;
-  min-height: 60vh;
+  /* REMOVED: min-height: 60vh; */
 }
 
 /* Posts Section */
@@ -347,7 +338,7 @@ body, html {
 }
 
 .info-value a {
-  color: #1da1f2;
+  color: #1d45bfbd;
   text-decoration: none;
 }
 
@@ -487,7 +478,7 @@ body, html {
 
 .activity-item:hover {
   background: #1a1a1a;
-  border-color: #1da1f2;
+  border-color: #1d68f2b6;
 }
 
 .activity-icon {
@@ -557,7 +548,7 @@ body, html {
 }
 
 .tag-item:hover {
-  background: #1da1f2;
+  background: #1d68f2b6;
   transform: translateY(-2px);
 }
 
@@ -618,7 +609,7 @@ body, html {
 }
 
 .interest-item:hover {
-  background: #1da1f2;
+  background: #1d68f2b6;
   transform: translateY(-2px);
 }
 
@@ -716,100 +707,7 @@ body, html {
   font-weight: 500;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .user-profile-container{
-    max-width: 100%;
-  }
-  .profile-info {
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .profile-main-info {
-    min-width: 100%;
-  }
-  
-  .profile-stats {
-    gap: 20px;
-    justify-content: center;
-  }
-  
-  .stat-item {
-    min-width: 80px;
-  }
-  
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .engagement-stats {
-    grid-template-columns: 1fr;
-  }
-  
-  .interests-grid {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  }
-  
-  .tab-content {
-    padding: 15px;
-  }
-  
-  .profile-nav {
-    padding: 0 15px;
-  }
-  
-  .nav-tab {
-    padding: 12px 15px;
-  }
-}
-
-@media (max-width: 480px) {
-  .profile-cover {
-    height: 150px;
-  }
-  
-  .profile-avatar {
-    width: 80px;
-    height: 80px;
-  }
-  
-  .profile-avatar-container {
-    bottom: -30px;
-  }
-  
-  .profile-info {
-    padding: 40px 15px 15px;
-  }
-  
-  .profile-main-info h1 {
-    font-size: 24px;
-  }
-  
-  .profile-stats {
-    gap: 15px;
-  }
-  
-  .stat-number {
-    font-size: 18px;
-  }
-  
-  .interests-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .activity-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  
-  .activity-stats {
-    align-items: flex-start;
-    flex-direction: row;
-    gap: 10px;
-  }
-}
+/* Follow Button Styles */
 .follow-btn {
   display: flex;
   align-items: center;
@@ -826,17 +724,17 @@ body, html {
 }
 
 .follow-btn.follow {
-  background: #1DA1F2;
+  background: #1d68f2b6;
   color: white;
 }
 
 .follow-btn.follow:hover {
-  background: #1991DA;
+  background: rgba(25, 61, 169, 0.619)b6;
   transform: translateY(-1px);
 }
 
 .follow-btn.following {
-  background: #f7f9fa;
+  background: #ffffff;
   color: #536471;
   border: 1px solid #CFD9DE;
 }
@@ -868,50 +766,6 @@ body, html {
   animation: spin 1s linear infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.follow-message {
-  margin-top: 8px;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  text-align: center;
-  animation: slideIn 0.3s ease-out;
-}
-
-.follow-message.success {
-  background: #d1edff;
-  color: #1d4ed8;
-  border: 1px solid #93c5fd;
-}
-
-.follow-message.error {
-  background: #fee;
-  color: #dc2626;
-  border: 1px solid #fca5a5;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.follow-btn .follow-icon {
-  font-size: 16px;
-  line-height: 1;
-}
-
-.follow-btn.loading .follow-icon {
-  display: none;
-}
 /* Followers Section */
 .followers-section {
   display: flex;
@@ -931,7 +785,7 @@ body, html {
 }
 
 .followers-header h3 {
-  color: #fff;
+  color: #12c3b79a;
   font-size: 20px;
   margin: 0;
   font-weight: 600;
@@ -1159,8 +1013,49 @@ body, html {
   transform: translateY(-2px);
 }
 
-/* Responsive Design for Followers Section */
+/* Responsive Design */
 @media (max-width: 768px) {
+  .user-profile-container{
+    max-width: 100%;
+  }
+  .profile-info {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .profile-main-info {
+    min-width: 100%;
+  }
+  
+  .profile-stats {
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  .stat-item {
+    min-width: 80px;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .engagement-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .interests-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+  
+  .profile-nav {
+    padding: 0 15px;
+  }
+  
+  .nav-tab {
+    padding: 12px 15px;
+  }
+  
   .followers-header {
     flex-direction: column;
     gap: 15px;
@@ -1192,6 +1087,52 @@ body, html {
   .user-profile-container{
     max-width: 100%;
   }
+  
+  .profile-cover {
+    height: 150px;
+  }
+  
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .profile-avatar-container {
+    bottom: -30px;
+  }
+  
+  .profile-info {
+    padding: 40px 15px 15px;
+  }
+  
+  .profile-main-info h1 {
+    font-size: 24px;
+  }
+  
+  .profile-stats {
+    gap: 15px;
+  }
+  
+  .stat-number {
+    font-size: 18px;
+  }
+  
+  .interests-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .activity-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .activity-stats {
+    align-items: flex-start;
+    flex-direction: row;
+    gap: 10px;
+  }
+  
   .followers-header {
     padding: 15px;
   }
@@ -1232,5 +1173,286 @@ body, html {
   
   .no-followers h4 {
     font-size: 16px;
+  }
+} 
+/* Enhanced Scrollbar Styles */
+
+/* Main container scrollbar */
+.user-profile-container::-webkit-scrollbar {
+  width: 12px;
+  background: transparent;
+}
+
+.user-profile-container::-webkit-scrollbar-track {
+  background: rgba(26, 26, 26, 0.8);
+  border-radius: 10px;
+  margin: 8px 0;
+  border: 1px solid rgba(51, 51, 51, 0.3);
+}
+
+.user-profile-container::-webkit-scrollbar-thumb {
+  background: grey;
+  border-radius: 10px;
+  border: 2px solid rgba(26, 26, 26, 0.8);
+  box-shadow: 0 2px 8px rgba(29, 161, 242, 0.3);
+  transition: all 0.3s ease;
+}
+
+.user-profile-container::-webkit-scrollbar-thumb:hover {
+  background: grey;
+  box-shadow: 0 4px 12px rgba(29, 161, 242, 0.5);
+  transform: scaleY(1.05);
+}
+
+.user-profile-container::-webkit-scrollbar-thumb:active {
+  background: grey;
+  box-shadow: 0 2px 6px rgba(29, 161, 242, 0.4);
+}
+
+/* General scrollbar styles for all scrollable elements */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: grey rgba(26, 26, 26, 0.8);
+}
+
+/* Enhanced scrollbar for all webkit browsers */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background: transparent;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(26, 26, 26, 0.6);
+  border-radius: 8px;
+  margin: 4px 0;
+  border: 1px solid rgba(51, 51, 51, 0.2);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: grey;
+  border-radius: 8px;
+  border: 1px solid rgba(26, 26, 26, 0.6);
+  box-shadow: 0 1px 4px rgba(29, 161, 242, 0.2);
+  transition: all 0.2s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: grey;
+  box-shadow: 0 2px 8px rgba(29, 161, 242, 0.4);
+  border-color: rgba(29, 161, 242, 0.3);
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background: grey;
+  box-shadow: 0 1px 3px rgba(29, 161, 242, 0.3);
+}
+
+/* Corner styling for when both scrollbars are present */
+*::-webkit-scrollbar-corner {
+  background: rgba(26, 26, 26, 0.8);
+  border: 1px solid rgba(51, 51, 51, 0.2);
+}
+
+/* Special scrollbar for navigation tabs */
+.profile-nav::-webkit-scrollbar {
+  height: 6px;
+}
+
+.profile-nav::-webkit-scrollbar-track {
+  background: rgba(26, 26, 26, 0.9);
+  border-radius: 6px;
+  margin: 2px 0;
+}
+
+.profile-nav::-webkit-scrollbar-thumb {
+  background: grey;
+  border-radius: 6px;
+  border: 1px solid rgba(26, 26, 26, 0.9);
+  box-shadow: 0 1px 3px rgba(29, 161, 242, 0.3);
+}
+
+.profile-nav::-webkit-scrollbar-thumb:hover {
+  background: grey;
+  box-shadow: 0 2px 6px rgba(29, 161, 242, 0.5);
+}
+
+/* Scrollbar for card content areas */
+.about-card::-webkit-scrollbar,
+.activity-card::-webkit-scrollbar,
+.followers-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.about-card::-webkit-scrollbar-track,
+.activity-card::-webkit-scrollbar-track,
+.followers-list::-webkit-scrollbar-track {
+  background: rgba(10, 10, 10, 0.8);
+  border-radius: 6px;
+  margin: 4px 0;
+}
+
+.about-card::-webkit-scrollbar-thumb,
+.activity-card::-webkit-scrollbar-thumb,
+.followers-list::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #333, #555);
+  border-radius: 6px;
+  border: 1px solid rgba(10, 10, 10, 0.8);
+  transition: all 0.2s ease;
+}
+
+.about-card::-webkit-scrollbar-thumb:hover,
+.activity-card::-webkit-scrollbar-thumb:hover,
+.followers-list::-webkit-scrollbar-thumb:hover {
+  background: grey;
+  box-shadow: 0 1px 4px rgba(29, 161, 242, 0.3);
+}
+
+/* Responsive scrollbar adjustments */
+@media (max-width: 768px) {
+  .user-profile-container::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .user-profile-container::-webkit-scrollbar-track {
+    border-radius: 8px;
+    margin: 6px 0;
+  }
+  
+  .user-profile-container::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    border: 1px solid rgba(26, 26, 26, 0.8);
+  }
+  
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  *::-webkit-scrollbar-track {
+    border-radius: 6px;
+    margin: 3px 0;
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    border-radius: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-profile-container::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .user-profile-container::-webkit-scrollbar-track {
+    border-radius: 6px;
+    margin: 4px 0;
+  }
+  
+  .user-profile-container::-webkit-scrollbar-thumb {
+    border-radius: 6px;
+    border: 1px solid rgba(26, 26, 26, 0.8);
+  }
+  
+  *::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  
+  *::-webkit-scrollbar-track {
+    border-radius: 4px;
+    margin: 2px 0;
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+  }
+  
+  .profile-nav::-webkit-scrollbar {
+    height: 4px;
+  }
+}
+
+/* Smooth scrolling behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+.user-profile-container {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar animation */
+@keyframes scrollbar-glow {
+  0% {
+    box-shadow: 0 2px 8px rgba(29, 161, 242, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 16px rgba(29, 161, 242, 0.6);
+  }
+  100% {
+    box-shadow: 0 2px 8px rgba(29, 161, 242, 0.3);
+  }
+}
+
+/* Apply glow animation on scroll */
+.user-profile-container::-webkit-scrollbar-thumb:active {
+  animation: scrollbar-glow 0.3s ease-in-out;
+}
+
+/* Dark mode enhanced scrollbar */
+@media (prefers-color-scheme: dark) {
+  *::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, #1da1f2, #29a3f2);
+    border: 1px solid rgba(0, 0, 0, 0.9);
+    box-shadow: 0 1px 4px rgba(29, 161, 242, 0.4);
+  }
+  
+  *::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, #29a3f2, #3bb3ff);
+    box-shadow: 0 2px 8px rgba(29, 161, 242, 0.6);
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  *::-webkit-scrollbar-track {
+    background: #000;
+    border: 2px solid #fff;
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    background: #1da1f2;
+    border: 2px solid #fff;
+    box-shadow: none;
+  }
+  
+  *::-webkit-scrollbar-thumb:hover {
+    background: #fff;
+    border: 2px solid #1da1f2;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *::-webkit-scrollbar-thumb {
+    transition: none;
+  }
+  
+  .user-profile-container::-webkit-scrollbar-thumb:active {
+    animation: none;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+  
+  .user-profile-container {
+    scroll-behavior: auto;
   }
 }

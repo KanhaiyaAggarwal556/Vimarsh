@@ -336,3 +336,18 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .mobile-header-icons{display:flex!important;align-items:center; justify-content: center;}
 }
 .right-sidebar__header{position:relative; display:flex; justify-content: flex-end; }
+/* BASE SIDEBAR STYLES - Updated with left separator line */
+.right-sidebar{
+  position:fixed;
+  top:0;
+  right:0;
+  width:25%;
+  height:100%;
+  background-color:#000;
+  color:#fff;
+  box-shadow:-2px 0 5px rgba(30,29,29,0.24);
+  border-left: 1px solid #333; /* Add this line for separator */
+  z-index:1000;
+  display:flex;
+  flex-direction:column;
+}

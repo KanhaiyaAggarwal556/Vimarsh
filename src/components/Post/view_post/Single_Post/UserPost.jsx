@@ -167,7 +167,7 @@ export default function UserPost() {
         <div className="post-page">
           <div className="post-card">
             <div className="post-card-body">
-              <div className="loading-spinner">Loading post...</div>
+              <div className="loading-spinner"></div>
             </div>
           </div>
         </div>

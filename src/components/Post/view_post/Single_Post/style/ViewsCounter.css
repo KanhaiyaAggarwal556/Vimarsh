@@ -1,0 +1,286 @@
+/* ViewsCounter Component Styles */
+
+/* CSS Variables for consistency with the main theme */
+:root {
+  --post-bg-primary: #1a1a1a;
+  --post-bg-secondary: #242424;
+  --post-bg-tertiary: #2d2d2d;
+  --post-border-color: #333;
+  --post-text-primary: #fff;
+  --post-text-secondary: #e9ecef;
+  --post-text-muted: #6c757d;
+  --post-text-light: #adb5bd;
+  --post-info-color: #17a2b8;
+  --post-transition: all 0.3s ease;
+  --post-transition-fast: all 0.2s ease;
+}
+
+.post-views {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--post-text-muted);
+  font-size: clamp(0.75rem, 1.8vw, 0.875rem);
+  white-space: nowrap;
+  transition: var(--post-transition-fast);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.post-views:hover {
+  color: var(--post-text-light);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.post-views svg {
+  flex-shrink: 0;
+  opacity: 0.8;
+  transition: var(--post-transition-fast);
+}
+
+.post-views:hover svg {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.post-views small {
+  font-size: inherit;
+  font-weight: 400;
+  margin: 0;
+  color: inherit;
+}
+
+.post-views.compact {
+  gap: 4px;
+  padding: 2px 4px;
+  font-size: 0.7rem;
+}
+
+.post-views.large {
+  gap: 8px;
+  padding: 6px 12px;
+  font-size: 1rem;
+}
+
+.post-views.prominent {
+  color: var(--post-text-secondary);
+  background-color: var(--post-bg-tertiary);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+.post-views.prominent:hover {
+  color: var(--post-text-primary);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.post-views.updating {
+  animation: pulse 0.6s ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* High view count styling */
+.post-views.high-views {
+  color: var(--post-info-color);
+  font-weight: 500;
+}
+
+.post-views.high-views svg {
+  color: var(--post-info-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .post-views {
+    font-size: 0.75rem;
+    gap: 5px;
+    padding: 3px 6px;
+  }
+  
+  .post-views svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .post-views.large {
+    font-size: 0.875rem;
+    gap: 6px;
+    padding: 4px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .post-views {
+    font-size: 0.7rem;
+    gap: 4px;
+    padding: 2px 4px;
+  }
+  
+  .post-views svg {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .post-views.compact {
+    font-size: 0.65rem;
+    gap: 3px;
+    padding: 1px 3px;
+  }
+}
+
+/* Dark/Light theme toggle support */
+@media (prefers-color-scheme: light) {
+  :root {
+    --post-bg-primary: #ffffff;
+    --post-bg-secondary: #f8f9fa;
+    --post-bg-tertiary: #e9ecef;
+    --post-border-color: #dee2e6;
+    --post-text-primary: #212529;
+    --post-text-secondary: #495057;
+    --post-text-muted: #6c757d;
+    --post-text-light: #495057;
+  }
+  
+  .post-views:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  .post-views.prominent:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --post-text-muted: #000;
+  }
+  
+  .post-views {
+    border: 1px solid var(--post-text-muted);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .post-views,
+  .post-views svg {
+    transition: none;
+  }
+  
+  .post-views:hover svg {
+    transform: none;
+  }
+  
+  .post-views.updating {
+    animation: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .post-views {
+    color: #000;
+    background: none;
+  }
+  
+  .post-views:hover {
+    background: none;
+    color: #000;
+  }
+}
+
+/* Accessibility improvements */
+.post-views:focus-within {
+  outline: 2px solid var(--post-info-color);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Loading state */
+.post-views.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.post-views.loading::after {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-left: 4px;
+  gap: 5px;
+  border: 2px solid var(--post-text-muted);
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Utility classes */
+.post-views.hidden {
+  display: none;
+}
+
+.post-views.inline {
+  display: inline-flex;
+}
+
+.post-views.block {
+  display: block;
+}
+
+.post-views.center {
+  justify-content: center;
+}
+
+.post-views.right {
+  justify-content: flex-end;
+}
+
+/* Icon-only variant */
+.post-views.icon-only small {
+  display: none;
+}
+
+.post-views.icon-only {
+  width: 24px;
+  height: 24px;
+  justify-content: center;
+  border-radius: 50%;
+  position: relative;
+}
+
+.post-views.icon-only::after {
+  content: attr(data-views);
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--post-info-color);
+  color: white;
+  font-size: 0.6rem;
+  padding: 1px 4px;
+  border-radius: 8px;
+  min-width: 16px;
+  text-align: center;
+}
+
+
+
+/* End of ViewsCounter CSS */

@@ -1,0 +1,149 @@
+/* ShareAndViewsCounter Component CSS */
+
+/* Container for share button and views counter */
+.share-views-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+/* Share button styling */
+.share-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--post-text-muted);
+  cursor: pointer;
+  transition: var(--post-transition);
+  padding: 8px 12px;
+  border-radius: var(--post-border-radius-xs);
+  font-size: clamp(0.75rem, 1.8vw, 0.875rem);
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.share-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.share-btn:hover::before {
+  left: 100%;
+}
+
+.share-btn:hover {
+  background-color: var(--post-bg-tertiary);
+  color: var(--post-text-primary);
+  transform: translateY(-1px);
+}
+
+.share-btn:focus {
+  outline: 2px solid var(--post-info-color);
+  outline-offset: 2px;
+}
+
+.share-btn.shared {
+  color: var(--post-info-color);
+  background-color: rgba(23, 162, 184, 0.1);
+}
+
+.share-btn svg {
+  transition: var(--post-transition);
+  flex-shrink: 0;
+}
+
+.share-btn:hover svg {
+  transform: scale(1.1);
+}
+
+.share-btn.shared svg {
+  animation: shareSuccess 0.6s ease-in-out;
+}
+
+/* Share animation */
+@keyframes shareSuccess {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2) rotate(10deg);
+  }
+}
+
+/* Views counter integration */
+.share-views-container .post-views {
+  margin-right: auto;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .share-views-container {
+    gap: 10px;
+    justify-content: space-between;
+  }
+  
+  .share-btn {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .share-views-container {
+    gap: 8px;
+  }
+  
+  .share-btn {
+    padding: 5px 8px;
+    font-size: 0.7rem;
+  }
+  
+  .share-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Dark/Light theme support */
+@media (prefers-color-scheme: light) {
+  .share-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .share-btn,
+  .share-btn svg {
+    transition: none;
+  }
+  
+  .share-btn:hover {
+    transform: none;
+  }
+  
+  .share-btn:hover svg {
+    transform: none;
+  }
+  
+  .share-btn.shared svg {
+    animation: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .share-btn {
+    display: none;
+  }
+}

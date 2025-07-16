@@ -1,0 +1,198 @@
+/* PostComments Component CSS */
+
+/* CSS Variables (required for the component to work) */
+:root {
+  --post-bg-primary: #1a1a1a;
+  --post-bg-secondary: #242424;
+  --post-bg-tertiary: #2d2d2d;
+  --post-border-color: #333;
+  --post-text-primary: #fff;
+  --post-text-secondary: #e9ecef;
+  --post-text-muted: #6c757d;
+  --post-success-color: #28a745;
+  --post-danger-color: #dc3545;
+  --post-info-color: #17a2b8;
+  --post-border-radius-sm: 8px;
+  --post-border-radius-xs: 6px;
+  --post-transition-fast: all 0.2s ease;
+}
+
+/* Comments Styles */
+.post-comments {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid var(--post-border-color);
+}
+
+.post-no-comments {
+  color: var(--post-text-muted);
+  text-align: center;
+  margin: 0;
+  font-size: clamp(0.8rem, 1.8vw, 0.875rem);
+  padding: 20px;
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.post-comment {
+  background-color: var(--post-bg-secondary);
+  border-radius: var(--post-border-radius-sm);
+  padding: 12px;
+  border: 1px solid var(--post-border-color);
+  transition: var(--post-transition-fast);
+  position: relative;
+}
+
+.post-comment:hover {
+  background-color: var(--post-bg-tertiary);
+  border-color: var(--post-info-color);
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  gap: 10px;
+}
+
+.comment-user-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.comment-user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 8px;
+  flex-shrink: 0;
+  border: 1px solid var(--post-border-color);
+}
+
+.comment-user-details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.comment-username {
+  color: var(--post-text-primary);
+  font-size: clamp(0.75rem, 1.8vw, 0.875rem);
+  font-weight: 600;
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--post-transition-fast);
+}
+
+.comment-username:hover {
+  color: var(--post-info-color);
+}
+
+.comment-timestamp {
+  color: var(--post-text-muted);
+  font-size: clamp(0.7rem, 1.6vw, 0.75rem);
+  line-height: 1;
+}
+
+/* Comment Reactions */
+.comment-reactions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.comment-reaction-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--post-text-muted);
+  cursor: pointer;
+  transition: var(--post-transition-fast);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.comment-reaction-btn:hover {
+  background-color: var(--post-bg-tertiary);
+  color: var(--post-text-primary);
+}
+
+.comment-reaction-btn.liked {
+  color: var(--post-success-color);
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.comment-reaction-btn.disliked {
+  color: var(--post-danger-color);
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.comment-body {
+  color: var(--post-text-secondary);
+  line-height: 1.4;
+  margin-bottom: 8px;
+  word-wrap: break-word;
+  font-size: clamp(0.8rem, 1.8vw, 0.875rem);
+}
+
+.comment-body p {
+  margin: 0 0 8px 0;
+}
+
+.comment-body p:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive Design for Comments */
+@media (max-width: 768px) {
+  .comment-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+}
+
+/* Dark/Light theme toggle support */
+@media (prefers-color-scheme: light) {
+  :root {
+    --post-bg-primary: #ffffff;
+    --post-bg-secondary: #f8f9fa;
+    --post-bg-tertiary: #e9ecef;
+    --post-border-color: #dee2e6;
+    --post-text-primary: #212529;
+    --post-text-secondary: #495057;
+    --post-text-muted: #6c757d;
+  }
+}
+
+/* Accessibility improvements */
+.post-comment:focus-within {
+  outline: 2px solid var(--post-info-color);
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

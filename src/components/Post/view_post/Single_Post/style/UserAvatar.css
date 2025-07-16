@@ -1,0 +1,369 @@
+/* Enhanced UserAvatar Component CSS */
+
+/* CSS Variables for theming and consistency */
+:root {
+  --post-bg-primary: #1a1a1a;
+  --post-bg-secondary: #242424;
+  --post-bg-tertiary: #2d2d2d;
+  --post-border-color: #333;
+  --post-text-primary: #fff;
+  --post-text-secondary: #e9ecef;
+  --post-text-muted: #6c757d;
+  --post-text-light: #adb5bd;
+  --post-success-color: #28a745;
+  --post-danger-color: #dc3545;
+  --post-warning-color: #ffc107;
+  --post-info-color: #17a2b8;
+  --post-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  --post-shadow-hover: 0 6px 25px rgba(0,0,0,0.4);
+  --post-border-radius: 12px;
+  --post-border-radius-sm: 8px;
+  --post-border-radius-xs: 6px;
+  --post-transition: all 0.3s ease;
+  --post-transition-fast: all 0.2s ease;
+}
+
+/* User Avatar Container */
+.post-user-avatar {
+  margin-right: 12px;
+  flex-shrink: 0;
+  position: relative;
+  transition: var(--post-transition);
+}
+
+/* Avatar Wrapper for enhanced effects */
+.avatar-wrapper {
+  position: relative;
+  display: inline-block;
+  border-radius: 50%;
+  transition: var(--post-transition);
+}
+
+/* Avatar Image with enhanced circular styling */
+.post-avatar-img {
+  border-radius: 50%;
+  object-fit: cover;
+  width: 40px;
+  height: 40px;
+  border: 3px solid transparent;
+  transition: var(--post-transition);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  position: relative;
+  z-index: 2;
+}
+
+/* Avatar initials with gradient backgrounds */
+.user-avatar-initials {
+  border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.1);
+  transition: var(--post-transition);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  position: relative;
+  z-index: 2;
+  backdrop-filter: blur(10px);
+}
+
+/* Animated ring effect */
+.avatar-ring {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #1e4eaf, rgba(2, 81, 91, 0.885));
+  opacity: 0;
+  transition: var(--post-transition);
+  z-index: 1;
+  animation: rotate 3s linear infinite;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Pulse ring for online status */
+.pulse-ring {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(40, 167, 69, 0.3) 0%, rgba(40, 167, 69, 0) 70%);
+  animation: pulse 2s ease-in-out infinite;
+  z-index: 0;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Skeleton loading animation */
+.user-avatar-skeleton {
+  border-radius: 50%;
+  background: var(--post-bg-tertiary);
+  overflow: hidden;
+  position: relative;
+}
+
+.skeleton-pulse {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255,255,255,0.1), 
+    transparent
+  );
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Hover effects */
+.post-user-avatar:hover .avatar-wrapper {
+  transform: scale(1.05);
+}
+
+.post-user-avatar:hover .avatar-ring {
+  opacity: 1;
+}
+
+.post-user-avatar:hover .post-avatar-img {
+  border-color: rgba(255,255,255,0.3);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+.post-user-avatar:hover .user-avatar-initials {
+  border-color: rgba(255,255,255,0.3);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  transform: scale(1.02);
+}
+
+/* Clickable states */
+.post-user-avatar.clickable {
+  cursor: pointer;
+}
+
+.post-user-avatar.clickable:active .avatar-wrapper {
+  transform: scale(0.95);
+}
+
+/* Online status indicator */
+.user-status-indicator {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  z-index: 3;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--post-bg-primary);
+  background-color: var(--post-success-color);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  animation: status-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes status-glow {
+  0% {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2), 0 0 4px rgba(40, 167, 69, 0.3);
+  }
+  100% {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2), 0 0 8px rgba(40, 167, 69, 0.6);
+  }
+}
+
+/* Enhanced focus styles */
+.post-user-avatar:focus-within {
+  outline: none;
+}
+
+.post-user-avatar:focus-within .avatar-wrapper {
+  outline: 2px solid var(--post-info-color);
+  outline-offset: 2px;
+  transform: scale(1.05);
+}
+
+.post-user-avatar:focus-within .avatar-ring {
+  opacity: 1;
+}
+
+/* Special effects for different sizes */
+.post-user-avatar[style*="width: 32px"] .avatar-ring {
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+}
+
+.post-user-avatar[style*="width: 64px"] .avatar-ring {
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+}
+
+/* Dark/Light theme support */
+@media (prefers-color-scheme: light) {
+  :root {
+    --post-bg-primary: #ffffff;
+    --post-bg-secondary: #f8f9fa;
+    --post-bg-tertiary: #e9ecef;
+    --post-border-color: #dee2e6;
+    --post-text-primary: #212529;
+    --post-text-secondary: #495057;
+    --post-text-muted: #6c757d;
+    --post-text-light: #495057;
+    --post-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    --post-shadow-hover: 0 6px 25px rgba(0,0,0,0.15);
+  }
+  
+  .user-avatar-initials {
+    border-color: rgba(0,0,0,0.1);
+  }
+  
+  .post-user-avatar:hover .post-avatar-img,
+  .post-user-avatar:hover .user-avatar-initials {
+    border-color: rgba(0,0,0,0.2);
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .post-avatar-img,
+  .user-avatar-initials {
+    border-width: 2px;
+    border-color: currentColor;
+  }
+  
+  .avatar-ring {
+    display: none;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .avatar-ring,
+  .pulse-ring,
+  .skeleton-pulse,
+  .status-dot {
+    animation: none !important;
+  }
+  
+  .post-user-avatar:hover .avatar-wrapper,
+  .post-user-avatar:hover .user-avatar-initials {
+    transform: none !important;
+  }
+  
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .post-user-avatar {
+    margin-right: 8px;
+  }
+  
+  .post-avatar-img,
+  .user-avatar-initials {
+    border: 1px solid #000;
+    box-shadow: none;
+  }
+  
+  .avatar-ring,
+  .pulse-ring {
+    display: none;
+  }
+}
+
+/* Accessibility improvements */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Utility classes */
+.post-loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.post-disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Additional cool effects */
+.post-user-avatar.has-status .avatar-wrapper::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  background: conic-gradient(from 0deg, #667eea, #764ba2, #f093fb, #f5576c, #667eea);
+  border-radius: 50%;
+  z-index: 0;
+  opacity: 0.3;
+  animation: rotate 4s linear infinite;
+}
+
+/* Special sparkle effect for VIP users (can be triggered with additional class) */
+.post-user-avatar.vip::after {
+  content: '✨';
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 12px;
+  z-index: 4;
+  animation: sparkle 1.5s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

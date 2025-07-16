@@ -1,0 +1,55 @@
+.main{
+    display: flex;
+}
+
+.sidebar{
+    min-height: 100vh;
+    position: fixed;
+}
+.body{
+    width: 100%;
+    margin-left: 240px;
+}
+.header{
+    width: calc(100% - 240px);
+    position: fixed;
+    height: 70px;
+    z-index: 100;
+}
+.mini-container{
+    padding-top: 100px;
+    padding-left: 40px;
+    overflow-x: hidden;
+}
+.footer{
+    margin-top: 25vh;
+}
+.item{
+    margin-right: 3px;
+}
+.item1{
+    display: flex;
+    margin-right: 10px;
+}
+.item2{
+    display: flex;
+}
+.Views{
+    display: flex;
+}
+.userId{
+    display: flex;
+    margin-bottom: 6px;
+}
+.post{
+    max-width: 46vw;
+    min-width: 30vw;
+}
+.Items{
+    font-weight: 600;
+    font-size: 0.9em;
+}
+.reactions{
+    display: flex;
+    gap: 6vw;
+}

@@ -1,0 +1,214 @@
+/* UserHoverCard.css */
+
+.user-hover-trigger {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #17a2b8;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.user-hover-trigger:hover {
+  color: #138496;
+  text-decoration: underline;
+}
+
+.user-hover-card {
+  position: absolute;
+  z-index: 1000;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  padding: 0;
+  min-width: 280px;
+  max-width: 320px;
+  animation: fadeInUp 0.2s ease-out;
+  backdrop-filter: blur(10px);
+}
+
+.user-hover-card-content {
+  padding: 16px;
+}
+
+.user-hover-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.user-hover-card-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #333;
+  flex-shrink: 0;
+}
+
+.user-hover-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-hover-card-name {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  word-wrap: break-word;
+  line-height: 1.2;
+}
+
+.user-hover-card-id {
+  margin: 0;
+  font-size: 14px;
+  color: #adb5bd;
+  word-wrap: break-word;
+  line-height: 1.2;
+}
+
+.user-hover-card-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 16px;
+  padding: 12px 0;
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+}
+
+.user-hover-card-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.user-hover-card-stat-number {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.user-hover-card-stat-label {
+  font-size: 12px;
+  color: #6c757d;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.user-hover-card-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.user-hover-card-button {
+  background: #17a2b8;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
+
+.user-hover-card-button:hover {
+  background: #138496;
+  transform: translateY(-1px);
+}
+
+.user-hover-card-button:active {
+  transform: translateY(0);
+}
+
+/* Light theme support */
+@media (prefers-color-scheme: light) {
+  .user-hover-card {
+    background: #fff;
+    border-color: #dee2e6;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  }
+  
+  .user-hover-card-name {
+    color: #212529;
+  }
+  
+  .user-hover-card-id {
+    color: #6c757d;
+  }
+  
+  .user-hover-card-stat-number {
+    color: #212529;
+  }
+  
+  .user-hover-card-stats {
+    border-top-color: #dee2e6;
+    border-bottom-color: #dee2e6;
+  }
+  
+  .user-hover-card-avatar {
+    border-color: #dee2e6;
+  }
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .user-hover-card {
+    min-width: 260px;
+    max-width: 280px;
+  }
+  
+  .user-hover-card-content {
+    padding: 14px;
+  }
+  
+  .user-hover-card-avatar {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .user-hover-card-name {
+    font-size: 15px;
+  }
+  
+  .user-hover-card-id {
+    font-size: 13px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .user-hover-card {
+    animation: none;
+  }
+  
+  .user-hover-trigger {
+    transition: none;
+  }
+  
+  .user-hover-card-button {
+    transition: none;
+  }
+  
+  .user-hover-card-button:hover {
+    transform: none;
+  }
+}

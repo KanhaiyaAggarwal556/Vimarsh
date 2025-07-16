@@ -1,0 +1,26 @@
+/* PostActions Component CSS */
+
+/* Actions Styles */
+.post-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--post-border-color);
+}
+
+/* Responsive Design for PostActions */
+@media (max-width: 768px) {
+  .post-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+}
+
+/* CSS Variables (required for the component to work) */
+:root {
+  --post-border-color: #333;
+}

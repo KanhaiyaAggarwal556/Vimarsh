@@ -1,0 +1,385 @@
+/* Enhanced PostHeader Component CSS */
+
+/* CSS Variables for theming and consistency */
+:root {
+  --post-bg-primary: #1a1a1a;
+  --post-bg-secondary: #1a1a1a;
+  --post-bg-tertiary: #2d2d2d;
+  --post-border-color: #333;
+  --post-text-primary: #fff;
+  --post-text-secondary: #e9ecef;
+  --post-text-muted: #8b98a5;
+  --post-text-light: #adb5bd;
+  --post-accent-color: #1d9bf0;
+  --post-success-color: #00ba7c;
+  --post-hover-bg: rgba(255, 255, 255, 0.03);
+  --post-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --post-border-radius-sm: 8px;
+  --post-border-radius-xs: 8px;
+  --post-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --post-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+}
+
+/* Header Styles */
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;  
+  margin-bottom: 0px;
+  position: relative;
+}
+
+.post-user-info {
+  display: flex;
+  align-items: flex-start;
+  flex: 1;
+  min-width: 0;
+  padding: 4px 8px;
+  margin: -4px -8px;
+}
+
+/* Avatar Container - Now clickable */
+.user-avatar-container {
+  position: relative;
+  margin-right: 12px;
+  flex-shrink: 0;
+  cursor: pointer;
+  border-radius: var(--post-border-radius-xs);
+  padding: 2px;
+  margin: -2px;
+  transition: var(--post-transition);
+}
+
+.user-avatar-container:hover {
+  background-color: var(--post-hover-bg);
+}
+
+.user-avatar-container:active {
+  transform: scale(0.95);
+}
+
+.user-status-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  background: var(--post-success-color);
+  border: 2px solid var(--post-bg-primary);
+  border-radius: 50%;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+/* User Details */
+.post-user-details {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.post-user-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.2;
+}
+
+/* Username - Now clickable */
+.username {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--post-text-primary);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: var(--post-border-radius-xs);
+  margin: -2px -4px;
+  transition: var(--post-transition);
+}
+
+.username:hover {
+  background-color: var(--post-hover-bg);
+  text-decoration: underline;
+}
+
+.username:active {
+  transform: scale(0.98);
+}
+
+.verification-badge {
+  display: inline-flex;
+  align-items: center;
+  color: var(--post-accent-color);
+  opacity: 0.9;
+  transition: var(--post-transition);
+  pointer-events: none;
+}
+
+.verification-badge:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.verification-badge svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+/* Post Meta */
+.post-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--post-text-muted);
+  line-height: 1.2;
+}
+
+/* User ID - Now clickable */
+.post-user-id {
+  font-weight: 400;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: var(--post-border-radius-xs);
+  margin: -2px -4px;
+  transition: var(--post-transition);
+}
+
+.post-user-id:hover {
+  background-color: var(--post-hover-bg);
+  text-decoration: underline;
+}
+
+.post-user-id:active {
+  transform: scale(0.98);
+}
+
+.post-time-separator {
+  font-weight: 700;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.post-time {
+  font-weight: 400;
+  color: var(--post-text-light);
+  font-feature-settings: "tnum";
+  min-width: fit-content;
+  pointer-events: none;
+}
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .post-header {
+    padding: 8px 0;
+  }
+  
+  .user-avatar-container {
+    margin-right: 8px;
+  }
+  
+  .username {
+    max-width: 140px;
+    font-size: 14px;
+  }
+  
+  .post-user-id {
+    max-width: 100px;
+  }
+  
+  .post-meta {
+    font-size: 13px;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .post-header {
+    padding: 6px 0;
+  }
+  
+  .post-user-info {
+    padding: 2px 4px;
+    margin: -2px -4px;
+  }
+  
+  .username {
+    max-width: 120px;
+    font-size: 13px;
+  }
+  
+  .post-user-id {
+    max-width: 80px;
+  }
+  
+  .post-meta {
+    font-size: 12px;
+    gap: 4px;
+  }
+  
+  .user-status-indicator {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+/* Dark/Light theme toggle support */
+@media (prefers-color-scheme: light) {
+  :root {
+    --post-bg-primary: #ffffff;
+    --post-bg-secondary: #f7f9fa;
+    --post-bg-tertiary: #e9ecef;
+    --post-border-color: #dee2e6;
+    --post-text-primary: #212529;
+    --post-text-secondary: #495057;
+    --post-text-muted: #495057;
+    --post-text-light: #495057;
+    --post-hover-bg: rgba(0, 0, 0, 0.03);
+    --post-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --post-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --post-border-color: #000;
+    --post-text-muted: #000;
+  }
+  
+  .verification-badge {
+    opacity: 1;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .user-avatar-container:active,
+  .username:active,
+  .post-user-id:active {
+    transform: none;
+  }
+  
+  .verification-badge:hover {
+    transform: none;
+  }
+}
+
+/* Focus styles for accessibility */
+.user-avatar-container:focus,
+.username:focus,
+.post-user-id:focus {
+  outline: 2px solid var(--post-accent-color);
+  outline-offset: 2px;
+}
+
+/* Loading state styles */
+.post-header.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.post-header.loading .user-avatar-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+/* Add this to your existing PostHeader.css file */
+
+/* Dropdown Trigger Button */
+.dropdown-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  color: var(--post-text-muted);
+  cursor: pointer;
+  transition: var(--post-transition);
+  position: relative;
+  padding: 0;
+  margin: 0;
+  outline: none;
+}
+
+.dropdown-trigger:hover {
+  background-color: var(--post-hover-bg);
+  color: var(--post-text-primary);
+}
+
+.dropdown-trigger:active {
+  transform: scale(0.95);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-trigger:focus {
+  outline: 2px solid var(--post-accent-color);
+  outline-offset: 2px;
+}
+
+.dropdown-trigger svg {
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+/* Post Actions Container */
+.post-actions {
+  display: flex;
+  margin-top: 0px !important;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dropdown-trigger {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .dropdown-trigger svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dropdown-trigger {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .dropdown-trigger svg {
+    width: 16px;
+    height: 16px;
+  }
+}

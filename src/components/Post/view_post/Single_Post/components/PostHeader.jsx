@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import UserAvatar from "../UI/UserAvatar";
-// import PostDropdown from "./PostDropdown";
+import PostDropdown from "./PostDropdown";
 
 import "../style/PostHeader.css";
 
@@ -173,7 +173,7 @@ export default function PostHeader({
           </svg>
         </button>
 
-{/*         {showDropdown && (
+         {showDropdown && (
           <PostDropdown
             show={showDropdown}
             setShow={setShowDropdown}
@@ -182,7 +182,7 @@ export default function PostHeader({
             onDelete={onDelete}
             onPostRemoved={onPostRemoved}
           />
-        )} */}
+        )} 
       </div>
     </div>
   );

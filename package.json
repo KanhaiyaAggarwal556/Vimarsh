@@ -10,6 +10,7 @@
     "build": "npx vite build",
     "dev": "npx vite"
   },
+  
   "dependencies": {
     "@headlessui/react": "^2.2.4",
     "bootstrap": "^5.3.3",

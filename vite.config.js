@@ -7,9 +7,10 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@store': '/src/Store',
-      // '@': path.resolve(__dirname, './src')
-    },
+      '@store': path.resolve(__dirname, './src/Store'), // Use proper path resolution
+      '@': path.resolve(__dirname, './src'),
+      buffer: 'buffer',
+    }
   },
   build: {
     rollupOptions: {
@@ -28,5 +29,8 @@ export default defineConfig({
   preview: {
     host: '0.0.0.0',
     port: process.env.PORT || 4173
+  },
+  define: {
+    global: 'globalThis',
   }
 })

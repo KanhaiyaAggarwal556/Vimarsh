@@ -92,7 +92,7 @@ export default function UsersProvider({ children }) {
     try {
       // Note: You'll need to implement PUT /api/users/:userId in your backend
       const response = await fetch(
-        `https://twooter-backend.onrender.com/api/users/${userId}`,
+        `https://twooter-backend.onrender.com/api/users${userId}`,
         {
           method: "PUT",
           headers: {

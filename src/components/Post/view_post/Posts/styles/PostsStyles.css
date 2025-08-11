@@ -154,10 +154,10 @@
   margin-bottom: 10px;
 }
 
-/* Scrollbar Styling */
+/* Scrollbar Styling
 .::-webkit-scrollbar {
   width: 8px;
-}
+} */
 
 .posts-container::-webkit-scrollbar-track {
   background: #1a1a1a;

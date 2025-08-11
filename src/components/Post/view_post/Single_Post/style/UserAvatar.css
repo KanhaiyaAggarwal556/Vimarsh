@@ -25,7 +25,6 @@
 
 /* User Avatar Container */
 .post-user-avatar {
-  margin-right: 12px;
   flex-shrink: 0;
   position: relative;
   transition: var(--post-transition);
@@ -291,9 +290,7 @@
 
 /* Print styles */
 @media print {
-  .post-user-avatar {
-    margin-right: 8px;
-  }
+
   
   .post-avatar-img,
   .user-avatar-initials {

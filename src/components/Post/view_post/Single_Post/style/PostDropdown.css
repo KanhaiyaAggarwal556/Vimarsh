@@ -1,6 +1,6 @@
-/* PostDropdown Component CSS */
+/* PostDropdown Component CSS - Essential Styles Only */
 
-/* CSS Variables for PostDropdown theming */
+/* CSS Variables */
 :root {
   --post-bg-primary: #1a1a1a;
   --post-bg-tertiary: #2d2d2d;
@@ -21,32 +21,6 @@
   flex-shrink: 0;
 }
 
-/* Three Dots Menu Button */
-.post-dropdown-trigger {
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  transition: var(--post-transition-fast);
-  color: var(--post-text-light);
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: none;
-}
-
-.post-dropdown-trigger:hover {
-  background-color: var(--post-bg-tertiary);
-  color: var(--post-text-primary);
-}
-
-.post-dropdown-trigger:focus {
-  outline: 2px solid var(--post-info-color);
-  outline-offset: 2px;
-}
-
 /* Dropdown Menu Container */
 .post-dropdown-menu {
   position: absolute;
@@ -56,19 +30,14 @@
   border: 1px solid var(--post-border-color);
   border-radius: var(--post-border-radius-sm);
   padding: 5px 0;
-  min-width: 150px;
+  min-width: 200px;
   z-index: 1000;
   box-shadow: var(--post-shadow);
   opacity: 1;
   transform: translateY(0);
   transition: var(--post-transition-fast);
   pointer-events: auto;
-}
-
-.post-dropdown-menu.hidden {
-  opacity: 0;
-  transform: translateY(-10px);
-  pointer-events: none;
+  animation: dropdown-appear 0.15s ease-out;
 }
 
 /* Dropdown Menu Items */
@@ -76,7 +45,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 10px 15px;
+  padding: 12px 16px;
   background: none;
   border: none;
   color: var(--post-text-secondary);
@@ -84,6 +53,7 @@
   transition: var(--post-transition-fast);
   font-size: 0.875rem;
   text-align: left;
+  white-space: nowrap;
 }
 
 .post-dropdown-item:hover {
@@ -99,8 +69,13 @@
   background-color: rgba(220, 53, 69, 0.1);
 }
 
+.post-dropdown-item:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .post-dropdown-item svg {
-  margin-right: 8px;
+  margin-right: 10px;
   flex-shrink: 0;
 }
 
@@ -111,21 +86,27 @@
   margin: 5px 0;
 }
 
-/* Responsive Design for Mobile */
+/* Animation for dropdown appearance */
+@keyframes dropdown-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
   .post-dropdown-menu {
     right: -10px;
-    min-width: 180px;
-  }
-  
-  .post-dropdown-trigger {
-    width: 36px;
-    height: 36px;
-    padding: 6px;
+    min-width: 220px;
   }
   
   .post-dropdown-item {
-    padding: 12px 16px;
+    padding: 14px 18px;
     font-size: 0.9rem;
   }
 }
@@ -133,17 +114,11 @@
 @media (max-width: 480px) {
   .post-dropdown-menu {
     right: -15px;
-    min-width: 200px;
-  }
-  
-  .post-dropdown-trigger {
-    width: 32px;
-    height: 32px;
-    padding: 4px;
+    min-width: 240px;
   }
   
   .post-dropdown-item {
-    padding: 14px 18px;
+    padding: 16px 20px;
     font-size: 0.95rem;
   }
 }
@@ -161,97 +136,17 @@
   }
 }
 
-/* High Contrast Mode Support */
-@media (prefers-contrast: high) {
-  :root {
-    --post-border-color: #000;
-    --post-text-muted: #000;
-    --post-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  }
-  
-  .post-dropdown-item {
-    border-bottom: 1px solid var(--post-border-color);
-  }
-  
-  .post-dropdown-item:last-child {
-    border-bottom: none;
-  }
-}
-
-/* Reduced Motion Support */
-@media (prefers-reduced-motion: reduce) {
-  .post-dropdown-trigger,
-  .post-dropdown-menu,
-  .post-dropdown-item {
-    transition-duration: 0.01ms !important;
-  }
-  
-  .post-dropdown-menu.hidden {
-    transform: none;
-  }
-}
-
-/* Accessibility Improvements */
-.post-dropdown-container:focus-within {
-  outline: 2px solid var(--post-info-color);
-  outline-offset: 2px;
-  border-radius: var(--post-border-radius-sm);
-}
-
+/* Accessibility */
 .post-dropdown-item:focus {
   outline: 2px solid var(--post-info-color);
   outline-offset: -2px;
   background-color: var(--post-bg-tertiary);
 }
 
-/* Screen Reader Only Text */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* Animation for dropdown appearance */
-@keyframes dropdown-appear {
-  from {
-    opacity: 0;
-    transform: translateY(-10px) scale(0.95);
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .post-dropdown-menu {
+    transition-duration: 0.01ms !important;
+    animation: none;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.post-dropdown-menu:not(.hidden) {
-  animation: dropdown-appear 0.15s ease-out;
-}
-
-/* Loading state for dropdown items */
-.post-dropdown-item.loading {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-.post-dropdown-item.loading::after {
-  content: '';
-  position: absolute;
-  right: 15px;
-  width: 12px;
-  height: 12px;
-  border: 2px solid var(--post-border-color);
-  border-top: 2px solid var(--post-text-secondary);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }

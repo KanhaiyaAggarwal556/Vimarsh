@@ -1,0 +1,338 @@
+/* ActionSection.css */
+
+/* Action Buttons Container */
+.action-buttons-container {
+  padding: 1rem 1.5rem;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 640px) {
+  .action-buttons-container {
+    padding: 0.75rem 1rem;
+  }
+}
+
+/* Button Base Styles */
+.btn-base {
+  font-weight: 500;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+}
+
+.btn-base:hover {
+  transform: scale(1.02);
+}
+
+/* Edit Profile Button */
+.btn-edit-profile {
+  width: 100%;
+  background-color: #0f0f0f;
+  color: #e5e5e5;
+  padding: 0.5rem 1rem;
+  border: 1px solid #262626;
+}
+
+.btn-edit-profile:hover {
+  background-color: #1a1a1a;
+  border-color: #404040;
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+  .btn-edit-profile {
+    padding: 0.45rem 0.8rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Action Buttons Row */
+.action-buttons-row {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+  .action-buttons-row {
+    gap: 0.5rem;
+    justify-content: center;
+  }
+}
+
+/* Follow Button */
+.btn-follow {
+  flex: none;
+  width: auto;
+  min-width: 100px;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #1e40af, #1d4ed8);
+  color: white;
+  box-shadow: 0 2px 8px rgba(30, 64, 175, 0.25);
+  border: 1px solid #1e40af;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-follow:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e3a8a);
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.35);
+}
+
+.btn-follow:active {
+  transform: scale(0.98);
+}
+
+/* Following Button */
+.btn-following {
+  flex: none;
+  width: auto;
+  min-width: 100px;
+  padding: 0.5rem 1rem;
+  background-color: #0f0f0f;
+  color: #a3a3a3;
+  border: 1px solid #262626;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-following:hover {
+  background-color: #1a1a1a;
+  color: #e5e5e5;
+  border-color: #404040;
+}
+
+.btn-following:active {
+  transform: scale(0.98);
+}
+
+/* Message Button */
+.btn-message {
+  flex: none;
+  width: auto;
+  min-width: 110px;
+  background-color: #0f0f0f;
+  color: #a3a3a3;
+  padding: 0.5rem 1rem;
+  gap: 0.5rem;
+  border: 1px solid #262626;
+}
+
+.btn-message:hover {
+  background-color: #1a1a1a;
+  color: #e5e5e5;
+  border-color: #404040;
+}
+
+/* Mobile Responsive for Action Buttons */
+@media (max-width: 640px) {
+  .btn-follow,
+  .btn-following {
+    min-width: 85px;
+    padding: 0.45rem 0.8rem;
+    font-size: 0.85rem;
+  }
+  
+  .btn-message {
+    min-width: 95px;
+    padding: 0.45rem 0.8rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Content Tabs */
+.content-tabs {
+  border-top: 1px solid #262626;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.content-tabs::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+.tabs-container {
+  display: flex;
+  min-width: max-content;
+}
+
+/* Mobile Responsive for Tabs */
+@media (max-width: 768px) {
+  .tabs-container {
+    min-width: 100%;
+  }
+}
+
+/* Tab Button Base - Force Reset */
+.tab-btn {
+  flex: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  padding: 1rem !important;
+  transition: all 0.2s ease !important;
+  border: none !important;
+  background: none !important;
+  cursor: pointer !important;
+  border-bottom: 2px solid transparent !important;
+  white-space: nowrap !important;
+  min-width: fit-content !important;
+  /* Remove mobile tap highlights */
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  -khtml-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  outline: none !important;
+  /* Force initial state */
+  background-color: transparent !important;
+  color: #737373 !important;
+}
+
+.tab-btn * {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+  user-select: none !important;
+  outline: none !important;
+}
+
+.tab-btn:focus {
+  outline: none !important;
+  background-color: transparent !important;
+}
+
+.tab-btn:active {
+  transform: none !important;
+  background-color: transparent !important;
+}
+
+.tab-btn:focus:not(.tab-btn-active) {
+  color: #737373 !important;
+  background-color: transparent !important;
+  border-bottom-color: transparent !important;
+}
+
+.tab-btn:active:not(.tab-btn-active) {
+  color: #737373 !important;
+  background-color: transparent !important;
+  border-bottom-color: transparent !important;
+}
+
+/* Mobile Responsive for Tabs */
+@media (max-width: 768px) {
+  .tab-btn {
+    padding: 0.875rem 0.75rem;
+    flex: none;
+    min-width: 25%;
+  }
+}
+
+@media (max-width: 640px) {
+  .tab-btn {
+    padding: 0.75rem 0.5rem;
+    gap: 0.25rem;
+  }
+}
+
+/* Active Tab - Only when explicitly active */
+.tab-btn-active {
+  color: #3b82f6 !important;
+  border-bottom-color: #3b82f6 !important;
+  background-color: rgba(15, 15, 15, 0.8) !important;
+}
+
+.tab-btn-active:focus {
+  color: #3b82f6 !important;
+  border-bottom-color: #3b82f6 !important;
+  background-color: rgba(15, 15, 15, 0.8) !important;
+  outline: none !important;
+}
+
+.tab-btn-active:active {
+  color: #3b82f6 !important;
+  border-bottom-color: #3b82f6 !important;
+  background-color: rgba(15, 15, 15, 0.8) !important;
+}
+
+/* Inactive Tab - Force gray state */
+.tab-btn-inactive {
+  color: #737373 !important;
+  background-color: transparent !important;
+  border-bottom-color: transparent !important;
+}
+
+.tab-btn-inactive:hover {
+  color: #e5e5e5 !important;
+  background-color: rgba(26, 26, 26, 0.5) !important;
+}
+
+.tab-btn-inactive:focus {
+  color: #737373 !important;
+  background-color: transparent !important;
+  border-bottom-color: transparent !important;
+  outline: none !important;
+}
+
+.tab-btn-inactive:active {
+  color: #737373 !important;
+  background-color: transparent !important;
+  border-bottom-color: transparent !important;
+}
+
+/* Override any browser default focus/active states */
+.tab-btn-inactive:focus-visible {
+  color: #737373 !important;
+  background-color: transparent !important;
+  border-bottom-color: transparent !important;
+  outline: none !important;
+}
+
+/* Specific fix for touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .tab-btn-inactive:active {
+    color: #737373 !important;
+    background-color: transparent !important;
+    border-bottom-color: transparent !important;
+  }
+  
+  .tab-btn-inactive:focus {
+    color: #737373 !important;
+    background-color: transparent !important;
+    border-bottom-color: transparent !important;
+  }
+}
+
+/* Force specific button states by attribute */
+.tab-btn[data-active="false"] {
+  color: #737373 !important;
+  background-color: transparent !important;
+  border-bottom-color: transparent !important;
+}
+
+.tab-btn[data-active="true"] {
+  color: #3b82f6 !important;
+  border-bottom-color: #3b82f6 !important;
+  background-color: rgba(15, 15, 15, 0.8) !important;
+}
+
+/* Tab Label */
+.tab-label {
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+/* Mobile Responsive for Tab Labels */
+@media (max-width: 640px) {
+  .tab-label {
+    font-size: 0.8rem;
+  }
+}

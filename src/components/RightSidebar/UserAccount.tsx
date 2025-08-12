@@ -69,7 +69,8 @@ const UserAccount: React.FC<UserAccountProps> = ({
 
   const fetchCurrentUser = async () => {
     try {
-      const response = await fetch("/users/auth/me", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/auth/me`
+, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -112,7 +113,8 @@ const UserAccount: React.FC<UserAccountProps> = ({
       console.log("Starting logout process...");
 
       // Call backend logout endpoint to clear server-side tokens/cookies
-      const response = await fetch("/users/auth/logout", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/auth/logout`
+, {
         method: "POST",
         credentials: "include",
         headers: {

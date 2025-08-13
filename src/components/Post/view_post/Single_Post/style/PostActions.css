@@ -1,0 +1,433 @@
+/* PostActions Component Styles - Dark Theme with Royal Blue */
+
+.post-actions-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-top: 1px solid #2d3748;
+  margin-top: 16px;
+  gap: 16px;
+}
+
+.post-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: #a0aec0;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-height: 36px;
+  background-color: transparent;
+}
+
+.action-button:hover {
+  background-color: rgba(45, 55, 72, 0.8);
+  color: #e2e8f0;
+  transform: translateY(-1px);
+}
+
+.action-button.active {
+  font-weight: 600;
+}
+
+/* Like button - Using royal blue to match theme with elegant glow */
+.action-button.active.like {
+  color: #3b8cf6c9;
+  background-color: rgba(59, 130, 246, 0.15);
+  /* box-shadow: 0 0 12px rgba(59, 130, 246, 0.3); */
+}
+
+.action-button.active.like:hover {
+  background-color: rgba(59, 130, 246, 0.25);
+  color: #3b8cf6c9;
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.4);
+}
+
+/* Dislike button - Using muted grey for neutral/negative feedback */
+.action-button.active.dislike {
+  color: #6b7280;
+  background-color: rgba(107, 114, 128, 0.15);
+}
+
+.action-button.active.dislike:hover {
+  background-color: rgba(107, 114, 128, 0.25);
+  color: #4b5563;
+}
+
+.action-button-icon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-button-count {
+  font-weight: 600;
+  min-width: 16px;
+  text-align: center;
+}
+
+.action-button-text {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.views-counter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #718096;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 12px;
+}
+
+.views-counter-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Authentication Warning Toast Modal Styles */
+.auth-warning-toast {
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.auth-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+.auth-modal-content {
+  background: #1f2937;
+  color: white;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 20px 64px rgba(0,0,0,0.6);
+  font-family: system-ui, -apple-system, sans-serif;
+  max-width: 400px;
+  width: 100%;
+  border: 1px solid #374151;
+  animation: scaleIn 0.3s ease;
+  position: relative;
+}
+
+.auth-modal-header {
+  display: flex;
+  align-items: start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.auth-modal-icon {
+  background: #dc2626;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: white;
+}
+
+.auth-modal-text {
+  flex: 1;
+}
+
+.auth-modal-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+  font-size: 18px;
+  color: #f9fafb;
+}
+
+.auth-modal-message {
+  color: #d1d5db;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.auth-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.auth-modal-close:hover {
+  background: rgba(75, 85, 99, 0.5);
+  color: #f3f4f6;
+}
+
+.auth-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.auth-modal-button {
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.auth-modal-button-cancel {
+  background: #374151;
+  color: #d1d5db;
+}
+
+.auth-modal-button-cancel:hover {
+  background: #4b5563;
+}
+
+.auth-modal-button-login {
+  background: #3b82f6;
+  color: white;
+}
+
+.auth-modal-button-login:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+/* Success Toast Styles */
+.success-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  animation: slideIn 0.3s ease;
+}
+
+.success-toast-content {
+  background: #16a34a;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Toast animations */
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+  }
+  to { 
+    opacity: 1; 
+  }
+}
+
+@keyframes scaleIn {
+  from { 
+    transform: scale(0.95); 
+    opacity: 0; 
+  }
+  to { 
+    transform: scale(1); 
+    opacity: 1; 
+  }
+}
+
+/* Success toast for share functionality */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive design for mobile devices */
+@media (max-width: 768px) {
+  .post-actions-container {
+    padding: 12px 0;
+    gap: 12px;
+  }
+  
+  .post-actions-group {
+    gap: 4px;
+  }
+  
+  .action-button {
+    padding: 6px 8px;
+    font-size: 13px;
+    min-height: 32px;
+  }
+  
+  .action-button-text {
+    font-size: 13px;
+  }
+  
+  .views-counter {
+    font-size: 13px;
+    padding: 6px 8px;
+  }
+  
+  /* Adjust modal padding for mobile */
+  .auth-warning-toast > div:first-child {
+    padding: 16px !important;
+  }
+  
+  /* Make modal content more mobile-friendly */
+  .auth-warning-toast div[style*="max-width: 400px"] {
+    max-width: calc(100vw - 32px) !important;
+    margin: 0 !important;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .post-actions-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  
+  .post-actions-group {
+    justify-content: center;
+  }
+  
+  .post-actions-group:last-child {
+    justify-content: space-between;
+  }
+  
+  .action-button-text {
+    display: none;
+  }
+  
+  .action-button {
+    flex: 1;
+    justify-content: center;
+    max-width: 60px;
+  }
+  
+  .views-counter {
+    justify-content: center;
+  }
+}
+
+/* Focus styles for accessibility */
+.action-button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .action-button {
+    border: 1px solid #4a5568;
+  }
+  
+  .action-button.active.like {
+    border-color: #3b82f6;
+  }
+  
+  .action-button.active.dislike {
+    border-color: #6b7280;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .action-button {
+    transition: none;
+  }
+  
+  .action-button:hover {
+    transform: none;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes scaleIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
+
+/* Dark theme enhancements */
+@media (prefers-color-scheme: dark) {
+  .post-actions-container {
+    border-top-color: #2d3748;
+  }
+  
+  .action-button {
+    color: #a0aec0;
+  }
+  
+  .action-button:hover {
+    background-color: rgba(45, 55, 72, 0.8);
+    color: #e2e8f0;
+  }
+  
+  .views-counter {
+    color: #718096;
+  }
+}
+
+/* Print styles */
+@media print {
+  .post-actions-container {
+    display: none;
+  }
+  
+  .auth-warning-toast {
+    display: none;
+  }
+}

@@ -202,12 +202,18 @@ export default function Post({
         {/* PostActions now handles all reaction logic internally */}
         <PostActions
           post={post}
-          onReactionUpdate={onReactionUpdate}
           onComments={handleComments}
-          // Pass initial user states if available
-          initialUserLiked={initialUserLiked}
-          initialUserDisliked={initialUserDisliked}
-          initialUserSaved={initialUserSaved}
+          isOnPostPage={false} // or true if you're on the post page
+          // Pass the new props for better integration
+          onReactionUpdate={onReactionUpdate} // Your existing prop
+          initialUserLiked={initialUserLiked} // Your existing prop
+          initialUserDisliked={initialUserDisliked} // Your existing prop
+          initialUserSaved={initialUserSaved} // Your existing prop
+          // Legacy support - will still work
+          onPostUpdate={(updatedPost) => {
+            // Handle post update if needed
+            console.log("Post updated:", updatedPost);
+          }}
         />
 
         {/* FIXED: Pass the correct postId to PostComments */}

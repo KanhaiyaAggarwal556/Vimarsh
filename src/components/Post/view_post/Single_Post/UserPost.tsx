@@ -497,7 +497,7 @@ export default function UserPost(): JSX.Element {
 
             <PostContent post={post} />
 
-            {/* <PostActions
+            <PostActions
               post={post}
               currentLikes={currentLikes}
               currentDislikes={currentDislikes}
@@ -519,7 +519,7 @@ export default function UserPost(): JSX.Element {
               onShare={handleShare}
               onSave={handleSave}
               onComments={() => setShowComments(!showComments)}
-            /> */}
+            />
 
             {/* Comments Section */}
             <PostComments

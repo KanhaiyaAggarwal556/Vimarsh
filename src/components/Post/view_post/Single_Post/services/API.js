@@ -1,15 +1,30 @@
 // services/api.js
-const API_BASE_URL =
-   `${import.meta.env.VITE_API_BASE_URL}`;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
 
-// API service for post interactions
 export const postAPI = {
-  // Update post reaction (like/dislike/save)
   updateReaction: async (postId, type, action) => {
     try {
+      // 🔧 Validate postId on frontend before sending
+      if (!postId) {
+        throw new Error("Post ID is required");
+      }
+      
+      // Check if it looks like a MongoDB ObjectId (24 hex characters)
+      if (!/^[0-9a-fA-F]{24}$/.test(postId)) {
+        console.error("Invalid post ID format:", postId);
+        throw new Error(`Invalid post ID format: ${postId}`);
+      }
+
+      console.log("Making API call:", {
+        url: `${API_BASE_URL}/posts/${postId}/reaction`,
+        postId,
+        type,
+        action
+      });
+
       const response = await fetch(`${API_BASE_URL}/posts/${postId}/reaction`, {
         method: "POST",
-        credentials: "include", // Important for cookies
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -17,9 +32,15 @@ export const postAPI = {
       });
 
       const data = await response.json();
+      
+      console.log("API Response:", {
+        status: response.status,
+        ok: response.ok,
+        data: data
+      });
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to update reaction");
+        throw new Error(data.message || `HTTP ${response.status}: Failed to update reaction`);
       }
 
       return data;
@@ -29,9 +50,13 @@ export const postAPI = {
     }
   },
 
-  // Increment post views
   incrementViews: async (postId) => {
     try {
+      if (!postId || !/^[0-9a-fA-F]{24}$/.test(postId)) {
+        console.error("Invalid post ID for views:", postId);
+        throw new Error(`Invalid post ID format: ${postId}`);
+      }
+
       const response = await fetch(`${API_BASE_URL}/posts/${postId}/views`, {
         method: "POST",
         credentials: "include",
@@ -49,57 +74,6 @@ export const postAPI = {
       return data;
     } catch (error) {
       console.error("API Error - incrementViews:", error);
-      throw error;
-    }
-  },
-
-  // Get user interactions for a post
-  getUserInteractions: async (postId) => {
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/posts/${postId}/interactions`,
-        {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to fetch interactions");
-      }
-
-      return data;
-    } catch (error) {
-      console.error("API Error - getUserInteractions:", error);
-      throw error;
-    }
-  },
-
-  // Get single post with user interactions
-  getPost: async (postId) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/posts/${postId}`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to fetch post");
-      }
-
-      return data;
-    } catch (error) {
-      console.error("API Error - getPost:", error);
       throw error;
     }
   },

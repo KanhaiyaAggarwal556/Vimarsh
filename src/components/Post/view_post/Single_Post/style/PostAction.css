@@ -1,49 +1,38 @@
 :root {
   --post-bg-primary: #1a1a1a;
   --post-bg-secondary: #242424;
-  --post-bg-tertiary: #2d2d2d;
   --post-border-color: #333;
   --post-text-primary: #fff;
   --post-text-secondary: #e9ecef;
   --post-text-muted: #6c757d;
-  --post-text-light: #adb5bd;
   --post-success-color: #22c55e;
   --post-danger-color: #ef4444;
-  --post-warning-color: #ffc107;
   --post-info-color: #17a2b8;
-  --post-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  --post-shadow-hover: 0 6px 25px rgba(0, 0, 0, 0.4);
-  --post-border-radius: 12px;
-  --post-border-radius-sm: 8px;
   --post-border-radius-xs: 6px;
   --post-transition: all 0.15s ease;
-  --post-transition-fast: all 0.1s ease;
 }
 
-/* PostActions Container - Single line layout for all screens */
+/* PostActions Container - Responsive without scrollbar */
 .post-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: nowrap; /* Prevent wrapping */
   gap: 8px;
   padding: 12px 0;
   border-top: 1px solid var(--post-border-color);
   margin-top: 12px;
   min-height: 44px;
-  overflow-x: auto; /* Allow horizontal scroll if needed */
 }
 
-/* Post Reactions Container - Always single line */
+/* Post Reactions Container */
 .post-reactions {
   display: flex;
   align-items: center;
   gap: 6px;
   flex: 1;
-  flex-shrink: 0;
 }
 
-/* Share and Views Container - Always single line */
+/* Share and Views Container */
 .save-views-container {
   display: flex;
   align-items: center;
@@ -57,7 +46,7 @@
   gap: 6px;
 }
 
-/* Button Base Styles - Touch-friendly and performant */
+/* Button Base Styles */
 .post-action-btn,
 .engagement-btn {
   display: flex;
@@ -73,15 +62,13 @@
   font-size: 14px;
   font-weight: 500;
   white-space: nowrap;
-  position: relative;
-  min-height: 40px; /* Touch-friendly minimum */
-  min-width: 44px; /* Touch-friendly minimum */
+  min-height: 40px;
+  min-width: 44px;
   user-select: none;
-  -webkit-tap-highlight-color: transparent; /* Remove iOS tap highlight */
-  touch-action: manipulation; /* Improve touch responsiveness */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
-/* Enhanced interaction feedback - Faster transitions */
 .post-action-btn:hover,
 .engagement-btn:hover {
   background-color: rgba(255, 255, 255, 0.08);
@@ -93,7 +80,6 @@
 .engagement-btn:focus {
   outline: 2px solid var(--post-info-color);
   outline-offset: 2px;
-  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .post-action-btn:active,
@@ -102,22 +88,7 @@
   background-color: rgba(255, 255, 255, 0.12);
 }
 
-.post-action-btn:disabled,
-.engagement-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-  transform: none;
-  pointer-events: none;
-}
-
-/* Loading state for pending actions - Optimized */
-.post-action-btn.pending,
-.engagement-btn.pending {
-  cursor: wait;
-  opacity: 0.7;
-}
-
-/* Like Button - Enhanced styling with better mobile support */
+/* Like Button */
 .post-action-btn.liked {
   color: var(--post-success-color);
   background-color: rgba(34, 197, 94, 0.12);
@@ -126,14 +97,9 @@
 
 .post-action-btn.liked:hover {
   background-color: rgba(34, 197, 94, 0.18);
-  transform: translateY(-1px);
 }
 
-.post-action-btn.liked:active {
-  background-color: rgba(34, 197, 94, 0.25);
-}
-
-/* Dislike Button - Enhanced styling with better mobile support */
+/* Dislike Button */
 .post-action-btn.disliked {
   color: var(--post-danger-color);
   background-color: rgba(239, 68, 68, 0.12);
@@ -142,36 +108,9 @@
 
 .post-action-btn.disliked:hover {
   background-color: rgba(239, 68, 68, 0.18);
-  transform: translateY(-1px);
 }
 
-.post-action-btn.disliked:active {
-  background-color: rgba(239, 68, 68, 0.25);
-}
-
-/* Save Button - Enhanced styling */
-.engagement-btn.saved {
-  color: #1976d2;
-  background-color: rgba(25, 118, 210, 0.12);
-  font-weight: 600;
-}
-
-.engagement-btn.saved:hover {
-  background-color: rgba(25, 118, 210, 0.18);
-}
-
-/* Icon Animations - Optimized for performance */
-.post-action-icon,
-.engagement-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--post-transition-fast);
-  flex-shrink: 0;
-  will-change: transform; /* Optimize for animations */
-}
-
-/* Count and text styling - Always visible on mobile */
+/* Count and text styling */
 .count-text,
 .action-text {
   font-weight: 600;
@@ -180,7 +119,7 @@
   text-align: left;
 }
 
-/* Engagement Items - Better mobile styling */
+/* Engagement Items */
 .engagement-item {
   display: flex;
   align-items: center;
@@ -199,7 +138,7 @@
   font-size: 13px;
 }
 
-/* Enhanced tooltip styles - Mobile optimized */
+/* Tooltip styles */
 .tooltip-container {
   position: relative;
   display: inline-block;
@@ -223,7 +162,6 @@
   transition: opacity 0.2s, visibility 0.2s;
   white-space: nowrap;
   pointer-events: none;
-  backdrop-filter: blur(4px);
 }
 
 .tooltip::after {
@@ -245,94 +183,82 @@
   }
 }
 
-/* Hide tooltips on touch devices to avoid interference */
+/* Hide tooltips on touch devices */
 @media (hover: none) {
   .tooltip {
     display: none;
   }
 }
 
-/* Spinner Animation - Optimized */
-.spinner {
-  animation: spin 0.8s linear infinite;
-  will-change: transform;
+/* Animation classes */
+.animate-bounce {
+  animation: bounce-effect 0.3s ease-out;
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.animate-wobble {
+  animation: wobble-effect 0.3s ease-out;
 }
 
-.animate-pulse {
-  animation: pulse 0.6s ease-in-out;
-  will-change: opacity;
+@keyframes bounce-effect {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 
-@keyframes pulse {
-  0% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.7;
-    transform: scale(1.05);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
+@keyframes wobble-effect {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+  100% { transform: rotate(0deg); }
 }
 
-/* Mobile-First Responsive Design - Single Line Layout */
-
-/* Small screens (phones) - Show counts, hide some text labels */
+/* Mobile-First Responsive Design - NO SCROLLBAR */
 @media (max-width: 768px) {
   .post-actions {
     padding: 10px 0;
-    gap: 4px;
+    gap: 2px; /* Reduced gap to prevent overflow */
   }
 
   .post-reactions {
-    gap: 3px;
+    gap: 2px; /* Minimal gap */
+    flex: 1;
+    min-width: 0; /* Allow shrinking */
   }
 
   .engagement-actions {
-    gap: 3px;
+    gap: 2px; /* Minimal gap */
+    flex-shrink: 0;
   }
 
   .post-action-btn,
   .engagement-btn {
-    padding: 6px 4px;
-    min-width: 38px;
-    min-height: 38px;
+    padding: 6px 4px; /* Minimal padding */
+    min-width: 36px; /* Smaller minimum width */
+    min-height: 36px;
     font-size: 11px;
     gap: 2px;
-    flex-shrink: 0;
+    flex-shrink: 1; /* Allow buttons to shrink */
   }
 
   .engagement-item {
     padding: 6px 4px;
-    min-width: 42px;
+    min-width: 40px;
     font-size: 11px;
     gap: 2px;
     flex-shrink: 0;
   }
 
-  /* Hide text labels on mobile, but KEEP all counts visible */
+  /* Hide text labels on mobile to save space */
   .action-text {
     display: none;
   }
 
+  /* Keep counts visible but smaller */
   .count-text,
   .engagement-count {
-    display: block !important;
     font-size: 10px;
     font-weight: 600;
-    min-width: 16px;
+    min-width: 14px;
   }
 
   /* Smaller icons for mobile */
@@ -341,14 +267,13 @@
   .engagement-item svg {
     width: 14px;
     height: 14px;
-    flex-shrink: 0;
   }
 }
 
 /* Very small screens - Ultra compact */
 @media (max-width: 480px) {
   .post-actions {
-    gap: 2px;
+    gap: 1px; /* Absolute minimum gap */
     padding: 8px 0;
   }
 
@@ -362,24 +287,24 @@
 
   .post-action-btn,
   .engagement-btn {
-    padding: 4px 8px;
-    min-width: 34px;
-    min-height: 34px;
+    padding: 4px 2px; /* Minimal padding */
+    min-width: 32px;
+    min-height: 32px;
     font-size: 10px;
-    gap: 5px;
+    gap: 1px;
   }
 
   .engagement-item {
-    padding: 4px 8px;
-    min-width: 38px;
+    padding: 4px 2px;
+    min-width: 36px;
     font-size: 10px;
-    gap: 5px;
+    gap: 1px;
   }
 
   .count-text,
   .engagement-count {
     font-size: 9px;
-    min-width: 14px;
+    min-width: 12px;
   }
 
   /* Even smaller icons */
@@ -391,7 +316,7 @@
   }
 }
 
-/* Medium screens (tablets) - Show text labels */
+/* Medium screens (tablets) */
 @media (min-width: 769px) and (max-width: 1024px) {
   .post-actions {
     gap: 8px;
@@ -418,7 +343,6 @@
     gap: 4px;
   }
 
-  /* Show text labels on tablets */
   .action-text,
   .count-text,
   .engagement-count {
@@ -427,7 +351,7 @@
   }
 }
 
-/* Large screens (desktops) - Full labels and spacing */
+/* Large screens (desktops) */
 @media (min-width: 1025px) {
   .post-actions {
     gap: 12px;
@@ -452,7 +376,6 @@
     gap: 6px;
   }
 
-  /* Show all text labels on desktop */
   .action-text,
   .count-text,
   .engagement-count {
@@ -461,73 +384,20 @@
   }
 }
 
-/* High DPI displays */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
-  .post-action-icon svg,
-  .engagement-icon svg {
-    width: 18px;
-    height: 18px;
-  }
-}
-
-/* Landscape orientation adjustments - Keep single line */
-@media (orientation: landscape) and (max-height: 500px) {
-  .post-actions {
-    padding: 6px 0;
-    gap: 8px;
-  }
-
-  .post-action-btn,
-  .engagement-btn {
-    padding: 6px 8px;
-    min-height: 32px;
-  }
-
-  .engagement-item {
-    padding: 6px 8px;
-  }
-
-  .tooltip {
-    bottom: 100%;
-    padding: 4px 8px;
-    font-size: 10px;
-  }
-}
-
-/* Dark mode enhancements */
-@media (prefers-color-scheme: dark) {
-  .post-action-btn:hover,
-  .engagement-btn:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .tooltip {
-    background-color: rgba(0, 0, 0, 0.95);
-    backdrop-filter: blur(8px);
-  }
-}
-
 /* Light theme support */
 @media (prefers-color-scheme: light) {
   :root {
     --post-bg-primary: #ffffff;
     --post-bg-secondary: #f8f9fa;
-    --post-bg-tertiary: #e9ecef;
     --post-border-color: #dee2e6;
     --post-text-primary: #212529;
     --post-text-secondary: #495057;
     --post-text-muted: #6c757d;
-    --post-text-light: #495057;
   }
 
   .post-action-btn:hover,
   .engagement-btn:hover {
     background-color: rgba(0, 0, 0, 0.05);
-  }
-
-  .tooltip {
-    background-color: rgba(0, 0, 0, 0.9);
-    color: #fff;
   }
 }
 
@@ -543,10 +413,6 @@
   .engagement-btn:hover {
     transform: none;
   }
-
-  .animate-pulse {
-    animation: none;
-  }
 }
 
 /* Focus improvements for keyboard navigation */
@@ -555,162 +421,4 @@
   outline: 2px solid var(--post-info-color);
   outline-offset: 2px;
   background-color: rgba(23, 162, 184, 0.1);
-}
-
-/* Print styles */
-@media print {
-  .post-actions {
-    display: none;
-  }
-}
-
-/* Compact mode overrides - for when space is limited */
-.post-actions.compact {
-  padding: 8px 0;
-  gap: 8px;
-}
-
-.post-actions.compact .post-action-btn,
-.post-actions.compact .engagement-btn {
-  padding: 6px 8px;
-  min-height: 32px;
-  font-size: 12px;
-}
-
-.post-actions.compact .post-reactions {
-  gap: 6px;
-}
-
-.post-actions.compact .engagement-actions {
-  gap: 12px;
-}
-
-/* Accessibility improvements */
-@media (prefers-contrast: high) {
-  .post-action-btn,
-  .engagement-btn {
-    border: 1px solid var(--post-border-color);
-  }
-
-  .post-action-btn.liked {
-    border-color: var(--post-success-color);
-  }
-
-  .post-action-btn.disliked {
-    border-color: var(--post-danger-color);
-  }
-
-  .engagement-btn.saved {
-    border-color: #1976d2;
-  }
-}
-
-/* Loading skeleton for better perceived performance */
-.post-action-btn.loading,
-.engagement-btn.loading {
-  position: relative;
-  color: transparent;
-}
-
-.post-action-btn.loading::after,
-.engagement-btn.loading::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 16px;
-  height: 16px;
-  border: 2px solid var(--post-text-muted);
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-/* Loading dots animation for like, dislike, and save buttons */
-.loading-dots {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  width: 16px;
-  height: 16px;
-}
-
-.loading-dots .dot {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background-color: currentColor;
-  animation: dot-bounce 1.4s infinite ease-in-out both;
-}
-
-.loading-dots .dot:nth-child(1) {
-  animation-delay: -0.32s;
-}
-
-.loading-dots .dot:nth-child(2) {
-  animation-delay: -0.16s;
-}
-
-@keyframes dot-bounce {
-  0%, 80%, 100% {
-    opacity: 0.3;
-    transform: scale(0.8);
-  }
-  40% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Different animation styles for different buttons */
-.animate-bounce {
-  animation: bounce-effect 0.3s ease-out;
-}
-
-.animate-scale {
-  animation: scale-effect 0.3s ease-out;
-}
-
-.animate-wobble {
-  animation: wobble-effect 0.3s ease-out;
-}
-
-@keyframes bounce-effect {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes scale-effect {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.15);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes wobble-effect {
-  0% {
-    transform: rotate(0deg);
-  }
-  25% {
-    transform: rotate(-5deg);
-  }
-  75% {
-    transform: rotate(5deg);
-  }
-  100% {
-    transform: rotate(0deg);
-  }
 }

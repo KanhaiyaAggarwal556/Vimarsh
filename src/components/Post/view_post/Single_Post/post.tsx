@@ -200,7 +200,7 @@ export default function Post({
         <PostContent post={post} />
 
         {/* PostActions now handles all reaction logic internally */}
-        {/* <PostActions
+        <PostActions
           post={post}
           onReactionUpdate={onReactionUpdate}
           onComments={handleComments}
@@ -208,7 +208,7 @@ export default function Post({
           initialUserLiked={initialUserLiked}
           initialUserDisliked={initialUserDisliked}
           initialUserSaved={initialUserSaved}
-        /> */}
+        />
 
         {/* FIXED: Pass the correct postId to PostComments */}
         <PostComments showComments={showCommentsState} postId={validPostId} />

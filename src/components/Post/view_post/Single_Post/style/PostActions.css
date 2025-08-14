@@ -1,4 +1,4 @@
-/* PostActions Component Styles - Dark Theme with Royal Blue */
+/* PostActions Component Styles - Dark Theme - Simple & Clean */
 
 .post-actions-container {
   display: flex;
@@ -36,35 +36,32 @@
 .action-button:hover {
   background-color: rgba(45, 55, 72, 0.8);
   color: #e2e8f0;
-  transform: translateY(-1px);
 }
 
 .action-button.active {
   font-weight: 600;
 }
 
-/* Like button - Using royal blue to match theme with elegant glow */
+/* Like button - Simple blue theme */
 .action-button.active.like {
-  color: #3b8cf6c9;
-  background-color: rgba(59, 130, 246, 0.15);
-  /* box-shadow: 0 0 12px rgba(59, 130, 246, 0.3); */
+  color: #3182ce;
+  background-color: rgba(49, 130, 206, 0.1);
 }
 
 .action-button.active.like:hover {
-  background-color: rgba(59, 130, 246, 0.25);
-  color: #3b8cf6c9;
-  box-shadow: 0 0 16px rgba(59, 130, 246, 0.4);
+  background-color: rgba(49, 130, 206, 0.2);
+  color: #2c5282;
 }
 
-/* Dislike button - Using muted grey for neutral/negative feedback */
+/* Dislike button - Simple grey theme */
 .action-button.active.dislike {
-  color: #6b7280;
-  background-color: rgba(107, 114, 128, 0.15);
+  color: #718096;
+  background-color: rgba(113, 128, 150, 0.1);
 }
 
 .action-button.active.dislike:hover {
-  background-color: rgba(107, 114, 128, 0.25);
-  color: #4b5563;
+  background-color: rgba(113, 128, 150, 0.2);
+  color: #4a5568;
 }
 
 .action-button-icon {
@@ -99,6 +96,25 @@
 .views-counter-icon {
   width: 16px;
   height: 16px;
+}
+
+/* Loading state */
+.action-button.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.action-button.loading .action-button-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Authentication Warning Toast Modal Styles */
@@ -227,7 +243,6 @@
 
 .auth-modal-button-login:hover {
   background: #2563eb;
-  transform: translateY(-1px);
 }
 
 /* Success Toast Styles */
@@ -252,7 +267,7 @@
   gap: 8px;
 }
 
-/* Toast animations */
+/* Simple animations */
 @keyframes fadeIn {
   from { 
     opacity: 0; 
@@ -273,7 +288,6 @@
   }
 }
 
-/* Success toast for share functionality */
 @keyframes slideIn {
   from {
     transform: translateX(100%);
@@ -310,17 +324,6 @@
     font-size: 13px;
     padding: 6px 8px;
   }
-  
-  /* Adjust modal padding for mobile */
-  .auth-warning-toast > div:first-child {
-    padding: 16px !important;
-  }
-  
-  /* Make modal content more mobile-friendly */
-  .auth-warning-toast div[style*="max-width: 400px"] {
-    max-width: calc(100vw - 32px) !important;
-    margin: 0 !important;
-  }
 }
 
 /* Small mobile devices */
@@ -356,69 +359,8 @@
 
 /* Focus styles for accessibility */
 .action-button:focus {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid #3182ce;
   outline-offset: 2px;
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .action-button {
-    border: 1px solid #4a5568;
-  }
-  
-  .action-button.active.like {
-    border-color: #3b82f6;
-  }
-  
-  .action-button.active.dislike {
-    border-color: #6b7280;
-  }
-}
-
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-  .action-button {
-    transition: none;
-  }
-  
-  .action-button:hover {
-    transform: none;
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  
-  @keyframes scaleIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  
-  @keyframes slideIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-}
-
-/* Dark theme enhancements */
-@media (prefers-color-scheme: dark) {
-  .post-actions-container {
-    border-top-color: #2d3748;
-  }
-  
-  .action-button {
-    color: #a0aec0;
-  }
-  
-  .action-button:hover {
-    background-color: rgba(45, 55, 72, 0.8);
-    color: #e2e8f0;
-  }
-  
-  .views-counter {
-    color: #718096;
-  }
 }
 
 /* Print styles */

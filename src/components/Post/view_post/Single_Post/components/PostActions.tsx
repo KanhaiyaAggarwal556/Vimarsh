@@ -1,5 +1,6 @@
-import { useState, useCallback } from "react";
-import useAuthStore from "@store/useAuthStore"; // Adjust path as needed
+import { useState, useCallback, useEffect } from "react";
+import useAuthStore from "@store/useAuthStore";
+import { usePostInteraction, useToggleLike, useToggleDislike } from "../hooks/usePostInteractions";
 import "../style/PostActions.css";
 
 // Simplified interfaces
@@ -19,15 +20,6 @@ interface PostActionsProps {
   onPostUpdate?: (updatedPost: PostData) => void;
   onComments: () => void;
   isOnPostPage?: boolean;
-  // New optional props for parent control
-  onReactionUpdate?: (
-    postId: string,
-    type: "likes" | "dislikes" | "shares" | "saves",
-    action: "increment" | "decrement"
-  ) => Promise<any>;
-  initialUserLiked?: boolean;
-  initialUserDisliked?: boolean;
-  initialUserSaved?: boolean;
 }
 
 // Action Button Component with CSS classes
@@ -39,7 +31,8 @@ const ActionButton = ({
   label, 
   showText = false,
   text,
-  variant = "default"
+  variant = "default",
+  loading = false
 }: {
   icon: React.ReactNode;
   count?: number;
@@ -49,6 +42,7 @@ const ActionButton = ({
   showText?: boolean;
   text?: string;
   variant?: "default" | "like" | "dislike" | "share";
+  loading?: boolean;
 }) => {
   const getButtonClasses = () => {
     let classes = "action-button";
@@ -58,6 +52,7 @@ const ActionButton = ({
       if (variant === "dislike") classes += " dislike";
       if (variant === "share") classes += " share";
     }
+    if (loading) classes += " loading";
     return classes;
   };
 
@@ -67,9 +62,15 @@ const ActionButton = ({
       onClick={onClick}
       aria-label={label}
       type="button"
+      disabled={loading}
     >
       <span className="action-button-icon">
-        {icon}
+        {loading ? (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '100%', height: '100%' }}>
+            <circle cx="12" cy="12" r="10" opacity="0.25"/>
+            <path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+          </svg>
+        ) : icon}
       </span>
       {count !== undefined && (
         <span className="action-button-count">
@@ -78,7 +79,7 @@ const ActionButton = ({
       )}
       {showText && text && (
         <span className="action-button-text">
-          {text}
+          {loading ? "Loading..." : text}
         </span>
       )}
     </button>
@@ -92,9 +93,8 @@ const formatNumber = (num: number): string => {
   return `${(num / 1000000).toFixed(1)}M`;
 };
 
-// Enhanced toast notification with login button - Centered Modal
+// Enhanced toast notification with login button
 const showLoginWarning = (action: string) => {
-  // Remove any existing toast
   const existingToast = document.querySelector('.auth-warning-toast');
   if (existingToast) {
     existingToast.remove();
@@ -140,11 +140,8 @@ const showLoginWarning = (action: string) => {
   `;
   
   document.body.appendChild(toast);
-  
-  // Prevent body scroll when modal is open
   document.body.style.overflow = 'hidden';
   
-  // Auto remove after 10 seconds if user doesn't interact
   const autoRemoveTimer = setTimeout(() => {
     if (toast.parentNode) {
       document.body.style.overflow = 'unset';
@@ -152,7 +149,6 @@ const showLoginWarning = (action: string) => {
     }
   }, 10000);
   
-  // Clean up function for manual removal
   const originalRemove = toast.remove;
   toast.remove = function() {
     document.body.style.overflow = 'unset';
@@ -161,7 +157,7 @@ const showLoginWarning = (action: string) => {
   };
 };
 
-// Success toast for share functionality
+// Success toast
 const showSuccessToast = (message: string) => {
   const successToast = document.createElement('div');
   successToast.className = 'success-toast';
@@ -188,35 +184,41 @@ export default function PostActions({
   onPostUpdate,
   onComments,
   isOnPostPage = false,
-  onReactionUpdate,
-  initialUserLiked = false,
-  initialUserDisliked = false,
-  initialUserSaved = false,
 }: PostActionsProps) {
   const { currentUser } = useAuthStore();
   
+  // TanStack Query hooks
+  const { data: userInteraction } = usePostInteraction(post._id, {
+    enabled: !!currentUser && !!post._id
+  });
+  
+  const toggleLikeMutation = useToggleLike();
+  const toggleDislikeMutation = useToggleDislike();
+
+  // Local state for reactions with real-time updates
   const [reactions, setReactions] = useState({
     likes: post.reactions?.likes || 0,
     dislikes: post.reactions?.dislikes || 0,
   });
-  
-  const [userState, setUserState] = useState({
-    liked: initialUserLiked,
-    disliked: initialUserDisliked,
-    saved: initialUserSaved,
-  });
 
-  const [isLoading, setIsLoading] = useState({
-    like: false,
-    dislike: false,
-    share: false,
-  });
+  const [isShareLoading, setIsShareLoading] = useState(false);
 
-  // Updated authentication check with controlled redirect
+  // Sync reactions when post prop changes
+  useEffect(() => {
+    setReactions({
+      likes: post.reactions?.likes || 0,
+      dislikes: post.reactions?.dislikes || 0,
+    });
+  }, [post.reactions]);
+
+  // Get user interaction states
+  const userLiked = userInteraction?.liked || false;
+  const userDisliked = userInteraction?.disliked || false;
+
+  // Authentication check wrapper
   const withAuthCheck = (callback: () => void | Promise<void>, action: string) => {
     return async () => {
       if (!currentUser) {
-        // Show warning toast with redirect option
         showLoginWarning(action);
         return;
       }
@@ -224,118 +226,112 @@ export default function PostActions({
     };
   };
 
+  // Handle like action with immediate UI updates
   const handleLike = useCallback(async () => {
-    if (isLoading.like) return;
-    
-    setIsLoading(prev => ({ ...prev, like: true }));
-    
-    const wasLiked = userState.liked;
-    const newState = {
-      ...userState,
-      liked: !wasLiked,
-      disliked: userState.disliked && !wasLiked ? false : userState.disliked,
-    };
-    
-    const newReactions = {
-      likes: wasLiked ? reactions.likes - 1 : reactions.likes + 1,
-      dislikes: userState.disliked && !wasLiked 
-        ? reactions.dislikes - 1 
-        : reactions.dislikes,
-    };
-
-    // Optimistic update
-    setUserState(newState);
-    setReactions(newReactions);
+    if (toggleLikeMutation.isPending) return;
     
     try {
-      // If parent provides onReactionUpdate, use it
-      if (onReactionUpdate) {
-        await onReactionUpdate(
-          post._id, 
-          "likes", 
-          wasLiked ? "decrement" : "increment"
-        );
-        
-        // Handle dislike decrement if user was disliking
-        if (userState.disliked && !wasLiked) {
-          await onReactionUpdate(post._id, "dislikes", "decrement");
+      // Calculate optimistic updates
+      const wasLiked = userLiked;
+      const wasDisliked = userDisliked;
+      
+      let newLikes = reactions.likes;
+      let newDislikes = reactions.dislikes;
+      
+      if (wasLiked) {
+        // Unlike: just remove the like
+        newLikes = Math.max(0, reactions.likes - 1);
+      } else {
+        // Like: add like and remove dislike if exists
+        newLikes = reactions.likes + 1;
+        if (wasDisliked) {
+          newDislikes = Math.max(0, reactions.dislikes - 1);
         }
       }
+
+      // Update local state immediately for instant feedback
+      setReactions({
+        likes: newLikes,
+        dislikes: newDislikes,
+      });
       
-      // Also call the legacy onPostUpdate if provided
+      // Trigger server mutation
+      await toggleLikeMutation.mutateAsync(post._id);
+      
+      // Update parent component
       onPostUpdate?.({
         ...post,
-        reactions: newReactions,
+        reactions: {
+          likes: newLikes,
+          dislikes: newDislikes,
+        },
       });
+      
     } catch (error) {
       // Revert on error
-      setUserState(userState);
-      setReactions(reactions);
-      console.error("Failed to update like:", error);
-      showSuccessToast("Failed to update like. Please try again.");
-    } finally {
-      setIsLoading(prev => ({ ...prev, like: false }));
+      setReactions({
+        likes: post.reactions?.likes || 0,
+        dislikes: post.reactions?.dislikes || 0,
+      });
+      console.error("Failed to toggle like:", error);
     }
-  }, [userState, reactions, post, onPostUpdate, onReactionUpdate, isLoading.like]);
+  }, [userLiked, userDisliked, reactions, post, onPostUpdate, toggleLikeMutation]);
 
+  // Handle dislike action with immediate UI updates
   const handleDislike = useCallback(async () => {
-    if (isLoading.dislike) return;
-    
-    setIsLoading(prev => ({ ...prev, dislike: true }));
-    
-    const wasDisliked = userState.disliked;
-    const newState = {
-      ...userState,
-      disliked: !wasDisliked,
-      liked: userState.liked && !wasDisliked ? false : userState.liked,
-    };
-    
-    const newReactions = {
-      likes: userState.liked && !wasDisliked 
-        ? reactions.likes - 1 
-        : reactions.likes,
-      dislikes: wasDisliked ? reactions.dislikes - 1 : reactions.dislikes + 1,
-    };
-
-    // Optimistic update
-    setUserState(newState);
-    setReactions(newReactions);
+    if (toggleDislikeMutation.isPending) return;
     
     try {
-      // If parent provides onReactionUpdate, use it
-      if (onReactionUpdate) {
-        await onReactionUpdate(
-          post._id, 
-          "dislikes", 
-          wasDisliked ? "decrement" : "increment"
-        );
-        
-        // Handle like decrement if user was liking
-        if (userState.liked && !wasDisliked) {
-          await onReactionUpdate(post._id, "likes", "decrement");
+      const wasLiked = userLiked;
+      const wasDisliked = userDisliked;
+      
+      let newLikes = reactions.likes;
+      let newDislikes = reactions.dislikes;
+      
+      if (wasDisliked) {
+        // Remove dislike: just remove the dislike
+        newDislikes = Math.max(0, reactions.dislikes - 1);
+      } else {
+        // Add dislike: add dislike and remove like if exists
+        newDislikes = reactions.dislikes + 1;
+        if (wasLiked) {
+          newLikes = Math.max(0, reactions.likes - 1);
         }
       }
+
+      // Update local state immediately
+      setReactions({
+        likes: newLikes,
+        dislikes: newDislikes,
+      });
       
-      // Also call the legacy onPostUpdate if provided
+      // Trigger server mutation
+      await toggleDislikeMutation.mutateAsync(post._id);
+      
+      // Update parent component
       onPostUpdate?.({
         ...post,
-        reactions: newReactions,
+        reactions: {
+          likes: newLikes,
+          dislikes: newDislikes,
+        },
       });
+      
     } catch (error) {
       // Revert on error
-      setUserState(userState);
-      setReactions(reactions);
-      console.error("Failed to update dislike:", error);
-      showSuccessToast("Failed to update dislike. Please try again.");
-    } finally {
-      setIsLoading(prev => ({ ...prev, dislike: false }));
+      setReactions({
+        likes: post.reactions?.likes || 0,
+        dislikes: post.reactions?.dislikes || 0,
+      });
+      console.error("Failed to toggle dislike:", error);
     }
-  }, [userState, reactions, post, onPostUpdate, onReactionUpdate, isLoading.dislike]);
+  }, [userLiked, userDisliked, reactions, post, onPostUpdate, toggleDislikeMutation]);
 
+  // Handle share action
   const handleShare = useCallback(async () => {
-    if (isLoading.share) return;
+    if (isShareLoading) return;
     
-    setIsLoading(prev => ({ ...prev, share: true }));
+    setIsShareLoading(true);
     
     try {
       const shareUrl = `${window.location.origin}/p/${post._id}`;
@@ -357,15 +353,9 @@ export default function PostActions({
         await navigator.clipboard.writeText(shareUrl);
         showSuccessToast("Link copied to clipboard!");
       }
-      
-      // Update share count if callback provided
-      if (onReactionUpdate) {
-        await onReactionUpdate(post._id, "shares", "increment");
-      }
     } catch (error) {
-      if (error !== 'AbortError') { // User cancelled share
+      if (error !== 'AbortError') {
         console.error("Share failed:", error);
-        // Fallback to clipboard
         try {
           const shareUrl = `${window.location.origin}/p/${post._id}`;
           await navigator.clipboard.writeText(shareUrl);
@@ -376,10 +366,11 @@ export default function PostActions({
         }
       }
     } finally {
-      setIsLoading(prev => ({ ...prev, share: false }));
+      setIsShareLoading(false);
     }
-  }, [post._id, post.title, post.description, onReactionUpdate, isLoading.share]);
+  }, [post._id, post.title, post.description, isShareLoading]);
 
+  // Handle comments
   const handleComments = useCallback((e?: React.MouseEvent) => {
     if (e) {
       e.preventDefault();
@@ -402,16 +393,17 @@ export default function PostActions({
             <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" style={{ width: '100%', height: '100%' }}>
               <path 
                 d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" 
-                fill={userState.liked ? 'currentColor' : 'none'}
+                fill={userLiked ? 'currentColor' : 'none'}
                 stroke="currentColor"
               />
             </svg>
           }
           count={reactions.likes}
-          active={userState.liked}
+          active={userLiked}
           onClick={withAuthCheck(handleLike, "Like")}
-          label={userState.liked ? "Unlike" : "Like"}
+          label={userLiked ? "Unlike" : "Like"}
           variant="like"
+          loading={toggleLikeMutation.isPending}
         />
         
         <ActionButton
@@ -419,16 +411,17 @@ export default function PostActions({
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '100%', height: '100%' }}>
               <path 
                 d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" 
-                fill={userState.disliked ? 'currentColor' : 'none'}
+                fill={userDisliked ? 'currentColor' : 'none'}
                 stroke="currentColor"
               />
             </svg>
           }
           count={reactions.dislikes}
-          active={userState.disliked}
+          active={userDisliked}
           onClick={withAuthCheck(handleDislike, "Dislike")}
-          label={userState.disliked ? "Remove dislike" : "Dislike"}
+          label={userDisliked ? "Remove dislike" : "Dislike"}
           variant="dislike"
+          loading={toggleDislikeMutation.isPending}
         />
         
         <ActionButton
@@ -447,7 +440,7 @@ export default function PostActions({
       <div className="post-actions-group">
         <ActionButton
           icon={
-            isLoading.share ? (
+            isShareLoading ? (
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '100%', height: '100%' }}>
                 <circle cx="12" cy="12" r="10" opacity="0.25"/>
                 <path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
@@ -465,8 +458,9 @@ export default function PostActions({
           onClick={withAuthCheck(handleShare, "Share")}
           label="Share post"
           showText={true}
-          text={isLoading.share ? "Sharing..." : "Share"}
+          text={isShareLoading ? "Sharing..." : "Share"}
           variant="share"
+          loading={isShareLoading}
         />
         
         <div className="views-counter">

@@ -2,7 +2,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApiService } from "@/services/apiService";
 import { CacheUtils } from "@/utils/cacheUtils";
-import { API_CONFIG } from "@/config/APIConfig";
+import { API_CONFIG } from "@/config/apiConfig";
 import type { ReactionPayload } from "@/types/apiTypes";
 
 export const usePostMutations = () => {

@@ -1,54 +1,50 @@
-/* HomeSection.css - Home section component styles */
+/* HomeSection.css - Optimized for smooth mobile scrolling and spinner pull-to-refresh */
 
-/* Home Section - Enhanced for pull-to-refresh and infinite scroll */
+/* Home Section - Optimized for mobile performance */
 .home-section {
   display: flex;
   flex-direction: column;
   gap: 20px;
   min-height: calc(100vh - 120px);
   position: relative;
-  /* Enable touch-action for pull-to-refresh */
+  /* Optimized touch behavior */
   touch-action: pan-y;
-  overscroll-behavior-y: none;
+  overscroll-behavior-y: contain;
+  /* Prevent momentum scrolling issues */
+  -webkit-overflow-scrolling: touch;
 }
 
-/* PULL TO REFRESH STYLES */
-.pull-to-refresh-indicator {
-  position: absolute;
-  top: -80px;
-  left: 0;
-  right: 0;
-  height: 80px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.9);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  z-index: 50;
-  border-radius: 0 0 12px 12px;
-  transition: opacity 0.3s ease;
-  will-change: transform, opacity;
+/* SPINNER PULL TO REFRESH STYLES */
+.pull-refresh-spinner {
+  position: fixed !important;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  pointer-events: none;
+  transition: opacity 0.2s ease-out;
 }
 
-.pull-refresh-content {
+.spinner-container {
+  border-radius: 50%;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 0 20px 0;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 500;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, box-shadow;
 }
 
-.pull-refresh-icon {
-  font-size: 20px;
-  font-weight: bold;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s ease;
-  will-change: transform;
+/* Spinner animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-/* Regular refresh indicator for non-mobile */
+/* Regular refresh indicator for desktop */
 .refresh-indicator {
   position: sticky;
   top: 0;
@@ -71,19 +67,32 @@
   font-weight: 500;
 }
 
-/* Posts list container - Optimized for infinite scroll */
+/* Posts list container - HEAVILY optimized for smooth scrolling */
 .posts-list {
   display: flex;
   flex-direction: column;
   gap: 20px;
   width: 100%;
-  /* Performance optimizations */
+  /* Critical mobile performance optimizations */
   contain: content;
   will-change: transform;
+  /* Smooth transitions */
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  /* Memory optimization for large lists */
-  content-visibility: auto;
-  contain-intrinsic-size: 0 500px;
+  /* GPU acceleration */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  /* Optimize rendering */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Optimize each post for performance */
+.posts-list > * {
+  contain: layout style paint;
+  will-change: auto;
+  /* Prevent layout thrashing */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 /* Enhanced infinite scroll loading indicator */
@@ -104,7 +113,6 @@
   animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Add subtle loading animation */
 .infinite-loading::before {
   content: '';
   position: absolute;
@@ -155,10 +163,8 @@
   height: 20px;
   margin: 40px 0;
   background: transparent;
-  /* Ensure it's detectable by intersection observer */
   min-height: 1px;
   position: relative;
-  /* Performance optimization */
   contain: strict;
   max-height: 20px;
 }
@@ -212,7 +218,7 @@
   max-width: 100px;
 }
 
-/* Initial loading state - Enhanced */
+/* Initial loading state */
 .initial-loading {
   display: flex;
   flex-direction: column;
@@ -242,7 +248,7 @@
   font-weight: 500;
 }
 
-/* Error states - Enhanced */
+/* Error states */
 .error-state {
   display: flex;
   flex-direction: column;
@@ -384,39 +390,42 @@
   border-width: 1.5px;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Mobile Optimizations - Enhanced for pull-to-refresh */
+/* MOBILE OPTIMIZATIONS - Critical for smooth scrolling */
 @media (max-width: 768px) {
   .home-section {
     gap: 15px;
-    /* Enhanced touch behavior for mobile */
+    /* Enhanced mobile touch behavior */
     touch-action: pan-y;
     overscroll-behavior-y: contain;
+    /* Prevent iOS bounce scrolling issues */
+    -webkit-overflow-scrolling: touch;
+    /* Optimize for mobile rendering */
+    contain: content;
   }
 
   .posts-list {
     gap: 15px;
+    /* Critical: Enable hardware acceleration */
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+    /* Prevent scroll lag on iOS */
+    -webkit-overflow-scrolling: touch;
+    /* Optimize scrolling performance */
+    will-change: transform;
   }
 
-  /* Mobile pull-to-refresh enhancements */
-  .pull-to-refresh-indicator {
-    top: -100px;
-    height: 100px;
-    border-radius: 0 0 16px 16px;
+  /* Optimize individual posts for mobile */
+  .posts-list > * {
+    /* Enable hardware acceleration for each post */
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+    /* Prevent reflow during scroll */
+    contain: layout style paint;
   }
 
-  .pull-refresh-content {
-    padding: 0 0 24px 0;
-    font-size: 15px;
-  }
-
-  .pull-refresh-icon {
-    font-size: 22px;
+  /* Mobile spinner positioning */
+  .pull-refresh-spinner {
+    top: 15px;
   }
 
   .infinite-loading,
@@ -437,15 +446,28 @@
   .end-of-content span {
     font-size: 14px;
   }
+
+  /* Mobile-specific scroll optimizations */
+  .home-section * {
+    /* Prevent paint on scroll for better performance */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
 }
 
 @media (max-width: 480px) {
   .home-section {
     gap: 12px;
+    /* Extra scroll optimizations for small screens */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 
   .posts-list {
     gap: 12px;
+    /* Force GPU acceleration */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
   }
 
   .infinite-loading,
@@ -459,19 +481,29 @@
     padding: 32px 12px;
   }
 
-  /* Small screen pull-to-refresh */
-  .pull-to-refresh-indicator {
-    top: -80px;
-    height: 80px;
+  .pull-refresh-spinner {
+    top: 12px;
+  }
+}
+
+/* Critical iOS Safari optimizations */
+@supports (-webkit-touch-callout: none) {
+  .home-section {
+    /* Fix iOS momentum scrolling */
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
   }
 
-  .pull-refresh-content {
-    font-size: 14px;
-    padding: 0 0 20px 0;
+  .posts-list {
+    /* Prevent iOS scroll lag */
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
   }
 
-  .pull-refresh-icon {
-    font-size: 18px;
+  .posts-list > * {
+    /* Force hardware acceleration on iOS */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
 }
 
@@ -480,8 +512,13 @@
   .retry-button,
   .infinite-loading::before,
   .retry-button::before,
-  .end-emoji {
+  .end-emoji,
+  .spinner-container {
     animation: none;
+    transition: none;
+  }
+  
+  .posts-list {
     transition: none;
   }
 }
@@ -506,15 +543,16 @@
     border: 1px solid #fff;
   }
 
-  .pull-to-refresh-indicator {
+  .spinner-container {
     border: 1px solid #fff;
   }
 }
 
 /* GPU acceleration for smooth animations */
-.pull-to-refresh-indicator,
+.pull-refresh-spinner,
 .posts-list,
-.infinite-loading {
+.infinite-loading,
+.home-section {
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
 }
@@ -525,10 +563,31 @@
     transform: none;
     box-shadow: none;
   }
+  
+  /* Optimize touch scrolling */
+  .home-section {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  .posts-list {
+    /* Critical for smooth touch scrolling */
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+  }
 }
 
 /* Performance optimizations for infinite scroll */
 .posts-list > * {
   contain: layout style paint;
   will-change: auto;
+}
+
+/* Prevent memory leaks in long lists */
+@supports (content-visibility: auto) {
+  .posts-list > * {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 300px;
+  }
 }

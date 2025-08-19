@@ -1,4 +1,4 @@
-// components/Post/view_post/Posts/Header/HomeSection.tsx - Enhanced with better visual feedback
+// components/Post/view_post/Posts/Header/HomeSection.tsx - Updated with spinner-style pull-to-refresh
 import { RefObject } from 'react';
 import { HomeSectionProps } from '@/types';
 import { createToggleClass } from '@/utils/classNames';
@@ -44,7 +44,7 @@ const HomeSection = ({
     onRefresh: async () => {
       await onRefetch?.();
     },
-    threshold: 80,
+    threshold: 60,
     resistance: 2.0,
     enabled: isActive && postList.length > 0,
     refreshing: fetching
@@ -52,8 +52,8 @@ const HomeSection = ({
 
   // Calculate pull-to-refresh visual effects
   const pullProgress = Math.min(pullDistance / threshold, 1);
-  const pullOpacity = Math.min(pullProgress * 1.5, 1);
-  const iconRotation = pullProgress * 180;
+  const spinnerSize = 20 + (pullProgress * 8); // Grows from 20px to 28px
+  const spinnerOpacity = Math.min(pullProgress * 2, 1);
 
   // Error state with retry option
   if (error && postList.length === 0) {
@@ -98,71 +98,38 @@ const HomeSection = ({
 
   return (
     <div 
-      className={createToggleClass('section home-section', isActive)}
+      className={`${createToggleClass('section home-section', isActive)} ${
+        pullToRefreshEnabled && isPulling ? 'pulling' : 'not-pulling'
+      }`}
       ref={containerRef}
-      style={{
-        position: 'relative'
-      }}
+      style={pullToRefreshEnabled && isPulling ? {
+        '--pull-distance': `${Math.min(pullDistance * 0.5, 30)}px`
+      } as React.CSSProperties : undefined}
     >
-      {/* Pull-to-refresh indicator */}
+      {/* Compact spinner-style pull-to-refresh indicator */}
       {pullToRefreshEnabled && (isPulling || isRefreshing) && (
-        <div 
-          className="pull-to-refresh-indicator"
-          style={{
-            position: 'absolute',
-            top: '-60px',
-            left: '50%',
-            transform: `translateX(-50%) translateY(${Math.min(pullDistance * 0.6, 60)}px)`,
-            opacity: pullOpacity,
-            zIndex: 100,
-            transition: isPulling ? 'none' : 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
-        >
+        <div className={`pull-refresh-spinner ${spinnerOpacity > 0 ? 'visible' : 'hidden'}`}>
           <div 
-            className="pull-refresh-content"
+            className={`spinner-container ${canRefresh || isRefreshing ? 'can-refresh' : 'not-ready'} ${
+              isRefreshing ? 'refreshing' : ''
+            }`}
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '16px',
-              background: 'rgba(255, 255, 255, 0.95)',
-              borderRadius: '12px',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-              border: `2px solid ${canRefresh ? '#10b981' : '#e5e7eb'}`
+              width: `${spinnerSize}px`,
+              height: `${spinnerSize}px`
             }}
           >
             {isRefreshing ? (
-              <>
-                <div style={{ width: '24px', height: '24px' }}>
-                  <LoadingSpinner size="small" />
-                </div>
-                <span style={{ fontSize: '14px', fontWeight: '500' }}>Refreshing...</span>
-              </>
+              <div className="spinner-loading" />
             ) : (
-              <>
-                <div 
-                  className="pull-refresh-icon"
-                  style={{
-                    fontSize: '24px',
-                    transform: `rotate(${iconRotation}deg)`,
-                    color: canRefresh ? '#10b981' : '#6b7280',
-                    transition: 'transform 0.1s ease-out, color 0.2s ease-out'
-                  }}
-                >
-                  ↓
-                </div>
-                <span 
-                  style={{ 
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: canRefresh ? '#10b981' : '#6b7280',
-                    transition: 'color 0.2s ease-out'
-                  }}
-                >
-                  {canRefresh ? 'Release to refresh' : 'Pull to refresh'}
-                </span>
-              </>
+              <div 
+                className="spinner-icon"
+                style={{
+                  fontSize: `${spinnerSize * 0.5}px`,
+                  transform: `rotate(${pullProgress * 180}deg)`
+                }}
+              >
+                ↓
+              </div>
             )}
           </div>
         </div>
@@ -170,45 +137,16 @@ const HomeSection = ({
 
       {/* Regular refresh indicator for non-mobile */}
       {fetching && postList.length > 0 && !isPulling && !isRefreshing && (
-        <div 
-          className="refresh-indicator"
-          style={{
-            position: 'sticky',
-            top: '0',
-            zIndex: 50,
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(8px)',
-            borderBottom: '1px solid #e5e7eb'
-          }}
-        >
-          <div 
-            className="refresh-content"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              padding: '12px'
-            }}
-          >
+        <div className="refresh-indicator">
+          <div className="refresh-content">
             <LoadingSpinner size="small" />
-            <span style={{ fontSize: '14px', color: '#6b7280' }}>
-              Refreshing content...
-            </span>
+            <span>Refreshing content...</span>
           </div>
         </div>
       )}
 
-      {/* Posts list with smooth transforms */}
-      <div 
-        className="posts-list"
-        style={{
-          transform: pullToRefreshEnabled && isPulling 
-            ? `translateY(${Math.min(pullDistance * 0.3, 20)}px)` 
-            : 'translateY(0)',
-          transition: isPulling ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-        }}
-      >
+      {/* Posts list */}
+      <div className="posts-list">
         {postList.map((post, index) => (
           <Post 
             key={`${post._id}-${index}`}
@@ -239,7 +177,7 @@ const HomeSection = ({
           }}
         >
           <LoadingSpinner size="small" />
-          <span style={{ fontSize: '14px', color: '#6b7280' }}>
+          <span style={{ fontSize: '14px', color: '#888' }}>
             Loading more posts...
           </span>
         </div>
@@ -319,7 +257,7 @@ const HomeSection = ({
               alignItems: 'center',
               gap: '8px',
               fontSize: '14px',
-              color: '#6b7280',
+              color: '#888',
               whiteSpace: 'nowrap'
             }}
           >
@@ -340,4 +278,4 @@ const HomeSection = ({
   );
 };
 
-export default HomeSection;
+export default HomeSection; 

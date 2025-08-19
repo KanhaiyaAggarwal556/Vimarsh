@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Eye, EyeOff, Mail, Lock, User, Check, X, AtSign } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
-import useAuthStore from "@store/useAuthStore"; // Add this import
+import useAuthStore from "@store/useAuthStore";
 import logo from "../../../assets/Vimarsh-logo2.png";
 import "./SignUp.css";
 
@@ -47,140 +46,65 @@ interface SignupData {
   password: string;
 }
 
-interface ApiResponse {
-  success: boolean;
-  message: string;
-  data?: any;
-  error?: string;
-}
 
 type SocialProvider = "Google" | "Facebook" | "LinkedIn" | "X";
 
-// API Functions
+
+
 const checkEmailAvailability = async (email: string): Promise<boolean> => {
-  const response = await fetch(
-    `${import.meta.env.VITE_API_BASE_URL}/users/email/${encodeURIComponent(
-      email
-    )}`
-  );
-  if (response.status === 404) {
-    // Email not found means it's available
-    return true;
-  } else if (response.ok) {
-    // Email found means it's taken
-    return false;
-  } else {
-    throw new Error("Failed to check email availability");
-  }
-};
-
-const checkUsernameAvailability = async (
-  username: string
-): Promise<boolean> => {
-  const response = await fetch(
-    `${import.meta.env.VITE_API_BASE_URL}/users/username/${encodeURIComponent(
-      username
-    )}`
-  );
-  if (response.status === 404) {
-    // Username not found means it's available
-    return true;
-  } else if (response.ok) {
-    // Username found means it's taken
-    return false;
-  } else {
-    throw new Error("Failed to check username availability");
-  }
-};
-
-const createUser = async (userData: SignupData): Promise<ApiResponse> => {
-  const response = await fetch(
-    `${import.meta.env.VITE_API_BASE_URL}/users/auth/create`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    }
-  );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to create user");
-  }
-
-  return data;
-};
-
-const createBoard = async (userId: string): Promise<ApiResponse> => {
-  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/boards`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      userId,
-      bio: "",
-      location: "",
-      website: "",
-      socialStats: {
-        followers: 0,
-        following: 0,
-        posts: 0,
-      },
-      interests: [],
-    }),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to create board");
-  }
-
-  return data;
-};
-
-// New function to check if board exists for a user
-const checkBoardExists = async (userId: string): Promise<boolean> => {
   try {
     const response = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/boards/user/${userId}`
-    );
-    return response.ok;
-  } catch (error) {
-    console.error("Error checking board existence:", error);
-    return false;
-  }
-};
-
-// New function to get current user (for social login scenarios)
-const getCurrentUser = async (): Promise<any> => {
-  try {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/auth/me`,
+      `${import.meta.env.VITE_API_BASE_URL}/users/email/${encodeURIComponent(email)}/availability`,
       {
-        credentials: "include", // Include cookies for session-based auth
+        credentials: 'include',
       }
     );
-
-    if (response.ok) {
-      return await response.json();
+    
+    if (response.status === 404) {
+      // Email not found means it's available
+      return true;
+    } else if (response.ok) {
+      // Email found means it's taken
+      return false;
+    } else {
+      throw new Error("Failed to check email availability");
     }
-    return null;
   } catch (error) {
-    console.error("Error getting current user:", error);
-    return null;
+    console.error('Email availability check error:', error);
+    throw error;
   }
 };
+
+const checkUsernameAvailability = async (username: string): Promise<boolean> => {
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/users/username/${encodeURIComponent(username)}/availability`,
+      {
+        credentials: 'include',
+      }
+    );
+    
+    if (response.status === 404) {
+      // Username not found means it's available
+      return true;
+    } else if (response.ok) {
+      // Username found means it's taken
+      return false;
+    } else {
+      throw new Error("Failed to check username availability");
+    }
+  } catch (error) {
+    console.error('Username availability check error:', error);
+    throw error;
+  }
+};
+
 
 export default function SignUp(): JSX.Element {
   const navigate = useNavigate();
 
-  // Get Zustand store actions
-  const { setCurrentUser } = useAuthStore();
+  // Get Zustand store actions - Updated to use register function
+  const { register, isLoading } = useAuthStore();
 
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -191,86 +115,70 @@ export default function SignUp(): JSX.Element {
   });
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [showConfirmPassword, setShowConfirmPassword] =
-    useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [emailValidation, setEmailValidation] = useState<EmailValidation>({
     isChecking: false,
     isValid: null,
     message: "",
   });
-  const [usernameValidation, setUsernameValidation] =
-    useState<UsernameValidation>({
-      isChecking: false,
-      isValid: null,
-      message: "",
-    });
+  const [usernameValidation, setUsernameValidation] = useState<UsernameValidation>({
+    isChecking: false,
+    isValid: null,
+    message: "",
+  });
 
-  // Check for social login completion and handle board creation
+  // Check for social login completion
   useEffect(() => {
     const checkSocialLoginCompletion = async () => {
-      // Check if user just completed social login (you can use URL params or other indicators)
       const urlParams = new URLSearchParams(window.location.search);
-      const socialLoginSuccess = urlParams.get("social_login_success");
-
-      if (socialLoginSuccess === "true") {
-        try {
-          const currentUser = await getCurrentUser();
-
-          if (currentUser && currentUser.data?._id) {
-            // Set user data in Zustand store
-            setCurrentUser(currentUser.data);
-
-            const boardExists = await checkBoardExists(currentUser.data._id);
-
-            if (!boardExists) {
-              // console.log("Creating board for social login user...");
-              await createBoard(currentUser.data._id);
-              // console.log("Board created successfully for social login user");
-            }
-
-            // Navigate to home after ensuring board exists
-            navigate("/home");
-          }
-        } catch (error) {
-          console.error("Error handling social login completion:", error);
-        }
+      const hasError = urlParams.get("error");
+      
+      if (hasError) {
+        console.error("Social login error:", hasError);
+        // Set appropriate error message based on the error type
+        const errorMessages: Record<string, string> = {
+          'google_auth_failed': 'Google authentication failed. Please try again.',
+          'facebook_auth_failed': 'Facebook authentication failed. Please try again.',
+          'linkedin_auth_failed': 'LinkedIn authentication failed. Please try again.',
+          'oauth_no_user': 'Social login failed. Please try again.',
+          'oauth_error': 'Authentication error occurred. Please try again.'
+        };
+        
+        const errorMessage = errorMessages[hasError] || 'Authentication failed. Please try again.';
+        setErrors({ email: errorMessage });
+        
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
       }
+
+      // If no error in URL params, user might have been authenticated
+      // The backend should have set cookies, so we can check auth status
+      // This is handled by the useAuthStore initialization
     };
 
     checkSocialLoginCompletion();
-  }, [navigate, setCurrentUser]);
+  }, [navigate]);
 
-  // TanStack Query mutations
-  const signupMutation = useMutation({
-    mutationFn: async (userData: SignupData) => {
-      // First create the user
-      const userResponse = await createUser(userData);
-
-      // Then create the board for the user
-      if (userResponse.success && userResponse.data?._id) {
-        await createBoard(userResponse.data._id);
+  // Use Zustand register function instead of TanStack Query
+  const handleSignup = async (userData: SignupData) => {
+    try {
+      const result = await register(userData);
+      
+      if (result.success && result.user) {
+        console.log("Signup successful:", result);
+        // Navigate to home page after successful signup
+        navigate("/home");
+      } else {
+        // Handle signup error
+        setErrors({ email: result.message || "Signup failed" });
       }
-
-      return userResponse;
-    },
-    onSuccess: (data) => {
-      console.log("Signup successful:", data);
-
-      // Set user data in Zustand store
-      if (data.success && data.data) {
-        setCurrentUser(data.data);
-      }
-
-      // Navigate to home page after successful signup
-      navigate("/home");
-    },
-    onError: (error: Error) => {
+    } catch (error) {
       console.error("Signup failed:", error);
-      // You can set form errors here if needed
-      setErrors({ email: error.message });
-    },
-  });
+      setErrors({ email: "An unexpected error occurred. Please try again." });
+    }
+  };
 
   const validateEmail = async (email: string): Promise<boolean> => {
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
@@ -307,6 +215,7 @@ export default function SignUp(): JSX.Element {
         return false;
       }
     } catch (error) {
+      console.error("Email validation error:", error);
       setEmailValidation({
         isChecking: false,
         isValid: false,
@@ -321,7 +230,7 @@ export default function SignUp(): JSX.Element {
       setUsernameValidation({
         isChecking: false,
         isValid: false,
-        message: "Username too short",
+        message: "Username must be at least 3 characters",
       });
       return false;
     }
@@ -360,6 +269,7 @@ export default function SignUp(): JSX.Element {
         return false;
       }
     } catch (error) {
+      console.error("Username validation error:", error);
       setUsernameValidation({
         isChecking: false,
         isValid: false,
@@ -372,12 +282,14 @@ export default function SignUp(): JSX.Element {
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
+    // Name validation - updated to match backend requirements
     if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    } else if (formData.name.length < 2) {
+      newErrors.name = "Full name is required";
+    } else if (formData.name.trim().length < 2) {
       newErrors.name = "Name must be at least 2 characters";
     }
 
+    // Username validation
     if (!formData.username.trim()) {
       newErrors.username = "Username is required";
     } else if (formData.username.length < 3) {
@@ -388,6 +300,7 @@ export default function SignUp(): JSX.Element {
       newErrors.username = "Please choose a different username";
     }
 
+    // Email validation
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -396,15 +309,16 @@ export default function SignUp(): JSX.Element {
       newErrors.email = "Please use a different email address";
     }
 
+    // Password validation - updated to match backend requirements
     if (!formData.password) {
       newErrors.password = "Password is required";
     } else if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
     } else if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password =
-        "Password must contain at least one letter and one number";
+      newErrors.password = "Password must contain at least one letter and one number";
     }
 
+    // Confirm password validation
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = "Please confirm your password";
     } else if (formData.password !== formData.confirmPassword) {
@@ -422,6 +336,7 @@ export default function SignUp(): JSX.Element {
       [name]: value,
     }));
 
+    // Clear existing error for this field
     if (errors[name as keyof FormErrors]) {
       setErrors((prev) => ({
         ...prev,
@@ -435,7 +350,7 @@ export default function SignUp(): JSX.Element {
       clearTimeout((window as any).emailTimeout);
       (window as any).emailTimeout = setTimeout(() => {
         if (value.trim() && /\S+@\S+\.\S+/.test(value)) {
-          validateEmail(value);
+          validateEmail(value.trim().toLowerCase());
         }
       }, 1000);
     }
@@ -445,12 +360,8 @@ export default function SignUp(): JSX.Element {
       setUsernameValidation({ isChecking: false, isValid: null, message: "" });
       clearTimeout((window as any).usernameTimeout);
       (window as any).usernameTimeout = setTimeout(() => {
-        if (
-          value.trim() &&
-          value.length >= 3 &&
-          /^[a-zA-Z0-9_]+$/.test(value)
-        ) {
-          validateUsername(value);
+        if (value.trim() && value.length >= 3 && /^[a-zA-Z0-9_]+$/.test(value)) {
+          validateUsername(value.trim());
         }
       }, 800);
     }
@@ -459,30 +370,30 @@ export default function SignUp(): JSX.Element {
   const handleSubmit = async (): Promise<void> => {
     if (!validateForm()) return;
 
-    // Prepare data for API call
+    // Prepare data for API call - matching backend expectations
     const signupData: SignupData = {
-      fullName: formData.name,
-      userName: formData.username,
-      email: formData.email,
+      fullName: formData.name.trim(),
+      userName: formData.username.trim(),
+      email: formData.email.trim().toLowerCase(),
       password: formData.password,
     };
 
-    // Use TanStack Query mutation
-    signupMutation.mutate(signupData);
+    // Use the handleSignup function which uses Zustand store
+    await handleSignup(signupData);
   };
 
-  // Updated handleSocialLogin function with board creation handling
+  // Updated handleSocialLogin function
   const handleSocialLogin = (provider: SocialProvider): void => {
-    // OAuth URLs that redirect to your backend
+    // Updated OAuth URLs to match backend routes
     const socialUrls: Record<SocialProvider, string> = {
       Google: `${import.meta.env.VITE_API_BASE_URL}/auth/google`,
       Facebook: `${import.meta.env.VITE_API_BASE_URL}/auth/facebook`,
       LinkedIn: `${import.meta.env.VITE_API_BASE_URL}/auth/linkedin`,
-      X: `${import.meta.env.VITE_API_BASE_URL}/auth/twitter`, // Will be implemented later
+      X: `${import.meta.env.VITE_API_BASE_URL}/auth/twitter`, // Note: backend uses 'twitter'
     };
 
-    // Store current URL to return after social login
-    sessionStorage.setItem("socialLoginReturn", window.location.href);
+    // Store current URL for potential redirect back
+    sessionStorage.setItem('preAuthUrl', window.location.pathname);
 
     // Redirect to OAuth provider
     window.location.href = socialUrls[provider];
@@ -524,6 +435,14 @@ export default function SignUp(): JSX.Element {
         </div>
 
         <div className="signup-form">
+          {/* Display general error message */}
+          {errors.email && !formData.email && (
+            <div className="error-message general-error">
+              <X className="error-icon" />
+              {errors.email}
+            </div>
+          )}
+
           {/* Name Field */}
           <div className="form-group">
             <label className="form-label">Full Name</label>
@@ -534,10 +453,9 @@ export default function SignUp(): JSX.Element {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className={`form-input ${
-                  errors.name ? "form-input-error" : ""
-                }`}
+                className={`form-input ${errors.name ? "form-input-error" : ""}`}
                 placeholder="Enter your full name"
+                maxLength={100} // Add reasonable limits
               />
             </div>
             {errors.name && (
@@ -558,30 +476,27 @@ export default function SignUp(): JSX.Element {
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                className={`form-input ${
-                  errors.username ? "form-input-error" : ""
-                } ${
+                className={`form-input ${errors.username ? "form-input-error" : ""} ${
                   usernameValidation.isValid === true ? "form-input-valid" : ""
                 }`}
                 placeholder="Choose a username"
+                maxLength={30}
               />
               {usernameValidation.isChecking && (
                 <div className="validation-icon">
                   <div className="spinner-small"></div>
                 </div>
               )}
-              {usernameValidation.isValid === true &&
-                !usernameValidation.isChecking && (
-                  <div className="validation-icon">
-                    <Check size={16} color="#198754" />
-                  </div>
-                )}
-              {usernameValidation.isValid === false &&
-                !usernameValidation.isChecking && (
-                  <div className="validation-icon">
-                    <X size={16} color="#dc3545" />
-                  </div>
-                )}
+              {usernameValidation.isValid === true && !usernameValidation.isChecking && (
+                <div className="validation-icon">
+                  <Check size={16} color="#198754" />
+                </div>
+              )}
+              {usernameValidation.isValid === false && !usernameValidation.isChecking && (
+                <div className="validation-icon">
+                  <X size={16} color="#dc3545" />
+                </div>
+              )}
             </div>
             {usernameValidation.message && (
               <div
@@ -614,30 +529,27 @@ export default function SignUp(): JSX.Element {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`form-input ${
-                  errors.email ? "form-input-error" : ""
-                } ${
+                className={`form-input ${errors.email && formData.email ? "form-input-error" : ""} ${
                   emailValidation.isValid === true ? "form-input-valid" : ""
                 }`}
                 placeholder="Enter your email"
+                maxLength={100}
               />
               {emailValidation.isChecking && (
                 <div className="validation-icon">
                   <div className="spinner-small"></div>
                 </div>
               )}
-              {emailValidation.isValid === true &&
-                !emailValidation.isChecking && (
-                  <div className="validation-icon">
-                    <Check size={16} color="#198754" />
-                  </div>
-                )}
-              {emailValidation.isValid === false &&
-                !emailValidation.isChecking && (
-                  <div className="validation-icon">
-                    <X size={16} color="#dc3545" />
-                  </div>
-                )}
+              {emailValidation.isValid === true && !emailValidation.isChecking && (
+                <div className="validation-icon">
+                  <Check size={16} color="#198754" />
+                </div>
+              )}
+              {emailValidation.isValid === false && !emailValidation.isChecking && (
+                <div className="validation-icon">
+                  <X size={16} color="#dc3545" />
+                </div>
+              )}
             </div>
             {emailValidation.message && (
               <div
@@ -652,7 +564,7 @@ export default function SignUp(): JSX.Element {
                 {emailValidation.message}
               </div>
             )}
-            {errors.email && (
+            {errors.email && formData.email && (
               <div className="error-message">
                 <X className="error-icon" />
                 {errors.email}
@@ -674,11 +586,13 @@ export default function SignUp(): JSX.Element {
                   errors.password ? "form-input-error" : ""
                 }`}
                 placeholder="Create a password"
+                maxLength={128}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="password-toggle"
+                tabIndex={-1}
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -691,19 +605,13 @@ export default function SignUp(): JSX.Element {
                   {[...Array(4)].map((_, i) => (
                     <div
                       key={i}
-                      className={`strength-bar strength-bar-${
-                        passwordStrength.className
-                      } ${
-                        i < passwordStrength.strength
-                          ? "strength-bar-active"
-                          : ""
+                      className={`strength-bar strength-bar-${passwordStrength.className} ${
+                        i < passwordStrength.strength ? "strength-bar-active" : ""
                       }`}
                     />
                   ))}
                 </div>
-                <p className="strength-label">
-                  Strength: {passwordStrength.label}
-                </p>
+                <p className="strength-label">Strength: {passwordStrength.label}</p>
               </div>
             )}
 
@@ -729,11 +637,13 @@ export default function SignUp(): JSX.Element {
                   errors.confirmPassword ? "form-input-error" : ""
                 }`}
                 placeholder="Confirm your password"
+                maxLength={128}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="password-toggle"
+                tabIndex={-1}
               >
                 {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -750,12 +660,10 @@ export default function SignUp(): JSX.Element {
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={signupMutation.isPending}
-            className={`submit-button ${
-              signupMutation.isPending ? "submit-button-disabled" : ""
-            }`}
+            disabled={isLoading}
+            className={`submit-button ${isLoading ? "submit-button-disabled" : ""}`}
           >
-            {signupMutation.isPending ? (
+            {isLoading ? (
               <div className="loading-content">
                 <div className="spinner"></div>
                 Creating Account...
@@ -776,6 +684,7 @@ export default function SignUp(): JSX.Element {
                 className="social-icon-button social-google"
                 title="Continue with Google"
                 type="button"
+                disabled={isLoading}
               >
                 <div className="social-icon google-icon">G</div>
               </button>
@@ -784,6 +693,7 @@ export default function SignUp(): JSX.Element {
                 className="social-icon-button social-facebook"
                 title="Continue with Facebook"
                 type="button"
+                disabled={isLoading}
               >
                 <div className="social-icon facebook-icon">f</div>
               </button>
@@ -792,6 +702,7 @@ export default function SignUp(): JSX.Element {
                 className="social-icon-button social-linkedin"
                 title="Continue with LinkedIn"
                 type="button"
+                disabled={isLoading}
               >
                 <div className="social-icon linkedin-icon">in</div>
               </button>

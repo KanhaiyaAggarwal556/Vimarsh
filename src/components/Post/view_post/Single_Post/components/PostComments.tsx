@@ -1,3 +1,4 @@
+// PostComments.tsx - Updated with separated types
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import {
   useInfiniteQuery,
@@ -9,58 +10,25 @@ import "../style/PostComments.css";
 import UserAvatar from "../UI/UserAvatar";
 import useAuthStore from "@store/useAuthStore";
 
-interface CommentReactions {
-  likes: number;
-  dislikes: number;
-}
-
-interface Comment {
-  _id: string;
-  id?: number;
-  body: string;
-  post: string;
-  user: {
-    _id: string;
-    username?: string;
-    userName?: string;
-    fullName?: string;
-    profilepic?: string;
-    email?: string;
-  };
-  reactions: CommentReactions;
-  timestamp?: string;
-  createdAt: string;
-  updatedAt: string;
-  userReaction?: "like" | "dislike" | null;
-}
-
-interface CommentsResponse {
-  success: boolean;
-  data: Comment[];
-  pagination: {
-    currentPage: number;
-    totalPages: number;
-    totalComments: number;
-    hasNextPage: boolean;
-    hasPrevious: boolean;
-  };
-}
-
-interface PostCommentsProps {
-  showComments: boolean;
-  postId: string;
-}
+// Import separated types
+import {
+  Comment,
+  CommentsResponse,
+  PostCommentsProps,
+  FetchCommentsParams,
+  PostCommentParams,
+  LikeCommentParams,
+  CommentFormState,
+  CommentInteractionState,
+} from "@/types/commentsTypes";
+import { ApiResponse } from "@/types/apiTypes";
 
 // API function to fetch comments with pagination
 const fetchComments = async ({
   postId,
   pageParam = 1,
   userId,
-}: {
-  postId: string;
-  pageParam?: number;
-  userId?: string;
-}): Promise<CommentsResponse> => {
+}: FetchCommentsParams): Promise<CommentsResponse> => {
   // Validate postId first
   if (!postId || postId === "undefined") {
     throw new Error("Invalid postId provided");
@@ -70,7 +38,7 @@ const fetchComments = async ({
   const queryParams = new URLSearchParams({
     page: pageParam.toString(),
     limit: "15",
-    sortOrder: "desc",
+    orderType: "smart", // Use smart ordering by default
   });
 
   if (userId) {
@@ -78,7 +46,6 @@ const fetchComments = async ({
   }
 
   const url = `${import.meta.env.VITE_API_BASE_URL}/comments/post/${postId}?${queryParams}`;
-  // console.log('Fetching comments from:', url); // Debug log
 
   const response = await fetch(url, {
     method: "GET",
@@ -97,7 +64,6 @@ const fetchComments = async ({
   }
 
   const data = await response.json();
-  // console.log('Received comments data:', data); // Debug log
   return data;
 };
 
@@ -106,11 +72,7 @@ const postComment = async ({
   postId,
   body,
   userId,
-}: {
-  postId: string;
-  body: string;
-  userId: string;
-}) => {
+}: PostCommentParams): Promise<ApiResponse<Comment>> => {
   if (!postId || postId === "undefined") {
     throw new Error("Invalid postId provided");
   }
@@ -140,18 +102,13 @@ const postComment = async ({
   return response.json();
 };
 
-// API function to react to a comment
-const reactToComment = async ({
+// API function to handle comment likes
+const likeComment = async ({
   commentId,
-  reactionType,
   userId,
-}: {
-  commentId: string;
-  reactionType: "like" | "dislike";
-  userId: string;
-}) => {
+}: LikeCommentParams): Promise<ApiResponse<{ userHasLiked: boolean; likes: number }>> => {
   const response = await fetch(
-    `${import.meta.env.VITE_API_BASE_URL}/comments/${commentId}/reactions`,
+    `${import.meta.env.VITE_API_BASE_URL}/comments/${commentId}/like`,
     {
       method: "PATCH",
       headers: {
@@ -159,7 +116,6 @@ const reactToComment = async ({
       },
       credentials: "include",
       body: JSON.stringify({
-        action: reactionType,
         userId: userId,
       }),
     }
@@ -167,8 +123,8 @@ const reactToComment = async ({
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error("Reaction API Error:", response.status, errorText);
-    throw new Error("Failed to react to comment");
+    console.error("Like API Error:", response.status, errorText);
+    throw new Error("Failed to like/unlike comment");
   }
 
   return response.json();
@@ -178,14 +134,17 @@ const PostComments: React.FC<PostCommentsProps> = ({
   showComments,
   postId,
 }) => {
-  const [newComment, setNewComment] = useState("");
-  const [isPosting, setIsPosting] = useState(false);
-  const [userReactions, setUserReactions] = useState<
-    Record<string, "like" | "dislike" | null>
-  >({});
-  const [processingReactions, setProcessingReactions] = useState<Set<string>>(
-    new Set()
-  );
+  // Form state
+  const [formState, setFormState] = useState<CommentFormState>({
+    newComment: "",
+    isPosting: false,
+  });
+
+  // Interaction state
+  const [interactionState, setInteractionState] = useState<CommentInteractionState>({
+    userLikes: {},
+    processingLikes: new Set(),
+  });
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -198,7 +157,6 @@ const PostComments: React.FC<PostCommentsProps> = ({
 
   // Debug log to check postId
   useEffect(() => {
-    // console.log('PostComments received postId:', postId);
     if (!postId || postId === "undefined") {
       console.error("PostComments: Invalid postId received");
     }
@@ -228,10 +186,9 @@ const PostComments: React.FC<PostCommentsProps> = ({
         ? lastPage.pagination.currentPage + 1
         : undefined;
     },
-    enabled: showComments && !!postId && postId !== "undefined", // Only fetch when valid postId
+    enabled: showComments && !!postId && postId !== "undefined",
     staleTime: 1000 * 60 * 5,
     retry: (failureCount, error) => {
-      // Don't retry if it's a validation error
       if (error.message.includes("Invalid postId")) {
         return false;
       }
@@ -241,18 +198,21 @@ const PostComments: React.FC<PostCommentsProps> = ({
     refetchOnWindowFocus: false,
   });
 
-  // Initialize user reactions from fetched data
+  // Initialize user likes from fetched data
   useEffect(() => {
     if (data?.pages) {
-      const reactions: Record<string, "like" | "dislike" | null> = {};
+      const likes: Record<string, boolean> = {};
       data.pages.forEach((page) => {
         page.data.forEach((comment) => {
-          if (comment.userReaction) {
-            reactions[comment._id] = comment.userReaction;
+          if (comment.userHasLiked !== undefined) {
+            likes[comment._id] = comment.userHasLiked;
           }
         });
       });
-      setUserReactions((prev) => ({ ...prev, ...reactions }));
+      setInteractionState(prev => ({ 
+        ...prev, 
+        userLikes: { ...prev.userLikes, ...likes }
+      }));
     }
   }, [data]);
 
@@ -298,7 +258,7 @@ const PostComments: React.FC<PostCommentsProps> = ({
   const postCommentMutation = useMutation({
     mutationFn: postComment,
     onSuccess: () => {
-      setNewComment("");
+      setFormState(prev => ({ ...prev, newComment: "" }));
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
     },
     onError: (error: any) => {
@@ -309,30 +269,30 @@ const PostComments: React.FC<PostCommentsProps> = ({
     },
   });
 
-  // FIXED: Improved reaction mutation with better state management
-  const reactMutation = useMutation({
-    mutationFn: reactToComment,
-    onMutate: async ({ commentId, reactionType }) => {
-      // Prevent multiple simultaneous reactions on same comment
-      if (processingReactions.has(commentId)) {
-        throw new Error("Please wait for previous reaction to complete");
+  // Like mutation
+  const likeMutation = useMutation({
+    mutationFn: likeComment,
+    onMutate: async ({ commentId }) => {
+      // Prevent multiple simultaneous likes on same comment
+      if (interactionState.processingLikes.has(commentId)) {
+        throw new Error("Please wait for previous action to complete");
       }
 
       // Add to processing set
-      setProcessingReactions((prev) => new Set(prev).add(commentId));
+      setInteractionState(prev => ({
+        ...prev,
+        processingLikes: new Set(prev.processingLikes).add(commentId)
+      }));
 
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ["comments", postId] });
 
-      // Get current reaction
-      const currentReaction = userReactions[commentId] || null;
-
-      // FIXED: Proper toggle logic - clicking same reaction removes it
-      const newReaction =
-        currentReaction === reactionType ? null : reactionType;
+      // Get current like status
+      const currentLike = interactionState.userLikes[commentId] || false;
+      const newLike = !currentLike; // Toggle like
 
       // Store previous state for rollback
-      const previousReaction = currentReaction;
+      const previousLike = currentLike;
       const previousData = queryClient.getQueryData([
         "comments",
         postId,
@@ -340,9 +300,12 @@ const PostComments: React.FC<PostCommentsProps> = ({
       ]);
 
       // Update UI immediately for instant feedback
-      setUserReactions((prev) => ({
+      setInteractionState(prev => ({
         ...prev,
-        [commentId]: newReaction,
+        userLikes: {
+          ...prev.userLikes,
+          [commentId]: newLike,
+        }
       }));
 
       // Optimistically update the query data for counts
@@ -359,27 +322,17 @@ const PostComments: React.FC<PostCommentsProps> = ({
                 if (comment._id === commentId) {
                   const newReactions = { ...comment.reactions };
 
-                  // Remove previous reaction count
-                  if (currentReaction === "like") {
-                    newReactions.likes = Math.max(0, newReactions.likes - 1);
-                  } else if (currentReaction === "dislike") {
-                    newReactions.dislikes = Math.max(
-                      0,
-                      newReactions.dislikes - 1
-                    );
-                  }
-
-                  // Add new reaction count
-                  if (newReaction === "like") {
+                  // Update like count based on toggle
+                  if (newLike) {
                     newReactions.likes += 1;
-                  } else if (newReaction === "dislike") {
-                    newReactions.dislikes += 1;
+                  } else {
+                    newReactions.likes = Math.max(0, newReactions.likes - 1);
                   }
 
                   return {
                     ...comment,
                     reactions: newReactions,
-                    userReaction: newReaction,
+                    userHasLiked: newLike,
                   };
                 }
                 return comment;
@@ -389,19 +342,22 @@ const PostComments: React.FC<PostCommentsProps> = ({
         }
       );
 
-      return { commentId, previousReaction, previousData };
+      return { commentId, previousLike, previousData };
     },
-    onSuccess: (data, variables) => {
-      // Update user reaction state with server response
-      if (data.success && data.data) {
-        setUserReactions((prev) => ({
+    onSuccess: (responseData, variables) => {
+      // Update user like state with server response
+      if (responseData.success && responseData.data) {
+        setInteractionState(prev => ({
           ...prev,
-          [variables.commentId]: data.data.userReaction,
+          userLikes: {
+            ...prev.userLikes,
+            [variables.commentId]: responseData.data.userHasLiked,
+          }
         }));
       }
     },
-    onError: (err, variables, context) => {
-      console.error("Failed to react to comment:", err);
+    onError: (errorResponse, variables, context) => {
+      console.error("Failed to like comment:", errorResponse);
 
       // Rollback optimistic updates
       if (context?.previousData) {
@@ -410,28 +366,34 @@ const PostComments: React.FC<PostCommentsProps> = ({
           context.previousData
         );
       }
-      if (context?.previousReaction !== undefined) {
-        setUserReactions((prev) => ({
+      if (context?.previousLike !== undefined) {
+        setInteractionState(prev => ({
           ...prev,
-          [variables.commentId]: context.previousReaction,
+          userLikes: {
+            ...prev.userLikes,
+            [variables.commentId]: context.previousLike,
+          }
         }));
       }
 
-      alert("Failed to update reaction. Please try again.");
+      alert("Failed to update like. Please try again.");
     },
-    onSettled: (variables) => {
+    onSettled: (_, __, variables) => {
       // Remove from processing set
-      setProcessingReactions((prev) => {
-        const newSet = new Set(prev);
+      setInteractionState(prev => {
+        const newSet = new Set(prev.processingLikes);
         newSet.delete(variables.commentId);
-        return newSet;
+        return {
+          ...prev,
+          processingLikes: newSet
+        };
       });
     },
   });
 
   const handlePostComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newComment.trim()) return;
+    if (!formState.newComment.trim()) return;
 
     if (!isAuthenticated || !currentUserId) {
       alert("Please log in to post a comment");
@@ -443,46 +405,42 @@ const PostComments: React.FC<PostCommentsProps> = ({
       return;
     }
 
-    setIsPosting(true);
+    setFormState(prev => ({ ...prev, isPosting: true }));
     try {
       await postCommentMutation.mutateAsync({
         postId,
-        body: newComment.trim(),
+        body: formState.newComment.trim(),
         userId: currentUserId,
       });
     } catch (error) {
       console.error("Error in handlePostComment:", error);
     } finally {
-      setIsPosting(false);
+      setFormState(prev => ({ ...prev, isPosting: false }));
     }
   };
 
-  const handleReaction = async (
-    commentId: string,
-    reactionType: "like" | "dislike"
-  ) => {
+  const handleLike = async (commentId: string) => {
     if (!isAuthenticated || !currentUserId) {
-      alert("Please log in to react to comments");
+      alert("Please log in to like comments");
       return;
     }
 
     // Prevent multiple clicks on same comment
-    if (processingReactions.has(commentId)) {
+    if (interactionState.processingLikes.has(commentId)) {
       return;
     }
 
     try {
-      await reactMutation.mutateAsync({
+      await likeMutation.mutateAsync({
         commentId,
-        reactionType,
         userId: currentUserId,
       });
     } catch (error) {
-      console.error("Reaction failed:", error);
+      console.error("Like failed:", error);
     }
   };
 
-  // Function to format numbers with K/M suffixes
+  // Utility functions
   const formatCount = (count: number): string => {
     if (count >= 1000000) {
       return `${(count / 1000000).toFixed(1).replace(/\.0$/, "")}M`;
@@ -514,10 +472,10 @@ const PostComments: React.FC<PostCommentsProps> = ({
   };
 
   const renderComment = (comment: Comment, index: number) => {
-    const reactions = comment.reactions || { likes: 0, dislikes: 0 };
-    const currentUserReaction = userReactions[comment._id] || null;
+    const reactions = comment.reactions || { likes: 0 };
+    const currentUserLike = interactionState.userLikes[comment._id] || false;
     const isLastComment = index === allComments.length - 1;
-    const isProcessing = processingReactions.has(comment._id);
+    const isProcessing = interactionState.processingLikes.has(comment._id);
 
     return (
       <div
@@ -560,19 +518,15 @@ const PostComments: React.FC<PostCommentsProps> = ({
             <div className="comment-actions">
               <button
                 className={`reaction-btn like-btn ${
-                  currentUserReaction === "like" ? "active" : ""
+                  currentUserLike ? "active" : ""
                 } ${isProcessing ? "processing" : ""}`}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  handleReaction(comment._id, "like");
+                  handleLike(comment._id);
                 }}
                 disabled={isProcessing || !isAuthenticated}
-                title={
-                  currentUserReaction === "like"
-                    ? "Remove like"
-                    : "Like comment"
-                }
+                title={currentUserLike ? "Unlike comment" : "Like comment"}
               >
                 <svg
                   width="16"
@@ -584,33 +538,6 @@ const PostComments: React.FC<PostCommentsProps> = ({
                   <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
                 </svg>
                 <span>{formatCount(reactions.likes)}</span>
-              </button>
-              <button
-                className={`reaction-btn dislike-btn ${
-                  currentUserReaction === "dislike" ? "active" : ""
-                } ${isProcessing ? "processing" : ""}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleReaction(comment._id, "dislike");
-                }}
-                disabled={isProcessing || !isAuthenticated}
-                title={
-                  currentUserReaction === "dislike"
-                    ? "Remove dislike"
-                    : "Dislike comment"
-                }
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                >
-                  <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a3 3 0 0 0-2.95 2.43L1.39 15.2A3 3 0 0 0 4.33 19H10zM17 2h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3" />
-                </svg>
-                <span>{formatCount(reactions.dislikes)}</span>
               </button>
             </div>
           </div>
@@ -655,19 +582,22 @@ const PostComments: React.FC<PostCommentsProps> = ({
           <form onSubmit={handlePostComment} className="comment-form">
             <div className="comment-input-wrapper">
               <textarea
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
+                value={formState.newComment}
+                onChange={(e) => setFormState(prev => ({ 
+                  ...prev, 
+                  newComment: e.target.value 
+                }))}
                 placeholder="Write a comment..."
                 className="comment-input"
                 rows={3}
-                disabled={isPosting}
+                disabled={formState.isPosting}
               />
               <button
                 type="submit"
                 className="post-comment-btn"
-                disabled={!newComment.trim() || isPosting}
+                disabled={!formState.newComment.trim() || formState.isPosting}
               >
-                {isPosting ? (
+                {formState.isPosting ? (
                   <div className="spinner-small"></div>
                 ) : (
                   <>

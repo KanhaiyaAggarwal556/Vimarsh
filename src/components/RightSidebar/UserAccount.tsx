@@ -1,21 +1,13 @@
-// UserAccount.tsx - Desktop-only component
-import React, { useState, useEffect, useRef } from "react";
-import { User, LogIn, UserPlus, LogOut, Settings } from "lucide-react";
+// UserAccount.tsx - Updated version compatible with new backend
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { User, LogIn, UserPlus, LogOut, Settings, Loader2, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import UserAvatar from "../Post/view_post/Single_Post/UI/UserAvatar";
-import useAuthStore from "@store/useAuthStore";
-import "./styles/UserAccount.css"; // Import your styles
-
-interface UserData {
-  _id: string;
-  fullName: string;
-  userName: string;
-  email: string;
-  profilepic?: string;
-}
+import useAuthStore, { User as UserType } from "@store/useAuthStore";
+import "./styles/UserAccount.css";
 
 interface UserAccountProps {
-  onUserChange?: (user: UserData | null) => void;
+  onUserChange?: (user: UserType | null) => void;
   className?: string;
 }
 
@@ -24,25 +16,63 @@ const UserAccount: React.FC<UserAccountProps> = ({
   className = "",
 }) => {
   const navigate = useNavigate();
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState<boolean>(false);
+  const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
+  const [showErrorNotification, setShowErrorNotification] = useState<boolean>(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const initializeTimeoutRef = useRef<NodeJS.Timeout>();
+  const errorTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // Get user from Zustand store
-  const { currentUser, removeAllUser, setCurrentUser } = useAuthStore();
-  const user = currentUser as UserData | null;
+  // Get user and actions from Zustand store
+  const { 
+    currentUser, 
+    isAuthenticated,
+    isLoading,
+    isInitializing,
+    error,
+    logout,
+    initializeAuth,
+    clearError,
+  } = useAuthStore();
 
-  // Fetch current user on component mount
-  useEffect(() => {
-    fetchCurrentUser();
-  }, []);
-
-  // Call onUserChange callback when user state changes
-  useEffect(() => {
+  // Memoized callback to prevent unnecessary re-renders
+  const handleUserChange = useCallback((user: UserType | null) => {
     if (onUserChange) {
       onUserChange(user);
     }
-  }, [user, onUserChange]);
+  }, [onUserChange]);
+
+  // Initialize authentication on mount
+  useEffect(() => {
+    let mounted = true;
+
+    const initialize = async () => {
+      if (mounted && isInitializing) {
+        try {
+          console.log('UserAccount: Initializing auth...');
+          await initializeAuth();
+          console.log('UserAccount: Auth initialization completed');
+        } catch (error) {
+          console.error('UserAccount: Auth initialization failed:', error);
+        }
+      }
+    };
+
+    // Add small delay to prevent rapid successive calls
+    initializeTimeoutRef.current = setTimeout(initialize, 50);
+
+    return () => {
+      mounted = false;
+      if (initializeTimeoutRef.current) {
+        clearTimeout(initializeTimeoutRef.current);
+      }
+    };
+  }, [initializeAuth, isInitializing]);
+
+  // Call onUserChange callback when user state changes
+  useEffect(() => {
+    handleUserChange(currentUser);
+  }, [currentUser, handleUserChange]);
 
   // Handle clicking outside to close menu
   useEffect(() => {
@@ -67,135 +97,119 @@ const UserAccount: React.FC<UserAccountProps> = ({
     };
   }, [isUserMenuOpen]);
 
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/auth/me`
-, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data) {
-          setCurrentUser(data.data);
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching current user:", error);
-    } finally {
-      setIsLoading(false);
+  // Handle error notifications
+  useEffect(() => {
+    if (error) {
+      setShowErrorNotification(true);
+      
+      // Auto-clear error notification after 5 seconds
+      errorTimeoutRef.current = setTimeout(() => {
+        setShowErrorNotification(false);
+        clearError();
+      }, 5000);
+    } else {
+      setShowErrorNotification(false);
     }
-  };
 
-  const handleLogin = (e: React.MouseEvent<HTMLButtonElement>) => {
+    return () => {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
+    };
+  }, [error, clearError]);
+
+  // Event handlers with improved error handling
+  const handleLogin = useCallback((e: React.MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
     e.stopPropagation();
     setIsUserMenuOpen(false);
+    clearError(); // Clear any existing errors
     navigate("/i/account/login");
-  };
+  }, [navigate, clearError]);
 
-  const handleSignup = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSignup = useCallback((e: React.MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
     e.stopPropagation();
     setIsUserMenuOpen(false);
+    clearError(); // Clear any existing errors
     navigate("/i/account/signup");
-  };
+  }, [navigate, clearError]);
 
-  const handleLogout = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleLogout = useCallback(async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (isLoggingOut) return; // Prevent double-clicks
 
     try {
-      console.log("Starting logout process...");
-
-      // Call backend logout endpoint to clear server-side tokens/cookies
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/auth/logout`
-, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        console.log("Server logout successful");
-      } else {
-        console.warn(
-          "Server logout failed, but continuing with client cleanup"
-        );
-      }
-
-      // Clear user from Zustand store (client-side cleanup)
-      removeAllUser();
-
-      // Clear any localStorage/sessionStorage if you're using them
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("user");
-      sessionStorage.clear();
-
+      setIsLoggingOut(true);
       setIsUserMenuOpen(false);
-      navigate("/i/account/login");
-
-      console.log("Logout complete - user cleared from all storage");
+      console.log("UserAccount: Starting logout process...");
+      
+      const result = await logout();
+      console.log("UserAccount: Logout completed:", result);
+      
+      // Navigate to login page after successful logout
+      navigate("/i/account/login", { replace: true });
+      
     } catch (error) {
-      console.error("Error during logout:", error);
-
-      // Even if server request fails, clear client-side data
-      removeAllUser();
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("user");
-      sessionStorage.clear();
-
-      setIsUserMenuOpen(false);
-      navigate("/i/account/login");
-
-      console.log("Logout completed with errors - client data cleared");
+      console.error("UserAccount: Unexpected error during logout:", error);
+      // Still navigate to login page even on error
+      navigate("/i/account/login", { replace: true });
+    } finally {
+      setIsLoggingOut(false);
     }
-  };
+  }, [logout, navigate, isLoggingOut]);
 
-  const handleUserProfile = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleUserProfile = useCallback((e: React.MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
     e.stopPropagation();
-    if (user) {
+    if (currentUser) {
       setIsUserMenuOpen(false);
-      navigate(`/${user.userName}`);
+      navigate(`/${currentUser.userName}`);
     }
-  };
+  }, [currentUser, navigate]);
 
-  const handleSettings = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSettings = useCallback((e: React.MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
     e.stopPropagation();
     setIsUserMenuOpen(false);
     navigate("/settings");
-  };
+  }, [navigate]);
 
-  const handleMenuToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleMenuToggle = useCallback((e: React.MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
     e.stopPropagation();
+    
+    // Clear any existing errors when opening menu
+    if (!isUserMenuOpen && error) {
+      setShowErrorNotification(false);
+      clearError();
+    }
+    
     setIsUserMenuOpen(!isUserMenuOpen);
-  };
+  }, [isUserMenuOpen, error, clearError]);
 
-  // Don't render anything while loading
-  if (isLoading) {
+  const handleErrorDismiss = useCallback(() => {
+    setShowErrorNotification(false);
+    clearError();
+    if (errorTimeoutRef.current) {
+      clearTimeout(errorTimeoutRef.current);
+    }
+  }, [clearError]);
+
+  // Show loading state during initialization
+  if (isInitializing) {
     return (
       <div className={`user-account-loading ${className}`}>
         <div className="user-menu">
           <button
             type="button"
             disabled
-            style={{
-              opacity: 0.5,
-              cursor: "not-allowed",
-            }}
+            className="user-menu-button loading"
+            aria-label="Loading user data"
           >
-            <User size={24} />
+            <Loader2 size={24} className="animate-spin" />
           </button>
         </div>
       </div>
@@ -208,16 +222,22 @@ const UserAccount: React.FC<UserAccountProps> = ({
         <button
           onClick={handleMenuToggle}
           type="button"
-          aria-label="User menu"
-          className={`user-menu-button ${user ? "logged-in" : "not-logged-in"}`}
+          aria-label={isAuthenticated ? "User menu" : "Account menu"}
+          aria-expanded={isUserMenuOpen}
+          className={`user-menu-button ${
+            isAuthenticated && currentUser ? "logged-in" : "not-logged-in"
+          } ${isLoading ? "loading" : ""}`}
+          disabled={isLoading && !currentUser}
         >
-          {user ? (
+          {isLoading && !currentUser ? (
+            <Loader2 size={24} className="animate-spin" />
+          ) : isAuthenticated && currentUser ? (
             <UserAvatar
               user={{
-                avatar: user.profilepic || "",
-                name: user.fullName,
-                username: user.userName,
-                id: user._id,
+                avatar: currentUser.profilepic || "",
+                name: currentUser.fullName,
+                username: currentUser.userName,
+                id: currentUser._id,
               }}
               size={40}
             />
@@ -227,33 +247,56 @@ const UserAccount: React.FC<UserAccountProps> = ({
         </button>
 
         {isUserMenuOpen && (
-          <div className="user-dropdown">
-            {user ? (
+          <div 
+            className="user-dropdown"
+            role="menu"
+            aria-label="User account menu"
+          >
+            {isAuthenticated && currentUser ? (
               <>
                 <button
                   onClick={handleUserProfile}
-                  className="menu-item user-profile-item"
+                  className="menu-item"
                   type="button"
+                  role="menuitem"
+                  aria-label="View profile"
                 >
-                  <span className="username">@{user.userName}</span>
+                  <User size={16} />
+                  Profile
                 </button>
 
                 <button
                   onClick={handleSettings}
                   className="menu-item"
                   type="button"
+                  role="menuitem"
+                  aria-label="Settings"
                 >
                   <Settings size={16} />
                   Settings
                 </button>
 
+                <div className="menu-divider" />
+
                 <button
                   onClick={handleLogout}
-                  className="menu-item"
+                  className={`menu-item logout-item ${isLoggingOut ? 'loading' : ''}`}
                   type="button"
+                  role="menuitem"
+                  disabled={isLoggingOut || isLoading}
+                  aria-label={isLoggingOut ? "Logging out..." : "Logout"}
                 >
-                  <LogOut size={16} />
-                  Logout
+                  {isLoggingOut ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Logging out...
+                    </>
+                  ) : (
+                    <>
+                      <LogOut size={16} />
+                      Logout
+                    </>
+                  )}
                 </button>
               </>
             ) : (
@@ -262,16 +305,23 @@ const UserAccount: React.FC<UserAccountProps> = ({
                   onClick={handleLogin}
                   className="menu-item"
                   type="button"
+                  role="menuitem"
+                  aria-label="Login"
+                  disabled={isLoading}
                 >
-                  <LogIn size={16} />
+                  {isLoading ? <Loader2 size={16} className="animate-spin" /> : <LogIn size={16} />}
                   Login
                 </button>
+
                 <button
                   onClick={handleSignup}
                   className="menu-item"
                   type="button"
+                  role="menuitem"
+                  aria-label="Sign up"
+                  disabled={isLoading}
                 >
-                  <UserPlus size={16} />
+                  {isLoading ? <Loader2 size={16} className="animate-spin" /> : <UserPlus size={16} />}
                   Sign Up
                 </button>
               </>
@@ -279,8 +329,29 @@ const UserAccount: React.FC<UserAccountProps> = ({
           </div>
         )}
       </div>
+      
+      {/* Enhanced error notification */}
+      {showErrorNotification && error && (
+        <div 
+          className="auth-error-notification" 
+          role="alert"
+          aria-live="polite"
+        >
+          <AlertCircle size={16} className="error-icon" />
+          <div className="error-message">
+            {error}
+          </div>
+          <button
+            onClick={handleErrorDismiss}
+            className="error-dismiss-button"
+            aria-label="Dismiss error"
+          >
+            ×
+          </button>
+        </div>
+      )}
     </div>
-  );
+  );  
 };
 
 export default UserAccount;

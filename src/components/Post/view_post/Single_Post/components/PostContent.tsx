@@ -1,21 +1,8 @@
 import { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { PostContentProps, MediaItem } from '@/types/postTypes';
 import "../style/PostContent.css";
-
-// Import types from the main Post component
-import type { PostData } from '../post'; // Adjust path as needed
-
-interface PostContentProps {
-  post: PostData;
-}
-
-interface MediaItem {
-  type: 'image' | 'video';
-  url: string;
-  key: string;
-  imageIndex: number | null;
-}
 
 export default function PostContent({ post }: PostContentProps) {
   const [isAdditionalMediaExpanded, setIsAdditionalMediaExpanded] = useState<boolean>(false);

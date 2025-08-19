@@ -33,7 +33,7 @@ export const SIDEBAR_CONFIG: SidebarConfig = {
 
 // Navigation items data
 export const NAV_ITEMS: NavItem[] = [
-  { to: "/", icon: <AiOutlineHome className="me-2" />, label: "Home" },
+  { to: "/home", icon: <AiOutlineHome className="me-2" />, label: "Home" },
   { to: "/search", icon: <AiOutlineSearch className="me-2" />, label: "Search" },
   { to: "/notifications", icon: <AiOutlineBell className="me-2" />, label: "Notifications" },
   { to: "/i/twitty", icon: <AiOutlineMessage className="me-2" />, label: "Tweety" },

@@ -1,0 +1,348 @@
+/* SectionToggle.css - Enhanced for smooth transitions */
+
+/* Section Toggle Styles */
+.section-toggle {
+  position: relative;
+  display: flex;
+  background: rgba(57, 52, 52, 0.48);
+  border-radius: 25px;
+  padding: 2px;
+  gap: 0;
+  /* Ensure it stays above sections during transitions */
+  z-index: 10;
+}
+
+.toggle-btn {
+  background: transparent;
+  border: none;
+  color: #888;
+  padding: 10px 18px;
+  border-radius: 23px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  font-weight: 500;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  text-align: center;
+  min-width: 80px;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.toggle-btn.active {
+  color: #fff;
+}
+
+.toggle-btn:hover:not(:disabled) {
+  color: #ccc;
+}
+
+.toggle-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+/* MULTI-CLICK REFRESH FUNCTIONALITY */
+.toggle-btn.refreshing {
+  color: rgba(255, 255, 255, 0.8);
+  cursor: wait;
+  position: relative;
+}
+
+.toggle-btn.refreshing::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(52, 71, 178, 0.1),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Toggle indicator - Synchronized with section transitions */
+.toggle-indicator {
+  position: absolute;
+  top: 2px;
+  height: calc(100% - 4px);
+  background: rgba(25, 36, 99, 0.671);
+  border-radius: 23px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+  will-change: transform;
+}
+
+.toggle-indicator.refreshing {
+  background: rgba(25, 36, 99, 0.671);
+  animation: indicatorPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes indicatorPulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.toggle-indicator.home {
+  left: 2px;
+  width: calc(50% - 2px);
+}
+
+.toggle-indicator.messages {
+  left: calc(50% + 2px);
+  width: calc(50% - 2px);
+}
+
+/* Multi-click progress indicator */
+.multi-click-indicator {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 25px;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.progress-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  animation: progressGlow 0.3s ease-out;
+}
+
+@keyframes progressGlow {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Refresh overlay for button */
+.refresh-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(52, 71, 178, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  z-index: 3;
+  animation: refreshPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes refreshPulse {
+  0%, 100% {
+    background: rgba(52, 71, 178, 0.1);
+  }
+  50% {
+    background: rgba(52, 71, 178, 0.2);
+  }
+}
+
+/* Refresh spinner */
+.refresh-spinner {
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: rgba(52, 71, 178, 0.8);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.refresh-spinner.small {
+  width: 12px;
+  height: 12px;
+  border-width: 1px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Global refresh notification */
+.refresh-notification {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  animation: slideDownFade 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.refresh-notification-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(52, 71, 178, 0.3);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 480px) {
+  .toggle-btn {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+
+  .toggle-indicator.home {
+    width: calc(50% - 2px);
+  }
+
+  .toggle-indicator.messages {
+    left: 50%;
+    width: calc(50% - 2px);
+  }
+
+  .refresh-notification {
+    top: 80px;
+    left: 10px;
+    right: 10px;
+    transform: none;
+  }
+
+  .refresh-notification-content {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .refresh-spinner {
+    width: 12px;
+    height: 12px;
+    border-width: 1px;
+  }
+}
+
+@media (max-width: 768px) {
+  .toggle-indicator.home {
+    width: calc(50% - 2px);
+  }
+
+  .toggle-indicator.messages {
+    left: 50%;
+    width: calc(50% - 2px);
+  }
+
+  .refresh-notification {
+    top: 90px;
+    left: 15px;
+    right: 15px;
+    transform: none;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .toggle-indicator,
+  .refresh-overlay,
+  .progress-ring,
+  .refresh-notification,
+  .refresh-spinner,
+  .toggle-btn.refreshing::after {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Focus states for accessibility */
+.toggle-btn:focus-visible {
+  outline: 2px solid rgb(52 71 178);
+  outline-offset: 2px;
+  border-radius: 23px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .toggle-btn {
+    border: 1px solid transparent;
+  }
+  
+  .toggle-btn.active {
+    border-color: #fff;
+  }
+
+  .refresh-notification-content {
+    border: 2px solid #fff;
+  }
+
+  .multi-click-indicator {
+    border: 2px solid rgba(52, 71, 178, 0.8);
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .toggle-btn:hover {
+    color: #888;
+  }
+  
+  .toggle-btn.active:hover {
+    color: #fff;
+  }
+
+  /* Enhanced touch targets for mobile */
+  .toggle-btn {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+}
+
+/* GPU acceleration for smooth animations */
+.toggle-indicator,
+.refresh-overlay,
+.progress-ring {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}

@@ -1,20 +1,27 @@
-// components/Header/Header.tsx
-import SectionToggle from './SectionToggle';
+// Header.tsx - Updated to pass refresh function to SectionToggle
+import { HeaderProps } from '@/types';
+import { createToggleClass } from '@/utils/classNames';
+import SectionToggle from '../Sections/SectionToggle';
+import "./Header.css"
 
-interface HeaderProps {
-  isScrolled: boolean;
-  activeSection: string;
-  onSectionToggle: (section: string) => void;
+interface ExtendedHeaderProps extends HeaderProps {
+  onHomeRefresh?: () => Promise<void> | void;
 }
 
-const Header = ({ isScrolled, activeSection, onSectionToggle }: HeaderProps) => {
+const Header = ({ 
+  isScrolled, 
+  activeSection, 
+  onSectionToggle, 
+  onHomeRefresh 
+}: ExtendedHeaderProps) => {
   return (
-    <header className={`dynamic-header ${isScrolled ? "scrolled" : ""}`}>
+    <header className={createToggleClass('dynamic-header', isScrolled, 'scrolled')}>
       <div className="header-content">
         <h1 className="header-title">Social Feed</h1>
         <SectionToggle 
           activeSection={activeSection} 
-          onSectionToggle={onSectionToggle} 
+          onSectionToggle={onSectionToggle}
+          onHomeRefresh={onHomeRefresh}
         />
       </div>
     </header>

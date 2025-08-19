@@ -1,24 +1,16 @@
-/* Enhanced PostHeader Component CSS */
+/* PostHeader Component CSS - Fixed Follow Button Issues */
 
-/* CSS Variables for theming and consistency */
+/* CSS Variables */
 :root {
-  --post-bg-primary: #1a1a1a;
-  --post-bg-secondary: #1a1a1a;
-  --post-bg-tertiary: #2d2d2d;
-  --post-border-color: #333;
   --post-text-primary: #fff;
-  --post-text-secondary: #e9ecef;
   --post-text-muted: #8b98a5;
   --post-text-light: #adb5bd;
   --post-accent-color: #1d9bf0;
-  --post-success-color: #00ba7c;
   --post-location-color: #8b98a5;
   --post-hover-bg: rgba(255, 255, 255, 0.03);
+  --post-hover-bg-strong: rgba(255, 255, 255, 0.08);
   --post-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  --post-border-radius-sm: 8px;
-  --post-border-radius-xs: 8px;
-  --post-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
-  --post-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --post-border-radius-xs: 6px;
 }
 
 /* Header Styles */
@@ -28,6 +20,7 @@
   align-items: flex-start;  
   margin-bottom: 0px;
   position: relative;
+  padding: 8px 0;
 }
 
 .post-user-info {
@@ -35,20 +28,15 @@
   align-items: flex-start;
   flex: 1;
   min-width: 0;
-  padding: 4px 8px;
-  margin: -4px -8px;
+  gap: 12px;
 }
 
-/* Avatar Container - Now clickable, removed status indicator */
+/* Avatar Container */
 .user-avatar-container {
-  position: relative;
-  margin-right: 12px;
-  flex-shrink: 0;
   cursor: pointer;
-  border-radius: var(--post-border-radius-xs);
-  padding: 2px;
-  margin: -2px;
+  border-radius: 50%;
   transition: var(--post-transition);
+  flex-shrink: 0;
 }
 
 .user-avatar-container:hover {
@@ -67,7 +55,7 @@
   flex-direction: column;
   gap: 4px;
   justify-content: center;
-  min-height: 44px; /* Match avatar size for proper alignment */
+  min-height: 44px;
 }
 
 .post-user-name {
@@ -75,9 +63,10 @@
   align-items: center;
   gap: 8px;
   line-height: 1.2;
+  flex-wrap: nowrap; /* Prevent wrapping */
 }
 
-/* Username - Now shows @username instead of full name, removed verification badge */
+/* Username */
 .username {
   font-weight: 700;
   font-size: 16px;
@@ -91,6 +80,7 @@
   border-radius: var(--post-border-radius-xs);
   margin: -2px -4px;
   transition: var(--post-transition);
+  flex-shrink: 1;
 }
 
 .username:hover {
@@ -102,7 +92,24 @@
   transform: scale(0.98);
 }
 
-/* Post Meta - Only shown when location exists */
+/* Time and separators */
+.post-time-separator {
+  font-weight: 700;
+  opacity: 0.7;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.post-time {
+  font-weight: 400;
+  color: var(--post-text-light);
+  font-feature-settings: "tnum";
+  min-width: fit-content;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+/* Post Meta - Location */
 .post-meta {
   display: flex;
   align-items: center;
@@ -113,7 +120,6 @@
   margin-top: 2px;
 }
 
-/* Location - New clickable location element */
 .post-location {
   display: inline-flex;
   align-items: center;
@@ -147,18 +153,92 @@
   height: 12px;
 }
 
-.post-time-separator {
-  font-weight: 700;
-  opacity: 0.7;
-  pointer-events: none;
+/* Post Actions Container */
+.post-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  position: relative;
 }
 
-.post-time {
-  font-weight: 400;
-  color: var(--post-text-light);
-  font-feature-settings: "tnum";
-  min-width: fit-content;
-  pointer-events: none;
+/* Pinned Indicator */
+.pinned-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--post-accent-color);
+}
+
+.pinned-indicator svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Inline Follow Button - FIXED VERSION */
+.follow-button-inline {
+  background: none !important;
+  border: none !important;
+  color: var(--post-accent-color) !important;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px 8px !important;
+  border-radius: var(--post-border-radius-xs);
+  transition: var(--post-transition);
+  white-space: nowrap;
+  flex-shrink: 0; /* Prevent shrinking */
+  min-width: fit-content; /* Ensure it maintains its width */
+  position: relative;
+  z-index: 10; /* Ensure it's above other elements */
+  outline: none;
+  /* Prevent disappearing */
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: inline-block !important;
+}
+
+/* Specific states for follow button */
+.follow-button-inline.not-following {
+  color: var(--post-accent-color) !important;
+}
+
+.follow-button-inline.not-following:hover:not(:disabled) {
+  background-color: rgba(29, 155, 240, 0.1) !important;
+  text-decoration: underline;
+}
+
+.follow-button-inline.following {
+  color: #536471 !important;
+}
+
+.follow-button-inline.following:hover:not(:disabled) {
+  color: #f91880 !important;
+  background-color: rgba(249, 24, 128, 0.1) !important;
+}
+
+.follow-button-inline:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+.follow-button-inline:focus {
+  outline: 2px solid var(--post-accent-color) !important;
+  outline-offset: 2px !important;
+}
+
+/* Loading state animation */
+.follow-button-inline.pending {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
 }
 
 /* Dropdown Trigger Button */
@@ -166,8 +246,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   background: none;
   border: none;
   border-radius: 50%;
@@ -187,7 +267,7 @@
 
 .dropdown-trigger:active {
   transform: scale(0.95);
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--post-hover-bg-strong);
 }
 
 .dropdown-trigger:focus {
@@ -201,48 +281,28 @@
   pointer-events: none;
 }
 
-/* Post Actions Container */
-.post-action {
-  display: flex;
-  margin-top: 0px !important;
-  flex-direction: row !important;
-  flex-shrink: 0;
-  position: relative;
-}
-
-/* Pinned Indicator */
-.pinned-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  color: var(--post-accent-color);
-  margin-right: 4px;
-}
-
-.pinned-indicator svg {
-  width: 16px;
-  height: 16px;
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
   .post-header {
     padding: 8px 0;
   }
   
-  .user-avatar-container {
-    margin-right: 8px;
+  .post-user-info {
+    gap: 10px;
   }
   
   .post-user-details {
-    min-height: 40px; /* Slightly smaller for mobile */
+    min-height: 40px;
   }
   
   .username {
     max-width: 140px;
     font-size: 15px;
+  }
+  
+  .follow-button-inline {
+    font-size: 13px !important;
+    padding: 3px 6px !important;
   }
   
   .post-location {
@@ -254,14 +314,18 @@
     gap: 6px;
   }
   
-  .dropdown-trigger {
-    width: 32px;
-    height: 32px;
+  .post-action {
+    gap: 6px;
   }
   
-  .dropdown-trigger svg {
-    width: 18px;
-    height: 18px;
+  .dropdown-trigger {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .pinned-indicator {
+    width: 28px;
+    height: 28px;
   }
 }
 
@@ -271,25 +335,25 @@
   }
   
   .post-user-info {
-    padding: 2px 4px;
-    margin: -2px -4px;
-  }
-  
-  .user-avatar-container {
-    margin-right: 6px; /* Reduced from 8px to 6px for tighter spacing */
+    gap: 8px;
   }
   
   .post-user-details {
-    min-height: 36px; /* Smaller for mobile */
+    min-height: 36px;
   }
   
   .username {
-    max-width: 120px;
+    max-width: 100px;
     font-size: 14px;
   }
   
+  .follow-button-inline {
+    font-size: 12px !important;
+    padding: 2px 4px !important;
+  }
+  
   .post-location {
-    max-width: 100px;
+    max-width: 80px;
   }
   
   .post-meta {
@@ -297,9 +361,18 @@
     gap: 4px;
   }
   
+  .post-action {
+    gap: 4px;
+  }
+  
   .dropdown-trigger {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
+  }
+  
+  .pinned-indicator {
+    width: 24px;
+    height: 24px;
   }
   
   .dropdown-trigger svg {
@@ -308,43 +381,33 @@
   }
 }
 
-/* Dark/Light theme toggle support */
+/* Light theme support */
 @media (prefers-color-scheme: light) {
   :root {
-    --post-bg-primary: #ffffff;
-    --post-bg-secondary: #f7f9fa;
-    --post-bg-tertiary: #e9ecef;
-    --post-border-color: #dee2e6;
     --post-text-primary: #212529;
-    --post-text-secondary: #495057;
     --post-text-muted: #495057;
     --post-text-light: #495057;
     --post-location-color: #8b98a5;
     --post-hover-bg: rgba(0, 0, 0, 0.03);
-    --post-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-    --post-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
+    --post-hover-bg-strong: rgba(0, 0, 0, 0.08);
   }
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  :root {
-    --post-border-color: #000;
-    --post-text-muted: #000;
+  
+  .follow-button-inline.following {
+    color: #8b98a5 !important;
   }
 }
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
   
   .user-avatar-container:active,
   .username:active,
-  .post-location:active {
+  .post-location:active,
+  .follow-button-inline:active,
+  .dropdown-trigger:active {
     transform: none;
   }
 }
@@ -355,23 +418,4 @@
 .post-location:focus {
   outline: 2px solid var(--post-accent-color);
   outline-offset: 2px;
-}
-
-/* Loading state styles */
-.post-header.loading {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-.post-header.loading .user-avatar-container::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-  animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
 }

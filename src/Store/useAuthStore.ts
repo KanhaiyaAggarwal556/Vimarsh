@@ -1,58 +1,134 @@
-// store/useAuthStore.ts
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { AuthStore } from '../types/auth';
+import { createAuthActions } from './authActions';
 
-// Define user interface
-export interface User {
-  _id: string;
-  username: string;
-  email: string;
-  displayName?: string;
-  avatar?: string;
-  bio?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  // Add other user properties as needed
-}
-
-// Define the auth store state
-interface AuthState {
-  currentUser: User | null;
-}
-
-// Define the auth store actions
-interface AuthActions {
-  setCurrentUser: (newUser: User | null) => void;
-  removeAllUser: () => void;
-  updateCurrentUser: (updateUser: Partial<User>) => void;
-}
-
-// Combine state and actions
-type AuthStore = AuthState & AuthActions;
+const AUTH_CACHE_DURATION = 3 * 60 * 1000; // 3 minutes cache for auth checks
 
 const useAuthStore = create<AuthStore>()(
   persist(
-    (set) => ({
-      // State
+    (set, get) => ({
+      // Initial state - User data
       currentUser: null,
+      isAuthenticated: false,
+      
+      // Initial state - Loading states
+      isLoading: false,
+      isInitializing: true,
+      error: null,
+      oauthInProgress: false,
+      
+      // Initial state - Session management (these were missing!)
+      lastAuthCheck: null,
+      lastActivity: null,
+      sessionExpiry: null,
 
-      // Actions
-      setCurrentUser: (newUser: User | null) => set({ currentUser: newUser }),
-      
-      removeAllUser: () => set({ currentUser: null }),
-      
-      updateCurrentUser: (updateUser: Partial<User>) => set((state) => ({
-        currentUser: state.currentUser 
-          ? { ...state.currentUser, ...updateUser }
-          : null
-      })),
+      // Spread all the actions
+      ...createAuthActions(set, get),
     }),
     {
-      name: 'auth-storage', // name of the item in the storage (must be unique)
-      storage: createJSONStorage(() => localStorage), // (optional) by default, 'localStorage' is used
-      partialize: (state) => ({ currentUser: state.currentUser }), // only persist currentUser
+      name: "auth-storage",
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        currentUser: state.currentUser,
+        lastAuthCheck: state.lastAuthCheck,
+        lastActivity: state.lastActivity,
+        sessionExpiry: state.sessionExpiry,
+        isAuthenticated: state.isAuthenticated,
+      }),
+      version: 8, // Increment version to trigger migration
+      migrate: (persistedState: any, version: number) => {
+        console.log("🔄 Migrating auth store from version", version);
+
+        // Clear old data and start fresh for problematic versions
+        if (version < 8) {
+          return {
+            currentUser: null,
+            lastAuthCheck: null,
+            lastActivity: null,
+            sessionExpiry: null,
+            isLoading: false,
+            isInitializing: true, // Will trigger fresh initialization
+            error: null,
+            isAuthenticated: false,
+            oauthInProgress: false,
+          };
+        }
+        return persistedState;
+      },
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          console.log("💾 Auth store rehydrated:", {
+            hasUser: !!state.currentUser,
+            isAuthenticated: state.isAuthenticated,
+            lastAuthCheck: state.lastAuthCheck,
+            lastActivity: state.lastActivity,
+            sessionExpiry: state.sessionExpiry,
+          });
+
+          // Always reset these on rehydration
+          state.isLoading = false;
+          state.error = null;
+          state.oauthInProgress = false;
+
+          // Check session validity
+          const now = Date.now();
+          const isSessionExpired = state.sessionExpiry && now > state.sessionExpiry;
+          const needsAuthCheck = !state.lastAuthCheck || 
+            now - state.lastAuthCheck > AUTH_CACHE_DURATION;
+
+          if (isSessionExpired) {
+            // Session expired, clear user data
+            state.currentUser = null;
+            state.isAuthenticated = false;
+            state.sessionExpiry = null;
+            state.lastActivity = null;
+            state.lastAuthCheck = null;
+            state.isInitializing = false;
+          } else {
+            // Set initialization state based on whether we need to verify user
+            const needsInitialization = !state.currentUser || needsAuthCheck;
+            state.isInitializing = needsInitialization;
+            state.isAuthenticated = !!state.currentUser;
+          }
+
+          console.log(
+            "🔄 Rehydration complete - isInitializing:",
+            state.isInitializing,
+            "isSessionExpired:",
+            isSessionExpired
+          );
+        }
+      },
     }
   )
 );
 
+// Helper hook for easier access to common auth properties
+export const useAuth = () => {
+  const store = useAuthStore();
+  return {
+    user: store.currentUser, // Alias for easier access
+    currentUser: store.currentUser,
+    isAuthenticated: store.isAuthenticated,
+    isLoading: store.isLoading,
+    isInitializing: store.isInitializing,
+    error: store.error,
+    oauthInProgress: store.oauthInProgress,
+    lastActivity: store.lastActivity,
+    sessionExpiry: store.sessionExpiry,
+    login: store.login,
+    logout: store.logout,
+    register: store.register,
+    handleOAuthCallback: store.handleOAuthCallback,
+    startOAuth: store.startOAuth,
+    clearError: store.clearError,
+    updateActivity: store.updateActivity,
+    isSessionValid: store.isSessionValid,
+    extendSession: store.extendSession,
+    clearSession: store.clearSession,
+  };
+};
+
 export default useAuthStore;
+export type { User } from '../types/auth';

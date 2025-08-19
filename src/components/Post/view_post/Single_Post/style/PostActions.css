@@ -245,7 +245,7 @@
   background: #2563eb;
 }
 
-/* Success Toast Styles */
+/* Success Toast Styles - REMOVED
 .success-toast {
   position: fixed;
   top: 20px;
@@ -266,6 +266,7 @@
   align-items: center;
   gap: 8px;
 }
+*/
 
 /* Simple animations */
 @keyframes fadeIn {
@@ -299,15 +300,17 @@
   }
 }
 
-/* Responsive design for mobile devices */
+/* Responsive design for mobile devices - UPDATED */
 @media (max-width: 768px) {
   .post-actions-container {
     padding: 12px 0;
     gap: 12px;
+    /* Keep the same flex layout as desktop */
+    justify-content: space-between;
   }
   
   .post-actions-group {
-    gap: 4px;
+    gap: 6px; /* Slightly reduce gap for better spacing */
   }
   
   .action-button {
@@ -316,8 +319,9 @@
     min-height: 32px;
   }
   
+  /* Hide text labels on mobile - only show icons and counts */
   .action-button-text {
-    font-size: 13px;
+    display: none;
   }
   
   .views-counter {
@@ -326,34 +330,39 @@
   }
 }
 
-/* Small mobile devices */
+/* Small mobile devices - UPDATED */
 @media (max-width: 480px) {
   .post-actions-container {
-    flex-direction: column;
-    align-items: stretch;
+    padding: 10px 0;
     gap: 8px;
-  }
-  
-  .post-actions-group {
-    justify-content: center;
-  }
-  
-  .post-actions-group:last-child {
+    /* Keep single row layout */
     justify-content: space-between;
   }
   
+  .post-actions-group {
+    gap: 4px; /* Minimal gap for tight spacing */
+  }
+  
+  .action-button {
+    padding: 4px 6px; /* Reduce padding for smaller screens */
+    min-height: 28px;
+  }
+  
+  /* Ensure text is hidden on small screens */
   .action-button-text {
     display: none;
   }
   
-  .action-button {
-    flex: 1;
-    justify-content: center;
-    max-width: 60px;
+  .views-counter {
+    font-size: 12px;
+    padding: 4px 6px;
   }
   
-  .views-counter {
-    justify-content: center;
+  /* Slightly smaller icons for very small screens */
+  .action-button-icon,
+  .views-counter-icon {
+    width: 14px;
+    height: 14px;
   }
 }
 

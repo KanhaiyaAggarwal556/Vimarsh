@@ -1,29 +1,31 @@
 import { useState, useCallback, useEffect } from "react";
 import useAuthStore from "@store/useAuthStore";
-import { usePostInteraction, useToggleLike, useToggleDislike } from "../hooks/usePostInteractions";
+import { 
+  usePostInteraction, 
+  useToggleLike, 
+  useToggleDislike 
+} from "@/hooks/usePostInteractions";
+import { useIntersectionViewTracking } from "@/hooks/useAutoViewTracking";
 import "../style/PostActions.css";
 
-// Simplified interfaces
-interface PostData {
-  _id: string;
-  views: number;
-  reactions: {
-    likes: number;
-    dislikes: number;
-  };
-  title?: string;
-  description?: string;
-}
+// Import separated types
+import {
+  PostActionsProps,
+  ActionButtonProps,
+  UserInteractionData,
+  PostActionsState,
+} from "@/types/postActionsTypes";
+import { UseViewTrackingResult } from "@/types/hookTypes";
 
-interface PostActionsProps {
-  post: PostData;
-  onPostUpdate?: (updatedPost: PostData) => void;
-  onComments: () => void;
-  isOnPostPage?: boolean;
-}
+// Number formatter utility
+const formatNumber = (num: number): string => {
+  if (num < 1000) return num.toString();
+  if (num < 1000000) return `${(num / 1000).toFixed(1)}K`;
+  return `${(num / 1000000).toFixed(1)}M`;
+};
 
-// Action Button Component with CSS classes
-const ActionButton = ({ 
+// Action Button Component
+const ActionButton: React.FC<ActionButtonProps> = ({ 
   icon, 
   count, 
   active = false, 
@@ -33,16 +35,6 @@ const ActionButton = ({
   text,
   variant = "default",
   loading = false
-}: {
-  icon: React.ReactNode;
-  count?: number;
-  active?: boolean;
-  onClick: (e?: React.MouseEvent) => void;
-  label: string;
-  showText?: boolean;
-  text?: string;
-  variant?: "default" | "like" | "dislike" | "share";
-  loading?: boolean;
 }) => {
   const getButtonClasses = () => {
     let classes = "action-button";
@@ -86,15 +78,8 @@ const ActionButton = ({
   );
 };
 
-// Number formatter
-const formatNumber = (num: number): string => {
-  if (num < 1000) return num.toString();
-  if (num < 1000000) return `${(num / 1000).toFixed(1)}K`;
-  return `${(num / 1000000).toFixed(1)}M`;
-};
-
 // Enhanced toast notification with login button
-const showLoginWarning = (action: string) => {
+const showLoginWarning = (action: string): void => {
   const existingToast = document.querySelector('.auth-warning-toast');
   if (existingToast) {
     existingToast.remove();
@@ -157,34 +142,15 @@ const showLoginWarning = (action: string) => {
   };
 };
 
-// Success toast
-const showSuccessToast = (message: string) => {
-  const successToast = document.createElement('div');
-  successToast.className = 'success-toast';
-  successToast.innerHTML = `
-    <div class="success-toast-content">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="20,6 9,17 4,12"></polyline>
-      </svg>
-      <span>${message}</span>
-    </div>
-  `;
-  
-  document.body.appendChild(successToast);
-  setTimeout(() => {
-    if (successToast.parentNode) {
-      successToast.remove();
-    }
-  }, 3000);
-};
-
-// Main Component
-export default function PostActions({
+// Main PostActions Component
+const PostActions: React.FC<PostActionsProps> = ({
   post,
   onPostUpdate,
   onComments,
   isOnPostPage = false,
-}: PostActionsProps) {
+  referralSource = 'direct',
+  enableViewTracking = true,
+}) => {
   const { currentUser } = useAuthStore();
   
   // TanStack Query hooks
@@ -195,27 +161,62 @@ export default function PostActions({
   const toggleLikeMutation = useToggleLike();
   const toggleDislikeMutation = useToggleDislike();
 
-  // Local state for reactions with real-time updates
-  const [reactions, setReactions] = useState({
-    likes: post.reactions?.likes || 0,
-    dislikes: post.reactions?.dislikes || 0,
+  // View tracking hook with proper typing
+  const { 
+    ref: viewTrackingRef, 
+    hasAttemptedTracking: hasViewBeenTracked,
+    isTracking 
+  }: UseViewTrackingResult = useIntersectionViewTracking(
+    post._id,
+    {
+      enabled: enableViewTracking,
+      referralSource,
+      minViewDuration: isOnPostPage ? 2000 : 1000,
+      threshold: 0.5,
+      rootMargin: '0px',
+    }
+  );
+
+  // Local state with proper typing - handle undefined views
+  const [state, setState] = useState<PostActionsState>({
+    reactions: {
+      likes: post.reactions?.likes || 0,
+      dislikes: post.reactions?.dislikes || 0,
+    },
+    viewCount: post.views ?? 0, // Use nullish coalescing to handle undefined
+    isShareLoading: false, // Add missing property
   });
 
-  const [isShareLoading, setIsShareLoading] = useState(false);
+  // Extract user interaction status (only for authenticated users)
+  const userInteractionData: UserInteractionData = {
+    liked: userInteraction?.liked || false,
+    disliked: userInteraction?.disliked || false,
+  };
 
   // Sync reactions when post prop changes
   useEffect(() => {
-    setReactions({
-      likes: post.reactions?.likes || 0,
-      dislikes: post.reactions?.dislikes || 0,
-    });
-  }, [post.reactions]);
+    setState(prev => ({
+      ...prev,
+      reactions: {
+        likes: post.reactions?.likes || 0,
+        dislikes: post.reactions?.dislikes || 0,
+      },
+      viewCount: post.views ?? 0, // Handle undefined views
+    }));
+  }, [post.reactions, post.views]);
 
-  // Get user interaction states
-  const userLiked = userInteraction?.liked || false;
-  const userDisliked = userInteraction?.disliked || false;
+  // Update view count when tracking happens for any user
+  useEffect(() => {
+    if (hasViewBeenTracked && enableViewTracking && !isTracking) {
+      console.log(`View tracked for post ${post._id}, updating local count`);
+      setState(prev => ({
+        ...prev,
+        viewCount: prev.viewCount + 1,
+      }));
+    }
+  }, [hasViewBeenTracked, enableViewTracking, isTracking, post._id]);
 
-  // Authentication check wrapper
+  // Authentication check wrapper - only for interactions, not views
   const withAuthCheck = (callback: () => void | Promise<void>, action: string) => {
     return async () => {
       if (!currentUser) {
@@ -231,36 +232,34 @@ export default function PostActions({
     if (toggleLikeMutation.isPending) return;
     
     try {
-      // Calculate optimistic updates
-      const wasLiked = userLiked;
-      const wasDisliked = userDisliked;
+      const wasLiked = userInteractionData.liked;
+      const wasDisliked = userInteractionData.disliked;
       
-      let newLikes = reactions.likes;
-      let newDislikes = reactions.dislikes;
+      let newLikes = state.reactions.likes;
+      let newDislikes = state.reactions.dislikes;
       
       if (wasLiked) {
-        // Unlike: just remove the like
-        newLikes = Math.max(0, reactions.likes - 1);
+        newLikes = Math.max(0, state.reactions.likes - 1);
       } else {
-        // Like: add like and remove dislike if exists
-        newLikes = reactions.likes + 1;
+        newLikes = state.reactions.likes + 1;
         if (wasDisliked) {
-          newDislikes = Math.max(0, reactions.dislikes - 1);
+          newDislikes = Math.max(0, state.reactions.dislikes - 1);
         }
       }
 
-      // Update local state immediately for instant feedback
-      setReactions({
-        likes: newLikes,
-        dislikes: newDislikes,
-      });
+      setState(prev => ({
+        ...prev,
+        reactions: {
+          likes: newLikes,
+          dislikes: newDislikes,
+        },
+      }));
       
-      // Trigger server mutation
       await toggleLikeMutation.mutateAsync(post._id);
       
-      // Update parent component
       onPostUpdate?.({
         ...post,
+        views: state.viewCount, // This will be a number now
         reactions: {
           likes: newLikes,
           dislikes: newDislikes,
@@ -268,49 +267,50 @@ export default function PostActions({
       });
       
     } catch (error) {
-      // Revert on error
-      setReactions({
-        likes: post.reactions?.likes || 0,
-        dislikes: post.reactions?.dislikes || 0,
-      });
+      setState(prev => ({
+        ...prev,
+        reactions: {
+          likes: post.reactions?.likes || 0,
+          dislikes: post.reactions?.dislikes || 0,
+        },
+      }));
       console.error("Failed to toggle like:", error);
     }
-  }, [userLiked, userDisliked, reactions, post, onPostUpdate, toggleLikeMutation]);
+  }, [userInteractionData, state.reactions, post, state.viewCount, onPostUpdate, toggleLikeMutation]);
 
   // Handle dislike action with immediate UI updates
   const handleDislike = useCallback(async () => {
     if (toggleDislikeMutation.isPending) return;
     
     try {
-      const wasLiked = userLiked;
-      const wasDisliked = userDisliked;
+      const wasLiked = userInteractionData.liked;
+      const wasDisliked = userInteractionData.disliked;
       
-      let newLikes = reactions.likes;
-      let newDislikes = reactions.dislikes;
+      let newLikes = state.reactions.likes;
+      let newDislikes = state.reactions.dislikes;
       
       if (wasDisliked) {
-        // Remove dislike: just remove the dislike
-        newDislikes = Math.max(0, reactions.dislikes - 1);
+        newDislikes = Math.max(0, state.reactions.dislikes - 1);
       } else {
-        // Add dislike: add dislike and remove like if exists
-        newDislikes = reactions.dislikes + 1;
+        newDislikes = state.reactions.dislikes + 1;
         if (wasLiked) {
-          newLikes = Math.max(0, reactions.likes - 1);
+          newLikes = Math.max(0, state.reactions.likes - 1);
         }
       }
 
-      // Update local state immediately
-      setReactions({
-        likes: newLikes,
-        dislikes: newDislikes,
-      });
+      setState(prev => ({
+        ...prev,
+        reactions: {
+          likes: newLikes,
+          dislikes: newDislikes,
+        },
+      }));
       
-      // Trigger server mutation
       await toggleDislikeMutation.mutateAsync(post._id);
       
-      // Update parent component
       onPostUpdate?.({
         ...post,
+        views: state.viewCount, // This will be a number now
         reactions: {
           likes: newLikes,
           dislikes: newDislikes,
@@ -318,20 +318,22 @@ export default function PostActions({
       });
       
     } catch (error) {
-      // Revert on error
-      setReactions({
-        likes: post.reactions?.likes || 0,
-        dislikes: post.reactions?.dislikes || 0,
-      });
+      setState(prev => ({
+        ...prev,
+        reactions: {
+          likes: post.reactions?.likes || 0,
+          dislikes: post.reactions?.dislikes || 0,
+        },
+      }));
       console.error("Failed to toggle dislike:", error);
     }
-  }, [userLiked, userDisliked, reactions, post, onPostUpdate, toggleDislikeMutation]);
+  }, [userInteractionData, state.reactions, post, state.viewCount, onPostUpdate, toggleDislikeMutation]);
 
-  // Handle share action
+  // Handle share action - UPDATED: No success toast
   const handleShare = useCallback(async () => {
-    if (isShareLoading) return;
+    if (state.isShareLoading) return;
     
-    setIsShareLoading(true);
+    setState(prev => ({ ...prev, isShareLoading: true }));
     
     try {
       const shareUrl = `${window.location.origin}/p/${post._id}`;
@@ -345,13 +347,13 @@ export default function PostActions({
         
         if (navigator.canShare(shareData)) {
           await navigator.share(shareData);
-          showSuccessToast("Post shared successfully!");
+          // Removed: showSuccessToast("Post shared successfully!");
         } else {
           throw new Error("Share not supported");
         }
       } else {
         await navigator.clipboard.writeText(shareUrl);
-        showSuccessToast("Link copied to clipboard!");
+        // Removed: showSuccessToast("Link copied to clipboard!");
       }
     } catch (error) {
       if (error !== 'AbortError') {
@@ -359,16 +361,16 @@ export default function PostActions({
         try {
           const shareUrl = `${window.location.origin}/p/${post._id}`;
           await navigator.clipboard.writeText(shareUrl);
-          showSuccessToast("Link copied to clipboard!");
+          // Removed: showSuccessToast("Link copied to clipboard!");
         } catch (clipboardError) {
           console.error("Clipboard fallback failed:", clipboardError);
-          showSuccessToast("Unable to share. Please copy the URL manually.");
+          // Removed: showSuccessToast("Unable to share. Please copy the URL manually.");
         }
       }
     } finally {
-      setIsShareLoading(false);
+      setState(prev => ({ ...prev, isShareLoading: false }));
     }
-  }, [post._id, post.title, post.description, isShareLoading]);
+  }, [post._id, post.title, post.description, state.isShareLoading]);
 
   // Handle comments
   const handleComments = useCallback((e?: React.MouseEvent) => {
@@ -385,23 +387,41 @@ export default function PostActions({
     onComments();
   }, [isOnPostPage, post._id, onComments]);
 
+  // Debug info in development
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`PostActions for ${post._id}:`, {
+        enableViewTracking,
+        hasViewBeenTracked,
+        isTracking,
+        currentViewCount: state.viewCount,
+        originalViewCount: post.views,
+        userAuthenticated: !!currentUser,
+        referralSource
+      });
+    }
+  }, [post._id, enableViewTracking, hasViewBeenTracked, isTracking, state.viewCount, post.views, currentUser, referralSource]);
+
   return (
-    <div className="post-actions-container">
+    <div 
+      className="post-actions-container" 
+      ref={viewTrackingRef as React.RefObject<HTMLDivElement>}
+    >
       <div className="post-actions-group">
         <ActionButton
           icon={
             <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" style={{ width: '100%', height: '100%' }}>
               <path 
                 d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" 
-                fill={userLiked ? 'currentColor' : 'none'}
+                fill={userInteractionData.liked ? 'currentColor' : 'none'}
                 stroke="currentColor"
               />
             </svg>
           }
-          count={reactions.likes}
-          active={userLiked}
+          count={state.reactions.likes}
+          active={userInteractionData.liked}
           onClick={withAuthCheck(handleLike, "Like")}
-          label={userLiked ? "Unlike" : "Like"}
+          label={userInteractionData.liked ? "Unlike" : "Like"}
           variant="like"
           loading={toggleLikeMutation.isPending}
         />
@@ -411,15 +431,15 @@ export default function PostActions({
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '100%', height: '100%' }}>
               <path 
                 d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" 
-                fill={userDisliked ? 'currentColor' : 'none'}
+                fill={userInteractionData.disliked ? 'currentColor' : 'none'}
                 stroke="currentColor"
               />
             </svg>
           }
-          count={reactions.dislikes}
-          active={userDisliked}
+          count={state.reactions.dislikes}
+          active={userInteractionData.disliked}
           onClick={withAuthCheck(handleDislike, "Dislike")}
-          label={userDisliked ? "Remove dislike" : "Dislike"}
+          label={userInteractionData.disliked ? "Remove dislike" : "Dislike"}
           variant="dislike"
           loading={toggleDislikeMutation.isPending}
         />
@@ -440,7 +460,7 @@ export default function PostActions({
       <div className="post-actions-group">
         <ActionButton
           icon={
-            isShareLoading ? (
+            state.isShareLoading ? (
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '100%', height: '100%' }}>
                 <circle cx="12" cy="12" r="10" opacity="0.25"/>
                 <path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
@@ -458,9 +478,9 @@ export default function PostActions({
           onClick={withAuthCheck(handleShare, "Share")}
           label="Share post"
           showText={true}
-          text={isShareLoading ? "Sharing..." : "Share"}
+          text={state.isShareLoading ? "Sharing..." : "Share"}
           variant="share"
-          loading={isShareLoading}
+          loading={state.isShareLoading}
         />
         
         <div className="views-counter">
@@ -468,9 +488,11 @@ export default function PostActions({
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
             <circle cx="12" cy="12" r="3" />
           </svg>
-          <span>{formatNumber(post.views)}</span>
+          <span>{formatNumber(state.viewCount)}</span>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default PostActions;

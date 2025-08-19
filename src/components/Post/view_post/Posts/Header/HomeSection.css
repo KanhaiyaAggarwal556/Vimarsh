@@ -1,0 +1,534 @@
+/* HomeSection.css - Home section component styles */
+
+/* Home Section - Enhanced for pull-to-refresh and infinite scroll */
+.home-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: calc(100vh - 120px);
+  position: relative;
+  /* Enable touch-action for pull-to-refresh */
+  touch-action: pan-y;
+  overscroll-behavior-y: none;
+}
+
+/* PULL TO REFRESH STYLES */
+.pull-to-refresh-indicator {
+  position: absolute;
+  top: -80px;
+  left: 0;
+  right: 0;
+  height: 80px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 50;
+  border-radius: 0 0 12px 12px;
+  transition: opacity 0.3s ease;
+  will-change: transform, opacity;
+}
+
+.pull-refresh-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 0 20px 0;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.pull-refresh-icon {
+  font-size: 20px;
+  font-weight: bold;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s ease;
+  will-change: transform;
+}
+
+/* Regular refresh indicator for non-mobile */
+.refresh-indicator {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid #333;
+  margin: 0 -20px 20px -20px;
+  padding: 15px 20px;
+}
+
+.refresh-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #888;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Posts list container - Optimized for infinite scroll */
+.posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  /* Performance optimizations */
+  contain: content;
+  will-change: transform;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Memory optimization for large lists */
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px;
+}
+
+/* Enhanced infinite scroll loading indicator */
+.infinite-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  gap: 12px;
+  margin: 20px 0;
+  background: rgba(15, 15, 15, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Add subtle loading animation */
+.infinite-loading::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(52, 71, 178, 0.1),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.infinite-loading span {
+  color: #ccc;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 1;
+}
+
+/* Enhanced infinite scroll sentinel */
+.infinite-scroll-sentinel {
+  pointer-events: none;
+  visibility: hidden;
+  height: 20px;
+  margin: 40px 0;
+  background: transparent;
+  /* Ensure it's detectable by intersection observer */
+  min-height: 1px;
+  position: relative;
+  /* Performance optimization */
+  contain: strict;
+  max-height: 20px;
+}
+
+/* Enhanced end of content indicator */
+.end-of-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px 48px;
+  gap: 16px;
+  text-align: center;
+  animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.end-content-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #888;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.end-emoji {
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-4px);
+  }
+  60% {
+    transform: translateY(-2px);
+  }
+}
+
+.end-content-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  max-width: 100px;
+}
+
+/* Initial loading state - Enhanced */
+.initial-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 16px;
+  text-align: center;
+  min-height: 400px;
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.initial-loading p {
+  margin-top: 16px;
+  color: #888;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Error states - Enhanced */
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 16px;
+  text-align: center;
+  min-height: 400px;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.error-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.error-state h3 {
+  margin: 0 0 8px;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.error-state p {
+  margin: 0 0 24px;
+  color: #888;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+.load-more-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px;
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 12px;
+  margin: 20px 0;
+  text-align: center;
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.error-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Enhanced retry buttons */
+.retry-button {
+  background: rgb(52 71 178);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 120px;
+  position: relative;
+  overflow: hidden;
+}
+
+.retry-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.retry-button:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.retry-button:hover:not(:disabled) {
+  background: rgb(29 78 216);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(52, 71, 178, 0.4);
+}
+
+.retry-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.retry-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.retry-button.small {
+  padding: 8px 16px;
+  font-size: 13px;
+  min-width: 100px;
+}
+
+/* Enhanced loading spinner */
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: rgb(52 71 178);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-spinner.small {
+  width: 16px;
+  height: 16px;
+  border-width: 1.5px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mobile Optimizations - Enhanced for pull-to-refresh */
+@media (max-width: 768px) {
+  .home-section {
+    gap: 15px;
+    /* Enhanced touch behavior for mobile */
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+  }
+
+  .posts-list {
+    gap: 15px;
+  }
+
+  /* Mobile pull-to-refresh enhancements */
+  .pull-to-refresh-indicator {
+    top: -100px;
+    height: 100px;
+    border-radius: 0 0 16px 16px;
+  }
+
+  .pull-refresh-content {
+    padding: 0 0 24px 0;
+    font-size: 15px;
+  }
+
+  .pull-refresh-icon {
+    font-size: 22px;
+  }
+
+  .infinite-loading,
+  .end-of-content {
+    padding: 20px 12px;
+    margin: 16px 0;
+  }
+  
+  .initial-loading,
+  .error-state {
+    padding: 40px 16px;
+  }
+
+  .end-of-content {
+    gap: 12px;
+  }
+  
+  .end-of-content span {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-section {
+    gap: 12px;
+  }
+
+  .posts-list {
+    gap: 12px;
+  }
+
+  .infinite-loading,
+  .end-of-content {
+    padding: 16px 8px;
+    margin: 12px 0;
+  }
+  
+  .initial-loading,
+  .error-state {
+    padding: 32px 12px;
+  }
+
+  /* Small screen pull-to-refresh */
+  .pull-to-refresh-indicator {
+    top: -80px;
+    height: 80px;
+  }
+
+  .pull-refresh-content {
+    font-size: 14px;
+    padding: 0 0 20px 0;
+  }
+
+  .pull-refresh-icon {
+    font-size: 18px;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .retry-button,
+  .infinite-loading::before,
+  .retry-button::before,
+  .end-emoji {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Focus states for accessibility */
+.retry-button:focus-visible {
+  outline: 2px solid rgb(52 71 178);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .infinite-loading {
+    border: 2px solid #fff;
+  }
+  
+  .end-content-line {
+    background: #fff;
+  }
+  
+  .retry-button {
+    border: 1px solid #fff;
+  }
+
+  .pull-to-refresh-indicator {
+    border: 1px solid #fff;
+  }
+}
+
+/* GPU acceleration for smooth animations */
+.pull-to-refresh-indicator,
+.posts-list,
+.infinite-loading {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .retry-button:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+/* Performance optimizations for infinite scroll */
+.posts-list > * {
+  contain: layout style paint;
+  will-change: auto;
+}

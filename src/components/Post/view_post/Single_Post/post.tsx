@@ -1,160 +1,34 @@
+// components/Single_Post/post.tsx
 import { useState } from "react";
 import PostHeader from "./components/PostHeader";
 import PostContent from "./components/PostContent";
 import PostActions from "./components/PostActions";
 import PostComments from "./components/PostComments";
+import { PostProps, convertToPostActionsData } from "@/types/postTypes";
+import { usePostMutations } from "@/hooks/usePostMutations";
 import "./style/post.css";
 
-// Type definitions
-interface CommentReactions {
-  likes: number;
-  dislikes: number;
-}
-
-interface CommentUser {
-  _id: string;
-  username: string;
-  email?: string;
-}
-
-interface Comment {
-  _id: string;
-  id?: number;
-  body: string;
-  post: string;
-  user: CommentUser;
-  reactions: CommentReactions;
-  timestamp: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface User {
-  _id: string;
-  fullName: string;
-  userName: string;
-  profilepic: string;
-}
-
-interface Reactions {
-  likes: number;
-  dislikes: number;
-  shares: number;
-  saves: number;
-}
-
-interface PostData {
-  _id: string;
-  title: string;
-  description: string;
-  reactions: Reactions;
-  images?: string[];
-  videos?: string[];
-  tags?: string[];
-  location?: string;
-  views: number;
-  isPinned: boolean;
-  user: User;
-  createdAt: string;
-  updatedAt: string;
-  __v?: number;
-}
-
-interface PostProps {
-  showComments?: boolean; // Made optional with default
-  comments?: Comment[]; // Made optional as PostComments will fetch its own data
-  postId?: string; // Made optional, will use post._id if not provided
-  isLoading?: boolean;
-  isError?: boolean;
-  error?: Error | null;
-  hasNextPage?: boolean;
-  isFetchingNextPage?: boolean;
-  onRetry?: () => void;
-  post: PostData;
-  onDelete?: (postId: string) => void;
-  onReactionUpdate?: (
-    postId: string,
-    type: "likes" | "dislikes" | "shares" | "saves",
-    action: "increment" | "decrement"
-  ) => Promise<any>;
-  onTogglePin?: (postId: string) => Promise<any>;
-  isDeleting?: boolean;
-  // New props for user interaction states (optional - PostActions will manage if not provided)
-  initialUserLiked?: boolean;
-  initialUserDisliked?: boolean;
-  initialUserSaved?: boolean;
-}
-
 export default function Post({
-  showComments = false, // Default value
-  comments = [],
-  postId, // Will use post._id if not provided
-  isLoading = false,
-  isError = false,
-  error = null,
-  hasNextPage = false,
-  isFetchingNextPage = false,
-  onRetry,
+  showComments = false,
+  postId,
   post,
-  onDelete,
-  onReactionUpdate,
-  onTogglePin,
-  isDeleting = false,
-  initialUserLiked = false,
-  initialUserDisliked = false,
-  initialUserSaved = false,
+  onDelete, // Optional parent callback
+  isDeleting = false
 }: PostProps) {
-  // Only keep states that are specific to Post component functionality
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
-  const [showCommentsState, setShowCommentsState] =
-    useState<boolean>(showComments);
-  const [pinPending, setPinPending] = useState<boolean>(false);
-
-  // FIXED: Use post._id if postId is not provided or is invalid
-  const validPostId = postId && postId !== "undefined" ? postId : post?._id;
-
-  // Debug log
-  // console.log('Post component - postId:', postId, 'post._id:', post?._id, 'validPostId:', validPostId);
-
-  // Event handlers for Post-specific actions
-  const handlePin = async (): Promise<void> => {
-    if (pinPending || !onTogglePin) return;
-
-    setPinPending(true);
-    setShowDropdown(false);
-
-    try {
-      await onTogglePin(post._id);
-    } catch (error) {
-      console.error("Error toggling pin:", error);
-    } finally {
-      setPinPending(false);
-    }
-  };
-
-  const handleDelete = (): void => {
-    setShowDropdown(false);
-    if (onDelete) {
-      onDelete(post._id);
-    }
-  };
-
-  const handleComments = (): void => {
-    setShowCommentsState(!showCommentsState);
-  };
-
-  const handleUserClick = (): void => {
-    // console.log("User clicked:", post.user._id);
-    // Example: navigate(`/profile/${post.user._id}`);
-  };
-
-  // const handleRetry = (): void => {
-  //   if (onRetry) {
-  //     onRetry();
-  //   } else {
-  //     console.log('No retry handler provided');
-  //   }
-  // };
+  const [showCommentsState, setShowCommentsState] = useState<boolean>(showComments);
+  
+  // Use the centralized mutations hook for any parent-level state management
+  const {
+    togglePin,
+    toggleFollow,
+    toggleBookmark,
+    deletePost,
+    isTogglingPin,
+    isTogglingFollow,
+    isTogglingBookmark,
+    isDeletingPost,
+  } = usePostMutations();
 
   // Early return if no post data
   if (!post) {
@@ -167,6 +41,9 @@ export default function Post({
       </div>
     );
   }
+
+  // Use post._id if postId is not provided or is invalid
+  const validPostId = postId && postId !== "undefined" ? postId : post?._id;
 
   // Early return if no valid post ID
   if (!validPostId) {
@@ -183,9 +60,61 @@ export default function Post({
     );
   }
 
+  // Fixed: Modified to use the deletePost mutation from the hook
+  const handleDelete = (): void => {
+    console.log('🗑️ Delete callback from parent');
+    setShowDropdown(false);
+    
+    // Use the mutation from the hook
+    try {
+      deletePost(validPostId);
+      // Call parent callback if provided for additional handling
+      if (onDelete) {
+        onDelete(validPostId);
+      }
+    } catch (error) {
+      console.error('Error deleting post:', error);
+    }
+  };
+
+  const handlePin = (): void => {
+    console.log('📌 Pin/Unpin post:', validPostId);
+    try {
+      togglePin(validPostId);
+    } catch (error) {
+      console.error('Error toggling pin:', error);
+    }
+  };
+
+  const handleFollow = (): void => {
+    console.log('👥 Follow/Unfollow user:', post.user._id);
+    try {
+      toggleFollow(post.user._id);
+    } catch (error) {
+      console.error('Error toggling follow:', error);
+    }
+  };
+
+  const handleBookmark = (): void => {
+    console.log('🔖 Bookmark/Unbookmark post:', validPostId);
+    try {
+      toggleBookmark(validPostId);
+    } catch (error) {
+      console.error('Error toggling bookmark:', error);
+    }
+  };
+
+  const handleUserClick = (): void => {
+    console.log("👤 User clicked:", post.user._id);
+  };
+
+  // Convert PostDataExtended to PostActionsData for PostActions component
+  const postActionsData = convertToPostActionsData(post);
+
   return (
     <div className={`post-card ${isDeleting ? "deleting" : ""}`}>
       <div className="post-card-body">
+        {/* PostHeader - now includes all required props */}
         <PostHeader
           post={post}
           showDropdown={showDropdown}
@@ -193,34 +122,28 @@ export default function Post({
           onUserClick={handleUserClick}
           onDelete={handleDelete}
           onPin={handlePin}
-          pinPending={pinPending}
-          deletePending={isDeleting}
+          onFollow={handleFollow}
+          onBookmark={handleBookmark}
+          pinPending={isTogglingPin}
+          deletePending={isDeletingPost}
+          followPending={isTogglingFollow}
+          bookmarkPending={isTogglingBookmark}
         />
 
         <PostContent post={post} />
 
-        {/* PostActions now handles all reaction logic internally */}
-        <PostActions
-          post={post}
-          onComments={handleComments}
-          isOnPostPage={false} // or true if you're on the post page
-          // Pass the new props for better integration
-          onReactionUpdate={onReactionUpdate} // Your existing prop
-          initialUserLiked={initialUserLiked} // Your existing prop
-          initialUserDisliked={initialUserDisliked} // Your existing prop
-          initialUserSaved={initialUserSaved} // Your existing prop
-          // Legacy support - will still work
-          onPostUpdate={(updatedPost) => {
-            // Handle post update if needed
-            console.log("Post updated:", updatedPost);
-          }}
+        {/* PostActions - handles reactions, removed onReactionUpdate prop */}
+        <PostActions 
+          post={postActionsData}
+          enableViewTracking={true}
+          referralSource="feed"
+          onPostUpdate={(updated) => console.log('Updated:', updated)}
+          onComments={() => setShowCommentsState(!showCommentsState)}
+          // Removed onReactionUpdate since it's not in PostActionsProps interface
         />
 
-        {/* FIXED: Pass the correct postId to PostComments */}
         <PostComments showComments={showCommentsState} postId={validPostId} />
       </div>
     </div>
   );
 }
-
-export type { PostData, User, Reactions, PostProps };

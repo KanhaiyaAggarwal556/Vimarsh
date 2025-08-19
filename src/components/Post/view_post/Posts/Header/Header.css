@@ -1,0 +1,132 @@
+/* Header.css - Header component styles */
+
+/* Dynamic Header Styles - Enhanced for pull-to-refresh */
+.dynamic-header {
+  position: sticky;
+  top: 0;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid #333;
+  z-index: 100;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 20px;
+  /* Ensure header stays fixed during pull-to-refresh */
+  transform: translateZ(0);
+}
+
+.dynamic-header.scrolled {
+  padding: 12px 20px;
+  background: rgba(0, 0, 0, 0.98);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 100%;
+}
+
+.header-title {
+  color: #fff;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  transition: font-size 0.3s ease;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.header-title:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+
+.header-title:active {
+  transform: translateY(0);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dynamic-header.scrolled .header-title {
+  font-size: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .dynamic-header {
+    padding: 15px;
+  }
+
+  .dynamic-header.scrolled {
+    padding: 10px 15px;
+  }
+
+  .header-title {
+    font-size: 22px;
+  }
+
+  .dynamic-header.scrolled .header-title {
+    font-size: 18px;
+  }
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .dynamic-header {
+    padding: 12px;
+  }
+
+  .dynamic-header.scrolled {
+    padding: 8px 12px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .header-title {
+    font-size: 20px;
+  }
+
+  .dynamic-header.scrolled .header-title {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dynamic-header {
+    padding: 10px;
+  }
+
+  .dynamic-header.scrolled {
+    padding: 6px 10px;
+  }
+
+  .header-title {
+    font-size: 18px;
+  }
+
+  .dynamic-header.scrolled .header-title {
+    font-size: 14px;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .header-title {
+    transition: none;
+  }
+}
+
+/* Focus states for accessibility */
+.header-title:focus-visible {
+  outline: 2px solid rgb(52 71 178);
+  outline-offset: 2px;
+  border-radius: 8px;
+}

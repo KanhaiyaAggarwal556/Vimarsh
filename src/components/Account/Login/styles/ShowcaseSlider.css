@@ -1,0 +1,488 @@
+/* Dark Theme Showcase Slider Styles - Scoped to Login Page Only */
+
+/* All styles scoped under .login-page-container to prevent conflicts */
+.login-page-container .showcase-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  background: #000000;
+  background-image: 
+    radial-gradient(circle at 25% 25%, #1a1a1a 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, #0f0f0f 0%, transparent 50%);
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow: hidden;
+}
+
+/* Navigation Styles */
+.login-page-container .slide-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  z-index: 10;
+}
+
+.login-page-container .nav-button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.login-page-container .nav-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.login-page-container .nav-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.login-page-container .slide-indicators {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.login-page-container .slide-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.login-page-container .slide-indicator:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.login-page-container .slide-indicator-active {
+  background: #ffffff;
+  transform: scale(1.2);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+/* Slide Content */
+.login-page-container .slide-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.3s ease;
+}
+
+.login-page-container .slide-content.transitioning {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Feature Slide Styles */
+.login-page-container .feature-slide {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.login-page-container .feature-image {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  flex: 1;
+  min-height: 300px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.login-page-container .showcase-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.login-page-container .feature-image:hover .showcase-image {
+  transform: scale(1.02);
+}
+
+.login-page-container .image-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+  padding: 1.5rem;
+  color: #ffffff;
+}
+
+.login-page-container .feature-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+}
+
+.login-page-container .feature-description {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
+}
+
+/* Stats Container - HORIZONTAL LAYOUT */
+.login-page-container .stats-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.login-page-container .stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  flex: 1;
+  min-width: 0;
+}
+
+.login-page-container .stat-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.login-page-container .stat-icon {
+  color: #60a5fa;
+  flex-shrink: 0;
+}
+
+.login-page-container .stat-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.login-page-container .stat-value {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.login-page-container .stat-label {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Video Slide Styles */
+.login-page-container .video-slide {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.login-page-container .video-container {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  flex: 1;
+  min-height: 300px;
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.login-page-container .video-placeholder {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: #111111;
+}
+
+.login-page-container .video-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.login-page-container .video-placeholder:hover .video-thumbnail {
+  transform: scale(1.02);
+}
+
+.login-page-container .play-button {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #ffffff;
+  padding-left: 4px;
+  backdrop-filter: blur(10px);
+}
+
+.login-page-container .play-button:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.login-page-container .video-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.login-page-container .video-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 16px;
+}
+
+.login-page-container .video-control-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 0.5rem;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.login-page-container .video-control-button:hover {
+  background: rgba(0, 0, 0, 0.9);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Video Info */
+.login-page-container .video-info {
+  color: #ffffff;
+}
+
+.login-page-container .video-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+}
+
+.login-page-container .video-description {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.login-page-container .features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.login-page-container .feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: transform 0.2s ease;
+}
+
+.login-page-container .feature-item:hover {
+  transform: translateX(4px);
+}
+
+.login-page-container .feature-bullet {
+  width: 6px;
+  height: 6px;
+  background: #60a5fa;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.login-page-container .feature-text {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.login-page-container .feature-item:hover .feature-text {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .login-page-container .showcase-container {
+    padding: 1.5rem;
+  }
+  
+  .login-page-container .stats-container {
+    max-width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-page-container .showcase-container {
+    padding: 1rem;
+  }
+
+  .login-page-container .slide-navigation {
+    margin-bottom: 1rem;
+  }
+
+  .login-page-container .nav-button {
+    width: 35px;
+    height: 35px;
+  }
+
+  .login-page-container .feature-slide,
+  .login-page-container .video-slide {
+    gap: 1rem;
+  }
+
+  .login-page-container .feature-title,
+  .login-page-container .video-title {
+    font-size: 1.25rem;
+  }
+
+  .login-page-container .feature-description,
+  .login-page-container .video-description {
+    font-size: 0.9rem;
+  }
+
+  .login-page-container .stats-container {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .login-page-container .stat-item {
+    padding: 0.75rem;
+  }
+
+  .login-page-container .play-button {
+    width: 50px;
+    height: 50px;
+  }
+
+  .login-page-container .image-overlay {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-page-container .showcase-container {
+    padding: 0.75rem;
+  }
+
+  .login-page-container .slide-navigation {
+    margin-bottom: 0.75rem;
+  }
+
+  .login-page-container .nav-button {
+    width: 32px;
+    height: 32px;
+  }
+
+  .login-page-container .slide-indicator {
+    width: 10px;
+    height: 10px;
+  }
+
+  .login-page-container .feature-title,
+  .login-page-container .video-title {
+    font-size: 1.1rem;
+  }
+
+  .login-page-container .feature-description,
+  .login-page-container .video-description {
+    font-size: 0.85rem;
+  }
+
+  .login-page-container .play-button {
+    width: 45px;
+    height: 45px;
+  }
+
+  .login-page-container .stat-item {
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .login-page-container .stat-value {
+    font-size: 1.1rem;
+  }
+
+  .login-page-container .stat-label {
+    font-size: 0.8rem;
+  }
+  .showcase-image{
+    border-radius: 12px;
+    height: 50px;
+    width: 50px;
+  }
+}
+
+@media (max-width: 360px) {
+  .login-page-container .showcase-container {
+    padding: 0.5rem;
+  }
+
+  .login-page-container .feature-image,
+  .login-page-container .video-container {
+    min-height: 250px;
+  }
+
+  .login-page-container .features-list {
+    gap: 0.25rem;
+  }
+
+  .login-page-container .feature-item {
+    gap: 0.5rem;
+  }
+}
+
+/* Accessibility - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .login-page-container .showcase-container * {
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  .login-page-container .showcase-image,
+  .login-page-container .video-thumbnail {
+    transform: none !important;
+  }
+}

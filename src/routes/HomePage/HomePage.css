@@ -1,5 +1,253 @@
-.home{
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* PostsStyles.css - Optimized for smooth transitions without flash */
+
+/* Base Container - Optimized for performance */
+.posts-container {
+  position: fixed;
+  left: 25%;
+  width: 50%;
+  height: 100%;
+  box-sizing: border-box;
+  background-color: #000;
+  overflow-y: auto;
+  overflow-x: hidden;
+  top: 0;
+  z-index: 1;
+  /* Performance optimizations */
+  will-change: scroll-position;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  contain: strict;
+}
+
+/* Prevent flash during transitions */
+.posts-container.transitioning {
+  pointer-events: none;
+}
+
+.posts-container.transitioning .section {
+  will-change: transform, opacity;
+}
+
+/* Content Styles - Enhanced for smooth transitions */
+.posts-content {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: calc(100vh - 80px);
+  /* Ensure consistent background during transitions */
+  background-color: #000;
+}
+
+.section {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  transform: translateX(30px);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  visibility: hidden;
+  padding: 20px;
+  box-sizing: border-box;
+  /* Enable hardware acceleration and prevent flash */
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* Ensure consistent background */
+  background-color: #000;
+}
+
+.section.active {
+  opacity: 1;
+  transform: translateX(0) translateZ(0);
+  visibility: visible;
+  /* Reset will-change when active to save memory */
+  will-change: auto;
+}
+
+/* Smooth entrance animation for sections */
+.section:not(.active) {
+  transform: translateX(30px) translateZ(0);
+  opacity: 0;
+}
+
+/* Optimize transitions for different directions */
+.section[data-direction="left"] {
+  transform: translateX(-30px) translateZ(0);
+}
+
+.section[data-direction="right"] {
+  transform: translateX(30px) translateZ(0);
+}
+
+/* Enhanced Scrollbar Styling */
+.posts-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.posts-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.posts-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  border: none;
+  transition: background 0.2s ease;
+}
+
+.posts-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.posts-container::-webkit-scrollbar-thumb:active {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* Firefox scrollbar styling */
+.posts-container {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+/* Prevent layout shift during transitions */
+.posts-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #000;
+  z-index: -1;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .posts-container {
+    left: 20%;
+    width: 60%;
+  }
+}
+
+/* Mobile Optimizations - FULL WIDTH */
+@media (max-width: 768px) {
+  .posts-container {
+    position: fixed;
+    left: 0 !important;
+    width: 100% !important;
+    top: 0;
+    height: 100%;
+    /* Optimize for mobile scrolling and prevent flash */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  .section {
+    padding: 15px;
+    /* Faster transitions on mobile */
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* Enhanced mobile scrollbar */
+  .posts-container::-webkit-scrollbar {
+    width: 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .posts-container {
+    position: fixed;
+    left: 0 !important;
+    width: 100% !important;
+    top: 0;
+    height: 100%;
+  }
+
+  .section {
+    padding: 10px;
+    /* Even faster transitions on small screens */
+    transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+}
+
+/* Dark theme support */
+.posts-container {
+  color-scheme: dark;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .section {
+    transition: opacity 0.2s ease;
+    transform: none !important;
+  }
+  
+  .posts-container {
+    scroll-behavior: auto;
+  }
+}
+
+/* Performance optimizations */
+@supports (contain: strict) {
+  .posts-container {
+    contain: strict;
+  }
+}
+
+/* Enhanced smooth scrolling for better UX */
+@media (hover: hover) and (pointer: fine) {
+  .posts-container {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .posts-container {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    /* Prevent flash on touch devices */
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Optimize for high refresh rate displays */
+@media (min-resolution: 120dpi) {
+  .posts-container {
+    will-change: scroll-position;
+  }
+  
+  .section {
+    /* Smoother transitions on high refresh displays */
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+}
+
+/* GPU acceleration for smoother animations */
+.section,
+.posts-container,
+.posts-content {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Prevent white flash during section changes */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  background-color: #000;
+}
+
+/* Ensure no background flicker */
+.section * {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }

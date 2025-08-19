@@ -1,0 +1,288 @@
+/* Cleaned CSS for Login Page - Fixed Responsive Issues with Mobile Centering */
+
+/* Keyframe animations used by the login page */
+@keyframes loginFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes loginSlideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes loginSlideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes loginSlideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes loginScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Base transitions */
+.login-page-container * {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Main container - used as root div */
+.login-page-container {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #000000;
+  animation: loginFadeIn 0.8s ease-out;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Main content wrapper */
+.login-page-container .main-content {
+  flex: 1;
+  display: flex;
+  min-height: 100vh;
+  animation: loginSlideInFromTop 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+/* Left side - contains login form */
+.login-page-container .left-side {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: #000000;
+  animation: loginSlideInFromLeft 1s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 100vh;
+  position: relative;
+  order: 1; /* Default order for desktop */
+}
+
+/* Right side - contains showcase slider */
+.login-page-container .right-side {
+  flex: 1;
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+  position: relative;
+  overflow: hidden;
+  animation: loginSlideInFromRight 1s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 100vh;
+  order: 2; /* Default order for desktop */
+}
+
+/* Login section container */
+.login-page-container .login-section {
+  width: 100%;
+  max-width: 400px;
+  animation: loginScaleIn 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 0 auto;
+}
+
+/* Responsive design for tablets and small laptops */
+@media screen and (max-width: 1024px) {
+  .login-page-container .main-content {
+    flex-direction: column;
+    min-height: auto;
+  }
+  
+  .login-page-container .left-side {
+    flex: none;
+    order: 1; /* Login form comes FIRST on mobile/tablet */
+    min-height: 100vh; /* Full viewport height for mobile */
+    padding: 2rem 1.5rem;
+    animation: loginSlideInFromTop 1s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Center the content vertically and horizontally */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .login-page-container .right-side {
+    flex: none;
+    order: 2; /* Showcase slider comes SECOND on mobile/tablet */
+    min-height: 50vh; /* Reduced height for better mobile experience */
+    animation: loginSlideInFromTop 1s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .login-page-container .login-section {
+    max-width: 450px;
+    width: 100%;
+  }
+}
+
+/* Standard tablets */
+@media screen and (max-width: 768px) {
+  .login-page-container .left-side {
+    padding: 2rem 1rem;
+    min-height: 100vh; /* Ensure full height on tablets */
+  }
+  
+  .login-page-container .right-side {
+    min-height: 40vh; /* Further reduced height for tablets */
+  }
+  
+  .login-page-container .login-section {
+    max-width: none;
+    width: 100%;
+  }
+}
+
+/* Small tablets and large phones */
+@media screen and (max-width: 640px) {
+  .login-page-container .left-side {
+    padding: 1.5rem 1rem;
+    min-height: 100vh; /* Full height for better centering */
+    /* Ensure perfect centering */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .login-page-container .right-side {
+    min-height: 30vh; /* Smaller height for small tablets */
+  }
+
+  .login-page-container .login-section {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* Mobile phones */
+@media screen and (max-width: 480px) {
+  .login-page-container {
+    overflow-y: auto; /* Allow scrolling if needed */
+  }
+
+  .login-page-container .main-content {
+    min-height: auto;
+  }
+
+  .login-page-container .left-side {
+    padding: 1rem;
+    min-height: 100vh; /* Full viewport height for mobile */
+    min-height: 100dvh; /* Use dynamic viewport height if supported */
+    /* Perfect centering for mobile */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  
+  .login-page-container .right-side {
+    min-height: 25vh; /* Much smaller height for mobile */
+  }
+  
+  .login-page-container .login-section {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+  }
+}
+
+/* Very small phones */
+@media screen and (max-width: 360px) {
+  .login-page-container .left-side {
+    padding: 0.75rem;
+    min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height */
+  }
+  
+  .login-page-container .login-section {
+    margin: 0 auto;
+    width: 100%;
+    padding: 0;
+  }
+  
+  .login-page-container .right-side {
+    min-height: 20vh; /* Very small height for small phones */
+  }
+}
+
+/* Landscape orientation on mobile - special handling */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  .login-page-container .main-content {
+    flex-direction: row; /* Side by side in landscape */
+  }
+  
+  .login-page-container .left-side {
+    order: 1;
+    min-height: 100vh;
+    padding: 1rem;
+    flex: 1.2; /* Login form takes more space */
+  }
+  
+  .login-page-container .right-side {
+    order: 2;
+    min-height: 100vh;
+    flex: 0.8; /* Showcase takes less space */
+  }
+  
+  .login-page-container .login-section {
+    max-width: 350px;
+  }
+}
+
+/* Special handling for very short mobile screens */
+@media screen and (max-height: 600px) and (max-width: 480px) {
+  .login-page-container .left-side {
+    padding: 0.5rem;
+    /* Allow some scrolling on very short screens */
+    min-height: auto;
+    min-height: max(100vh, 600px);
+  }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  @media screen and (max-width: 480px) {
+    .login-page-container .left-side {
+      min-height: -webkit-fill-available;
+    }
+  }
+}
+
+/* Accessibility - reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .login-page-container,
+  .login-page-container * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

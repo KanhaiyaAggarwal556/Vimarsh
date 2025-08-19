@@ -1,5 +1,5 @@
 // services/mockService.ts
-import { API_CONFIG } from "@/config/APIConfig";
+import { API_CONFIG } from "@/config/apiConfig";
 import type { ApiResponse } from "@/types/apiTypes";
 
 export class MockService {

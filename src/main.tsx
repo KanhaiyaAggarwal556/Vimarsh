@@ -17,11 +17,11 @@ import SearchPageLayout from "./routes/Layout/SearchPageLayout";
 import Notification from "./routes/Notification/Notification";
 import ContactPage from "./routes/ContactPage/ContactPage";
 import PhotoPage from "./routes/PhotoPage/PhotoPage";
-import SignupPage from "./routes/Auth/SignupPage";
 import ForgotPasswordPage from "./routes/Auth/PasswordResetSystem";
 import UserProfilePage from "./routes/UserProfilePage/UsersProfile";
 import FeaturesPage from "./routes/FeaturesPage/FeaturesPage";
 import About from "./routes/AboutPage/About";
+import SignupPage from "./routes/Auth/SignupPage";
 
 // Import auth components
 import AuthProvider from "./auth/AuthProvider";
@@ -141,7 +141,7 @@ createRoot(rootElement).render(
               path="/i/account/signup"
               element={
                 <PublicRoute>
-                  <SignupPage />
+                  <SignupPage/>
                 </PublicRoute>
               }
             />

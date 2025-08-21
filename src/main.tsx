@@ -21,7 +21,7 @@ import ForgotPasswordPage from "./routes/Auth/PasswordResetSystem";
 import UserProfilePage from "./routes/UserProfilePage/UsersProfile";
 import FeaturesPage from "./routes/FeaturesPage/FeaturesPage";
 import About from "./routes/AboutPage/About";
-import SignUpPage from "./routes/Auth/SignupPage";
+import SignUpPage from "./routes/Auth/SignUpPage";
 
 // Import auth components
 import AuthProvider from "./auth/AuthProvider";

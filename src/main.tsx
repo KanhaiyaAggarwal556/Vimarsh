@@ -21,7 +21,7 @@ import ForgotPasswordPage from "./routes/Auth/PasswordResetSystem";
 import UserProfilePage from "./routes/UserProfilePage/UsersProfile";
 import FeaturesPage from "./routes/FeaturesPage/FeaturesPage";
 import About from "./routes/AboutPage/About";
-import SignupPage from "./routes/Auth/SignUpPage";
+import SignUpPage from "./routes/Auth/SignUpPage";
 
 // Import auth components
 import AuthProvider from "./auth/AuthProvider";
@@ -141,7 +141,7 @@ createRoot(rootElement).render(
               path="/i/account/signup"
               element={
                 <PublicRoute>
-                  <SignupPage/>
+                  <SignUpPage/>
                 </PublicRoute>
               }
             />

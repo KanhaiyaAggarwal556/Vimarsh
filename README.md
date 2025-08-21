@@ -1,4 +1,3 @@
-![image](https://github.com/user-attachments/assets/ff0ee6e2-17f3-4f45-be10-e871b808788c)# Twooter 🐦  
 **"Speak your mind. Share your world."**
 
 ## 🌐 Live Site  

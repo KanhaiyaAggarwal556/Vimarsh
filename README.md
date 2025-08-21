@@ -31,6 +31,6 @@ Vimarsh is a dynamic and modern social media platform built for expression and e
 
 ## 📬 Connect  
 Have suggestions or feedback? Let’s connect!  
-📧 your-kanhaiaggarwal@gmail.com
+📧 kanhaiaggarwal@gmail.com
 🌍 [Portfolio Website](https://kanhainya-portfolio.netlify.app/)
 

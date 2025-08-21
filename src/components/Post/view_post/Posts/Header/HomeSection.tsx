@@ -1,5 +1,5 @@
-// components/Post/view_post/Posts/Header/HomeSection.tsx - Cleaned version with CSS-only styles
-import { RefObject } from 'react';
+// components/Post/view_post/Posts/Header/HomeSection.tsx - Fixed version
+import { RefObject, useState, useEffect } from 'react';
 import { HomeSectionProps } from '@/types';
 import { createToggleClass } from '@/utils/classNames';
 import { scrollToTop } from '@/utils/scroll';
@@ -26,12 +26,14 @@ const HomeSection = ({
   sentinelRef,
   error,
 }: ExtendedHomeSectionProps) => {
+  const [internalRefreshing, setInternalRefreshing] = useState(false);
+  
   const handleGetPostClick = () => {
     onRefetch?.();
     scrollToTop();
   };
 
-  // Pull-to-refresh functionality
+  // Enhanced pull-to-refresh functionality
   const {
     containerRef,
     isPulling,
@@ -42,22 +44,37 @@ const HomeSection = ({
     isEnabled: pullToRefreshEnabled
   } = usePullToRefresh({
     onRefresh: async () => {
-      await onRefetch?.();
+      setInternalRefreshing(true);
+      try {
+        if (onRefetch) {
+          await onRefetch();
+        }
+      } finally {
+        setInternalRefreshing(false);
+      }
     },
-    threshold: 60,
-    resistance: 2.0,
-    enabled: isActive && postList.length > 0,
-    refreshing: fetching
+    threshold: 70, // Slightly higher threshold for better UX
+    resistance: 2.2, // More resistance for natural feel
+    enabled: isActive && postList.length > 0 && !fetching,
+    refreshing: fetching || internalRefreshing
   });
 
-  // Calculate pull-to-refresh visual effects
+  // Reset internal refreshing state when fetching changes
+  useEffect(() => {
+    if (!fetching && internalRefreshing) {
+      setInternalRefreshing(false);
+    }
+  }, [fetching, internalRefreshing]);
+
+  // Calculate enhanced pull-to-refresh visual effects
   const pullProgress = Math.min(pullDistance / threshold, 1);
-  const spinnerSize = 20 + (pullProgress * 12);
-  const spinnerOpacity = Math.min(pullProgress * 2, 1);
+  const spinnerSize = 24 + (pullProgress * 16); // Larger spinner
+  const spinnerOpacity = Math.min(pullProgress * 1.5, 1);
 
   // Enhanced spinner visibility logic
-  const showSpinner = pullToRefreshEnabled && (isPulling || isRefreshing);
-  const spinnerVisible = showSpinner && (spinnerOpacity > 0.1 || isRefreshing);
+  const actuallyRefreshing = isRefreshing || internalRefreshing;
+  const showSpinner = pullToRefreshEnabled && (isPulling || actuallyRefreshing) && isActive;
+  const spinnerVisible = showSpinner && (spinnerOpacity > 0.1 || actuallyRefreshing);
 
   // Error state with retry option
   if (error && postList.length === 0) {
@@ -107,34 +124,34 @@ const HomeSection = ({
       }`}
       ref={containerRef}
       style={pullToRefreshEnabled && isPulling ? {
-        '--pull-distance': `${Math.min(pullDistance * 0.5, 30)}px`
+        '--pull-distance': `${Math.min(pullDistance * 0.3, 40)}px`
       } as React.CSSProperties : undefined}
     >
-      {/* Pull-to-refresh spinner indicator */}
+      {/* Enhanced pull-to-refresh spinner indicator */}
       {showSpinner && (
         <div 
           className={`pull-refresh-spinner ${spinnerVisible ? 'visible' : 'hidden'}`}
           style={{
-            opacity: isRefreshing ? 1 : spinnerOpacity,
-            display: isRefreshing || spinnerVisible ? 'flex' : 'none'
+            opacity: actuallyRefreshing ? 1 : spinnerOpacity,
+            display: actuallyRefreshing || spinnerVisible ? 'flex' : 'none'
           }}
         >
           <div 
-            className={`spinner-container ${canRefresh || isRefreshing ? 'can-refresh' : 'not-ready'} ${
-              isRefreshing ? 'refreshing' : ''
+            className={`spinner-container ${canRefresh || actuallyRefreshing ? 'can-refresh' : 'not-ready'} ${
+              actuallyRefreshing ? 'refreshing' : ''
             }`}
             style={{
-              width: `${Math.max(spinnerSize, 40)}px`,
-              height: `${Math.max(spinnerSize, 40)}px`
+              width: `${Math.max(spinnerSize, 50)}px`,
+              height: `${Math.max(spinnerSize, 50)}px`
             }}
           >
-            {isRefreshing ? (
+            {actuallyRefreshing ? (
               <div className="spinner-loading" />
             ) : (
               <div 
                 className="spinner-icon"
                 style={{
-                  fontSize: `${Math.max(spinnerSize * 0.5, 16)}px`,
+                  fontSize: `${Math.max(spinnerSize * 0.4, 20)}px`,
                   transform: `rotate(${pullProgress * 180}deg)`
                 }}
               >
@@ -142,11 +159,50 @@ const HomeSection = ({
               </div>
             )}
           </div>
+          
+          {/* Enhanced feedback text */}
+          {canRefresh && !actuallyRefreshing && (
+            <div style={{
+              position: 'absolute',
+              top: '100%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              marginTop: '8px',
+              fontSize: '12px',
+              color: '#fff',
+              background: 'rgba(52, 71, 178, 0.9)',
+              padding: '4px 8px',
+              borderRadius: '12px',
+              whiteSpace: 'nowrap',
+              opacity: pullProgress > 0.8 ? 1 : 0,
+              transition: 'opacity 0.2s ease'
+            }}>
+              Release to refresh
+            </div>
+          )}
+          
+          {actuallyRefreshing && (
+            <div style={{
+              position: 'absolute',
+              top: '100%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              marginTop: '8px',
+              fontSize: '12px',
+              color: '#fff',
+              background: 'rgba(34, 197, 94, 0.9)',
+              padding: '4px 8px',
+              borderRadius: '12px',
+              whiteSpace: 'nowrap'
+            }}>
+              Refreshing...
+            </div>
+          )}
         </div>
       )}
 
-      {/* Regular refresh indicator for non-mobile */}
-      {fetching && postList.length > 0 && !isPulling && !isRefreshing && (
+      {/* Regular refresh indicator for non-mobile or non-pull refresh */}
+      {fetching && postList.length > 0 && !isPulling && !actuallyRefreshing && (
         <div className="refresh-indicator">
           <div className="refresh-content">
             <LoadingSpinner size="small" />
@@ -155,7 +211,7 @@ const HomeSection = ({
         </div>
       )}
 
-      {/* Posts list */}
+      {/* Posts list with better structure */}
       <div className="posts-list">
         {postList.map((post, index) => (
           <Post 
@@ -170,6 +226,11 @@ const HomeSection = ({
         <div 
           ref={sentinelRef} 
           className="infinite-scroll-sentinel"
+          style={{ 
+            height: '20px',
+            margin: '40px 0',
+            background: 'transparent' 
+          }}
         />
       )}
       

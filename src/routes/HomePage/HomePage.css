@@ -1,6 +1,6 @@
-/* PostsStyles.css - Optimized for smooth transitions without flash */
+/* PostsStyles.css - Fixed version with proper mobile scrolling */
 
-/* Base Container - Optimized for performance */
+/* Base Container - CRITICAL FIXES for mobile scrolling */
 .posts-container {
   position: fixed;
   left: 25%;
@@ -12,31 +12,41 @@
   overflow-x: hidden;
   top: 0;
   z-index: 1;
-  /* Performance optimizations */
-  will-change: scroll-position;
+  
+  /* FIXED: Proper mobile scrolling setup */
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
-  contain: strict;
+  overscroll-behavior-y: auto; /* Allow native pull-to-refresh to be overridden */
+  
+  /* Remove problematic contain for better mobile performance */
+  contain: layout style;
+  
+  /* Ensure smooth scrolling performance */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
-/* Prevent flash during transitions */
+/* CRITICAL: Prevent flash during transitions */
 .posts-container.transitioning {
   pointer-events: none;
+  overflow-y: auto; /* Keep scrolling enabled during transitions */
 }
 
 .posts-container.transitioning .section {
   will-change: transform, opacity;
 }
 
-/* Content Styles - Enhanced for smooth transitions */
+/* Content Styles - Enhanced for smooth transitions and mobile */
 .posts-content {
   position: relative;
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
   min-height: calc(100vh - 80px);
-  /* Ensure consistent background during transitions */
   background-color: #000;
+  
+  /* Ensure no scrolling interference */
+  transform: none;
 }
 
 .section {
@@ -50,36 +60,27 @@
   visibility: hidden;
   padding: 20px;
   box-sizing: border-box;
-  /* Enable hardware acceleration and prevent flash */
+  
+  /* Hardware acceleration without scroll interference */
   will-change: transform, opacity;
-  transform: translateZ(0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  /* Ensure consistent background */
   background-color: #000;
+  
+  /* IMPORTANT: Don't interfere with container scrolling */
+  touch-action: inherit;
 }
 
 .section.active {
   opacity: 1;
-  transform: translateX(0) translateZ(0);
+  transform: translateX(0);
   visibility: visible;
-  /* Reset will-change when active to save memory */
   will-change: auto;
 }
 
-/* Smooth entrance animation for sections */
 .section:not(.active) {
-  transform: translateX(30px) translateZ(0);
+  transform: translateX(30px);
   opacity: 0;
-}
-
-/* Optimize transitions for different directions */
-.section[data-direction="left"] {
-  transform: translateX(-30px) translateZ(0);
-}
-
-.section[data-direction="right"] {
-  transform: translateX(30px) translateZ(0);
 }
 
 /* Enhanced Scrollbar Styling */
@@ -106,13 +107,12 @@
   background: rgba(255, 255, 255, 0.35);
 }
 
-/* Firefox scrollbar styling */
 .posts-container {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
 }
 
-/* Prevent layout shift during transitions */
+/* Prevent layout shift */
 .posts-content::before {
   content: '';
   position: absolute;
@@ -132,7 +132,7 @@
   }
 }
 
-/* Mobile Optimizations - FULL WIDTH */
+/* CRITICAL MOBILE FIXES */
 @media (max-width: 768px) {
   .posts-container {
     position: fixed;
@@ -140,22 +140,37 @@
     width: 100% !important;
     top: 0;
     height: 100%;
-    /* Optimize for mobile scrolling and prevent flash */
+    
+    /* CRITICAL: Proper mobile scrolling */
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior: none;
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+    overscroll-behavior: auto;
+    scroll-behavior: auto; /* Let mobile handle smooth scrolling */
+    
+    /* Remove problematic transforms */
+    -webkit-transform: none;
+    transform: none;
+    
+    /* Better mobile performance */
+    contain: none;
+    will-change: auto;
   }
 
   .section {
     padding: 15px;
-    /* Faster transitions on mobile */
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    
+    /* CRITICAL: Don't interfere with mobile scrolling */
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: inherit;
   }
 
-  /* Enhanced mobile scrollbar */
+  /* Mobile scrollbar - thinner */
   .posts-container::-webkit-scrollbar {
     width: 3px;
+  }
+  
+  .posts-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
   }
 }
 
@@ -166,12 +181,55 @@
     width: 100% !important;
     top: 0;
     height: 100%;
+    
+    /* Ultra-optimized for small screens */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: auto;
+    transform: none;
+    -webkit-transform: none;
   }
 
   .section {
     padding: 10px;
-    /* Even faster transitions on small screens */
     transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    touch-action: pan-y;
+  }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .posts-container {
+    /* Critical iOS fixes */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: auto;
+    transform: none;
+    -webkit-transform: none;
+    
+    /* Prevent momentum scrolling issues */
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .section {
+    /* Remove transforms that cause iOS scroll issues */
+    -webkit-transform: none;
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
+  }
+  
+  .section.active {
+    -webkit-transform: none;
+    transform: none;
+  }
+}
+
+/* Android Chrome specific fixes */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  .posts-container {
+    /* Android Chrome optimizations */
+    overscroll-behavior-y: auto;
+    scroll-behavior: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -185,6 +243,7 @@
   .section {
     transition: opacity 0.2s ease;
     transform: none !important;
+    -webkit-transform: none !important;
   }
   
   .posts-container {
@@ -192,49 +251,57 @@
   }
 }
 
-/* Performance optimizations */
-@supports (contain: strict) {
-  .posts-container {
-    contain: strict;
-  }
-}
-
-/* Enhanced smooth scrolling for better UX */
-@media (hover: hover) and (pointer: fine) {
-  .posts-container {
-    scroll-behavior: smooth;
-  }
-}
-
-/* Touch device optimizations */
+/* Touch device optimizations - MOST IMPORTANT */
 @media (hover: none) and (pointer: coarse) {
   .posts-container {
+    /* CRITICAL: Perfect mobile scrolling setup */
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    /* Prevent flash on touch devices */
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
+    overscroll-behavior: auto;
+    scroll-behavior: auto;
+    
+    /* Remove ALL transforms that interfere */
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto;
+    
+    /* Let mobile browser handle momentum */
+    contain: none;
+  }
+  
+  .section {
+    /* Remove GPU acceleration that causes issues */
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto;
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
+    
+    /* Only transition opacity for mobile */
+    transition: opacity 0.3s ease;
+  }
+  
+  .section.active {
+    opacity: 1;
+    transform: none !important;
+    -webkit-transform: none !important;
+  }
+  
+  .section:not(.active) {
+    opacity: 0;
+    transform: none !important;
+    -webkit-transform: none !important;
   }
 }
 
-/* Optimize for high refresh rate displays */
+/* High refresh rate display optimizations */
 @media (min-resolution: 120dpi) {
   .posts-container {
     will-change: scroll-position;
   }
   
   .section {
-    /* Smoother transitions on high refresh displays */
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
-}
-
-/* GPU acceleration for smoother animations */
-.section,
-.posts-container,
-.posts-content {
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
 }
 
 /* Prevent white flash during section changes */
@@ -246,8 +313,16 @@ html, body {
   background-color: #000;
 }
 
-/* Ensure no background flicker */
+/* Performance optimizations for content */
 .section * {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  /* Only apply backface-visibility on desktop */
+  backface-visibility: visible;
+  -webkit-backface-visibility: visible;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .section * {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
 }

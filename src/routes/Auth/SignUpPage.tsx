@@ -31,7 +31,7 @@ interface SignupData {
   password: string;
 }
 
-export default function SignUp(): JSX.Element {
+export default function Signup(): JSX.Element {
   const navigate = useNavigate();
   const { register, isLoading } = useAuthStore();
 

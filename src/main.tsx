@@ -17,7 +17,7 @@ import SearchPageLayout from "./routes/Layout/SearchPageLayout";
 import Notification from "./routes/Notification/Notification";
 import ContactPage from "./routes/ContactPage/ContactPage";
 import PhotoPage from "./routes/PhotoPage/PhotoPage";
-import SignUpPage from "./routes/Auth/SignupPage";
+import Signup from "./routes/Auth/SignupPage";
 import ForgotPasswordPage from "./routes/Auth/PasswordResetSystem";
 import UserProfilePage from "./routes/UserProfilePage/UsersProfile";
 import FeaturesPage from "./routes/FeaturesPage/FeaturesPage";
@@ -141,7 +141,7 @@ createRoot(rootElement).render(
               path="/i/account/signup"
               element={
                 <PublicRoute>
-                  <SignUpPage />
+                  <Signup />
                 </PublicRoute>
               }
             />

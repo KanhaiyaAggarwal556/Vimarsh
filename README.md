@@ -2,7 +2,7 @@
 **"Speak your mind. Share your world."**
 
 ## 🌐 Live Site  
-🔗 [Explore Twooter](https://vimarsh-social.netlify.app/)
+🔗 [Explore Vimarsh](https://vimarsh-social.netlify.app/)
 
 ## 📖 Overview  
 Vimarsh is a dynamic and modern social media platform built for expression and engagement. Whether it’s a moment, a story, a news update, or a personal thought, Twooter lets users share it all. With multimedia support, trending hashtags, and seamless interactivity, it’s your space to connect and be heard.
@@ -19,7 +19,7 @@ Vimarsh is a dynamic and modern social media platform built for expression and e
 - **Backend**: Node.js, Express.js  
 - **Database**: MongoDB  
 - **Authentication**: JWT  
-- **State Management**: Context API / Redux  
+- **State Management**: Context API / Zustand  
 
 ## 🎯 Future Enhancements  
 - 💬 Commenting system  

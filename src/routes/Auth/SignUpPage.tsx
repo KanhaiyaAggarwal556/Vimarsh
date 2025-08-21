@@ -6,7 +6,7 @@ import SignUpForm from "@/components/Account/SignUp/SignUpForm";
 import SocialLogin from "@/components/Account/SignUp/SocialLogin";
 import SignUpFooter from "@/components/Account/SignUp/SignUpFooter";
 import Footer from "@/components/Account/Login/Footer";
-import "./SignUpPage.css";
+import "./SignupPage.css";
 
 interface FormData {
   name: string;
@@ -50,21 +50,28 @@ export default function SignUpPage(): JSX.Element {
     const checkSocialLoginCompletion = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const hasError = urlParams.get("error");
-      
+
       if (hasError) {
         console.error("Social login error:", hasError);
         const errorMessages: Record<string, string> = {
-          'google_auth_failed': 'Google authentication failed. Please try again.',
-          'facebook_auth_failed': 'Facebook authentication failed. Please try again.',
-          'linkedin_auth_failed': 'LinkedIn authentication failed. Please try again.',
-          'oauth_no_user': 'Social login failed. Please try again.',
-          'oauth_error': 'Authentication error occurred. Please try again.'
+          google_auth_failed: "Google authentication failed. Please try again.",
+          facebook_auth_failed:
+            "Facebook authentication failed. Please try again.",
+          linkedin_auth_failed:
+            "LinkedIn authentication failed. Please try again.",
+          oauth_no_user: "Social login failed. Please try again.",
+          oauth_error: "Authentication error occurred. Please try again.",
         };
-        
-        const errorMessage = errorMessages[hasError] || 'Authentication failed. Please try again.';
+
+        const errorMessage =
+          errorMessages[hasError] || "Authentication failed. Please try again.";
         setErrors({ email: errorMessage });
-        
-        window.history.replaceState({}, document.title, window.location.pathname);
+
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname
+        );
       }
     };
 
@@ -74,7 +81,7 @@ export default function SignUpPage(): JSX.Element {
   const handleSignup = async (userData: SignupData) => {
     try {
       const result = await register(userData);
-      
+
       if (result.success && result.user) {
         console.log("Signup successful:", result);
         navigate("/home");
@@ -112,7 +119,7 @@ export default function SignUpPage(): JSX.Element {
         <div className="signup-container">
           <div className="signup-wrapper">
             <SignUpHeader />
-            
+
             <div className="signup-form">
               {/* Display general error message */}
               {errors.email && !formData.email && (
@@ -121,7 +128,7 @@ export default function SignUpPage(): JSX.Element {
                 </div>
               )}
 
-              <SignUpForm 
+              <SignUpForm
                 formData={formData}
                 errors={errors}
                 isLoading={isLoading}
@@ -137,7 +144,7 @@ export default function SignUpPage(): JSX.Element {
           </div>
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );

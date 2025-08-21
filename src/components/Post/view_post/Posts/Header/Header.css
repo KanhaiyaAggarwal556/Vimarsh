@@ -1,6 +1,6 @@
-/* Header.css - Header component styles */
+/* Header.css - Subtle dynamic sizing on scroll */
 
-/* Dynamic Header Styles - Enhanced for pull-to-refresh */
+/* Base Dynamic Header - Maintains original design */
 .dynamic-header {
   position: sticky;
   top: 0;
@@ -9,16 +9,17 @@
   -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid #333;
   z-index: 100;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 20px;
-  /* Ensure header stays fixed during pull-to-refresh */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform: translateZ(0);
 }
 
+/* Scrolled State - Subtle size reduction */
 .dynamic-header.scrolled {
-  padding: 12px 20px;
+  padding: 14px 20px;
   background: rgba(0, 0, 0, 0.98);
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .header-content {
@@ -26,6 +27,7 @@
   justify-content: space-between;
   align-items: center;
   max-width: 100%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .header-title {
@@ -33,13 +35,18 @@
   font-size: 24px;
   font-weight: 600;
   margin: 0;
-  transition: font-size 0.3s ease;
   cursor: pointer;
   user-select: none;
   position: relative;
   padding: 8px 12px;
   border-radius: 8px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Subtle title size reduction when scrolled */
+.dynamic-header.scrolled .header-title {
+  font-size: 20px;
+  padding: 6px 10px;
 }
 
 .header-title:hover {
@@ -52,18 +59,14 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-.dynamic-header.scrolled .header-title {
-  font-size: 20px;
-}
-
 /* Responsive Design */
 @media (max-width: 1024px) {
   .dynamic-header {
-    padding: 15px;
+    padding: 18px 16px;
   }
 
   .dynamic-header.scrolled {
-    padding: 10px 15px;
+    padding: 12px 16px;
   }
 
   .header-title {
@@ -78,16 +81,21 @@
 /* Mobile Optimizations */
 @media (max-width: 768px) {
   .dynamic-header {
-    padding: 12px;
+    padding: 16px 12px;
   }
 
   .dynamic-header.scrolled {
-    padding: 8px 12px;
+    padding: 10px 12px;
   }
 
   .header-content {
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
+  }
+
+  /* Reduce gap when scrolled */
+  .dynamic-header.scrolled .header-content {
+    gap: 8px;
   }
 
   .header-title {
@@ -101,11 +109,11 @@
 
 @media (max-width: 480px) {
   .dynamic-header {
-    padding: 10px;
+    padding: 14px 10px;
   }
 
   .dynamic-header.scrolled {
-    padding: 6px 10px;
+    padding: 8px 10px;
   }
 
   .header-title {
@@ -115,12 +123,19 @@
   .dynamic-header.scrolled .header-title {
     font-size: 14px;
   }
+
+  /* Smaller gap on very small screens when scrolled */
+  .dynamic-header.scrolled .header-content {
+    gap: 6px;
+  }
 }
 
 /* Accessibility improvements */
 @media (prefers-reduced-motion: reduce) {
+  .dynamic-header,
+  .header-content,
   .header-title {
-    transition: none;
+    transition: none !important;
   }
 }
 
@@ -129,4 +144,45 @@
   outline: 2px solid rgb(52 71 178);
   outline-offset: 2px;
   border-radius: 8px;
+}
+
+/* Performance optimizations */
+.dynamic-header {
+  contain: layout style;
+  transform: translateZ(0);
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .dynamic-header {
+    -webkit-transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .header-title:hover {
+    transform: none;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .header-title:active {
+    background: rgba(255, 255, 255, 0.08);
+    transform: scale(0.98);
+  }
+}
+
+/* Dark theme support */
+.dynamic-header {
+  color-scheme: dark;
+}
+
+/* Smooth performance */
+.dynamic-header,
+.header-content,
+.header-title {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }

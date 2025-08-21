@@ -1,41 +1,122 @@
-/* SectionToggle.css - Enhanced for smooth transitions */
+/* SectionToggle.css - Enhanced with compact scroll behavior and gradient indicator */
 
-/* Section Toggle Styles */
+/* Base Section Toggle Styles */
 .section-toggle {
   position: relative;
   display: flex;
   background: rgba(57, 52, 52, 0.48);
   border-radius: 25px;
-  padding: 2px;
+  padding: 3px;
   gap: 0;
-  /* Ensure it stays above sections during transitions */
   z-index: 10;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-height: 44px;
+  /* Standard transform for compatibility */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
 }
 
+/* COMPACT STATE - When header is scrolled */
+.section-toggle.compact {
+  border-radius: 18px;
+  padding: 2px;
+  min-height: 32px;
+  background: rgba(57, 52, 52, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transform: scale(0.9) translateZ(0);
+  -webkit-transform: scale(0.9) translateZ(0);
+  -moz-transform: scale(0.9) translateZ(0);
+  -ms-transform: scale(0.9) translateZ(0);
+}
+
+/* Ultra-compact for fast scrolling */
+.section-toggle.ultra-compact {
+  border-radius: 15px;
+  padding: 1px;
+  min-height: 28px;
+  background: rgba(57, 52, 52, 0.7);
+  transform: scale(0.85) translateZ(0);
+  -webkit-transform: scale(0.85) translateZ(0);
+  -moz-transform: scale(0.85) translateZ(0);
+  -ms-transform: scale(0.85) translateZ(0);
+}
+
+/* Toggle Button Base Styles */
 .toggle-btn {
   background: transparent;
   border: none;
   color: #888;
-  padding: 10px 18px;
-  border-radius: 23px;
+  padding: 12px 20px;
+  border-radius: 22px;
   cursor: pointer;
-  transition: color 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   font-weight: 500;
+  font-size: 14px;
   position: relative;
   z-index: 2;
   flex: 1;
   text-align: center;
-  min-width: 80px;
+  min-width: 85px;
   overflow: hidden;
   will-change: transform;
+  touch-action: manipulation;
+  /* Standard transform for compatibility */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
 }
 
+/* Compact button styles when scrolled */
+.section-toggle.compact .toggle-btn {
+  padding: 8px 16px;
+  border-radius: 16px;
+  font-size: 12px;
+  min-width: 70px;
+  font-weight: 600; /* Slightly bolder when compact for readability */
+}
+
+.section-toggle.ultra-compact .toggle-btn {
+  padding: 6px 12px;
+  border-radius: 13px;
+  font-size: 11px;
+  min-width: 60px;
+  font-weight: 600;
+}
+
+/* Active and Hover States */
 .toggle-btn.active {
   color: #fff;
+  font-weight: 600;
 }
 
 .toggle-btn:hover:not(:disabled) {
   color: #ccc;
+  transform: translateY(-1px) translateZ(0);
+  -webkit-transform: translateY(-1px) translateZ(0);
+  -moz-transform: translateY(-1px) translateZ(0);
+  -ms-transform: translateY(-1px) translateZ(0);
+}
+
+.section-toggle.compact .toggle-btn:hover:not(:disabled) {
+  transform: translateY(-0.5px) translateZ(0);
+  -webkit-transform: translateY(-0.5px) translateZ(0);
+  -moz-transform: translateY(-0.5px) translateZ(0);
+  -ms-transform: translateY(-0.5px) translateZ(0);
+}
+
+.section-toggle.ultra-compact .toggle-btn:hover:not(:disabled) {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
 }
 
 .toggle-btn:disabled {
@@ -43,7 +124,7 @@
   cursor: wait;
 }
 
-/* MULTI-CLICK REFRESH FUNCTIONALITY */
+/* REFRESH FUNCTIONALITY - Enhanced for compact states */
 .toggle-btn.refreshing {
   color: rgba(255, 255, 255, 0.8);
   cursor: wait;
@@ -60,161 +141,249 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(52, 71, 178, 0.1),
+    rgba(52, 71, 178, 0.15),
     transparent
   );
-  animation: shimmer 2s infinite;
+  animation: shimmer 1.8s infinite;
+}
+
+.section-toggle.compact .toggle-btn.refreshing::after {
+  animation: shimmerCompact 1.5s infinite;
 }
 
 @keyframes shimmer {
-  0% {
+  0% { 
     left: -100%;
+    transform: translateX(0);
+    -webkit-transform: translateX(0);
   }
-  100% {
+  100% { 
     left: 100%;
+    transform: translateX(0);
+    -webkit-transform: translateX(0);
   }
 }
 
-/* Toggle indicator - Synchronized with section transitions */
+@keyframes shimmerCompact {
+  0% { 
+    left: -100%; 
+    opacity: 0.8;
+    transform: translateX(0);
+    -webkit-transform: translateX(0);
+  }
+  100% { 
+    left: 100%; 
+    opacity: 1;
+    transform: translateX(0);
+    -webkit-transform: translateX(0);
+  }
+}
+
+/* Toggle Indicator - Enhanced for compact states with gradient background */
 .toggle-indicator {
   position: absolute;
-  top: 2px;
-  height: calc(100% - 4px);
-  background: rgba(25, 36, 99, 0.671);
-  border-radius: 23px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  top: 3px;
+  height: calc(100% - 6px);
+  /* Updated gradient background */
+  background: linear-gradient(180deg, #444c96 0%, #051744 100%);
+  border-radius: 22px;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   z-index: 1;
   will-change: transform;
+  box-shadow: 0 2px 8px rgba(25, 36, 99, 0.3);
+  /* Standard transform for compatibility */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+}
+
+.section-toggle.compact .toggle-indicator {
+  top: 2px;
+  height: calc(100% - 4px);
+  border-radius: 16px;
+  /* Enhanced gradient for compact state */
+  background: linear-gradient(180deg, #444c96 0%, #051744 100%);
+  box-shadow: 0 1px 6px rgba(25, 36, 99, 0.4);
+}
+
+.section-toggle.ultra-compact .toggle-indicator {
+  top: 1px;
+  height: calc(100% - 2px);
+  border-radius: 13px;
+  /* Enhanced gradient for ultra-compact state */
+  background: linear-gradient(180deg, #444c96 0%, #051744 100%);
+  box-shadow: 0 1px 4px rgba(25, 36, 99, 0.5);
 }
 
 .toggle-indicator.refreshing {
-  background: rgba(25, 36, 99, 0.671);
-  animation: indicatorPulse 1.5s ease-in-out infinite;
+  animation: indicatorPulse 1.2s ease-in-out infinite;
+}
+
+.section-toggle.compact .toggle-indicator.refreshing {
+  animation: indicatorPulseCompact 1s ease-in-out infinite;
 }
 
 @keyframes indicatorPulse {
-  0%, 100% {
-    opacity: 0.7;
+  0%, 100% { 
+    opacity: 0.7; 
+    transform: scale(1) translateZ(0);
+    -webkit-transform: scale(1) translateZ(0);
+    -moz-transform: scale(1) translateZ(0);
+    -ms-transform: scale(1) translateZ(0);
   }
-  50% {
-    opacity: 1;
+  50% { 
+    opacity: 1; 
+    transform: scale(1.02) translateZ(0);
+    -webkit-transform: scale(1.02) translateZ(0);
+    -moz-transform: scale(1.02) translateZ(0);
+    -ms-transform: scale(1.02) translateZ(0);
   }
 }
 
+@keyframes indicatorPulseCompact {
+  0%, 100% { 
+    opacity: 0.8; 
+    transform: scale(1) translateZ(0);
+    -webkit-transform: scale(1) translateZ(0);
+    -moz-transform: scale(1) translateZ(0);
+    -ms-transform: scale(1) translateZ(0);
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.01) translateZ(0);
+    -webkit-transform: scale(1.01) translateZ(0);
+    -moz-transform: scale(1.01) translateZ(0);
+    -ms-transform: scale(1.01) translateZ(0);
+  }
+}
+
+/* Position calculations for different states */
 .toggle-indicator.home {
+  left: 3px;
+  width: calc(50% - 3px);
+}
+
+.toggle-indicator.messages {
+  left: calc(50% + 3px);
+  width: calc(50% - 3px);
+}
+
+.section-toggle.compact .toggle-indicator.home {
   left: 2px;
   width: calc(50% - 2px);
 }
 
-.toggle-indicator.messages {
+.section-toggle.compact .toggle-indicator.messages {
   left: calc(50% + 2px);
   width: calc(50% - 2px);
 }
 
-/* Multi-click progress indicator */
+.section-toggle.ultra-compact .toggle-indicator.home {
+  left: 1px;
+  width: calc(50% - 1px);
+}
+
+.section-toggle.ultra-compact .toggle-indicator.messages {
+  left: calc(50% + 1px);
+  width: calc(50% - 1px);
+}
+
+/* Enhanced Loading States */
+.refresh-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: rgba(52, 71, 178, 0.8);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 6px;
+}
+
+.section-toggle.compact .refresh-spinner {
+  width: 10px;
+  height: 10px;
+  border-width: 1px;
+  margin-left: 4px;
+}
+
+.section-toggle.ultra-compact .refresh-spinner {
+  width: 8px;
+  height: 8px;
+  border-width: 1px;
+  margin-left: 3px;
+}
+
+@keyframes spin {
+  to { 
+    transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+  }
+}
+
+/* Multi-click Progress Indicator - Compact aware */
 .multi-click-indicator {
   position: absolute;
   top: -2px;
   left: -2px;
   right: -2px;
   bottom: -2px;
-  border-radius: 25px;
+  border-radius: 27px;
   pointer-events: none;
   z-index: 4;
+  transition: all 0.3s ease;
 }
 
-.progress-ring {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: inherit;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  animation: progressGlow 0.3s ease-out;
+.section-toggle.compact .multi-click-indicator {
+  border-radius: 20px;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
 }
 
-@keyframes progressGlow {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.section-toggle.ultra-compact .multi-click-indicator {
+  border-radius: 17px;
 }
 
-/* Refresh overlay for button */
-.refresh-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(52, 71, 178, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: inherit;
-  z-index: 3;
-  animation: refreshPulse 1.5s ease-in-out infinite;
-}
-
-@keyframes refreshPulse {
-  0%, 100% {
-    background: rgba(52, 71, 178, 0.1);
-  }
-  50% {
-    background: rgba(52, 71, 178, 0.2);
-  }
-}
-
-/* Refresh spinner */
-.refresh-spinner {
-  width: 14px;
-  height: 14px;
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
-  border-top-color: rgba(52, 71, 178, 0.8);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-.refresh-spinner.small {
-  width: 12px;
-  height: 12px;
-  border-width: 1px;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Global refresh notification */
+/* Refresh Notification - Responsive positioning */
 .refresh-notification {
   position: fixed;
-  top: 100px;
+  top: 110px;
   left: 50%;
-  transform: translateX(-50%);
   z-index: 200;
   animation: slideDownFade 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
+  transform: translateX(-50%);
+  -webkit-transform: translateX(-50%);
+  -moz-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+}
+
+/* Adjust notification position when header is compact */
+.refresh-notification.header-compact {
+  top: 80px;
+}
+
+.refresh-notification.header-ultra-compact {
+  top: 70px;
 }
 
 .refresh-notification-content {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
+  padding: 8px 14px;
   background: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(52, 71, 178, 0.3);
   border-radius: 8px;
   color: #fff;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
@@ -222,103 +391,240 @@
 @keyframes slideDownFade {
   from {
     opacity: 0;
-    transform: translateX(-50%) translateY(-20px);
+    transform: translateX(-50%) translateY(-20px) scale(0.95);
+    -webkit-transform: translateX(-50%) translateY(-20px) scale(0.95);
+    -moz-transform: translateX(-50%) translateY(-20px) scale(0.95);
+    -ms-transform: translateX(-50%) translateY(-20px) scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
+    transform: translateX(-50%) translateY(0) scale(1);
+    -webkit-transform: translateX(-50%) translateY(0) scale(1);
+    -moz-transform: translateX(-50%) translateY(0) scale(1);
+    -ms-transform: translateX(-50%) translateY(0) scale(1);
   }
 }
 
-/* Mobile responsive adjustments */
-@media (max-width: 480px) {
+/* Responsive Design - Tablet */
+@media (max-width: 1024px) {
+  .section-toggle {
+    min-height: 40px;
+    padding: 2px;
+  }
+
+  .section-toggle.compact {
+    min-height: 30px;
+    transform: scale(0.92) translateZ(0);
+    -webkit-transform: scale(0.92) translateZ(0);
+    -moz-transform: scale(0.92) translateZ(0);
+    -ms-transform: scale(0.92) translateZ(0);
+  }
+
+  .section-toggle.ultra-compact {
+    min-height: 26px;
+    transform: scale(0.88) translateZ(0);
+    -webkit-transform: scale(0.88) translateZ(0);
+    -moz-transform: scale(0.88) translateZ(0);
+    -ms-transform: scale(0.88) translateZ(0);
+  }
+
   .toggle-btn {
-    padding: 6px 12px;
-    font-size: 14px;
+    padding: 10px 18px;
+    font-size: 13px;
+    min-width: 80px;
   }
 
-  .toggle-indicator.home {
-    width: calc(50% - 2px);
-  }
-
-  .toggle-indicator.messages {
-    left: 50%;
-    width: calc(50% - 2px);
-  }
-
-  .refresh-notification {
-    top: 80px;
-    left: 10px;
-    right: 10px;
-    transform: none;
-  }
-
-  .refresh-notification-content {
-    padding: 8px 12px;
-    font-size: 12px;
-  }
-
-  .refresh-spinner {
-    width: 12px;
-    height: 12px;
-    border-width: 1px;
+  .section-toggle.compact .toggle-btn {
+    padding: 6px 14px;
+    font-size: 11px;
+    min-width: 65px;
   }
 }
 
+/* Mobile Optimizations */
 @media (max-width: 768px) {
-  .toggle-indicator.home {
-    width: calc(50% - 2px);
+  .section-toggle {
+    min-height: 38px;
+    padding: 2px;
+    border-radius: 20px;
   }
 
-  .toggle-indicator.messages {
-    left: 50%;
-    width: calc(50% - 2px);
+  .section-toggle.compact {
+    min-height: 28px;
+    border-radius: 16px;
+    transform: scale(0.9) translateZ(0);
+    -webkit-transform: scale(0.9) translateZ(0);
+    -moz-transform: scale(0.9) translateZ(0);
+    -ms-transform: scale(0.9) translateZ(0);
+  }
+
+  .section-toggle.ultra-compact {
+    min-height: 24px;
+    border-radius: 14px;
+    transform: scale(0.85) translateZ(0);
+    -webkit-transform: scale(0.85) translateZ(0);
+    -moz-transform: scale(0.85) translateZ(0);
+    -ms-transform: scale(0.85) translateZ(0);
+  }
+
+  .toggle-btn {
+    padding: 8px 16px;
+    font-size: 12px;
+    min-width: 70px;
+  }
+
+  .section-toggle.compact .toggle-btn {
+    padding: 5px 12px;
+    font-size: 10px;
+    min-width: 55px;
+  }
+
+  .section-toggle.ultra-compact .toggle-btn {
+    padding: 4px 10px;
+    font-size: 9px;
+    min-width: 50px;
   }
 
   .refresh-notification {
-    top: 90px;
+    top: 85px;
     left: 15px;
     right: 15px;
     transform: none;
+    -webkit-transform: none;
+    -moz-transform: none;
+    -ms-transform: none;
+  }
+
+  .refresh-notification.header-compact {
+    top: 65px;
+  }
+
+  .refresh-notification.header-ultra-compact {
+    top: 55px;
   }
 }
 
-/* Accessibility improvements */
+/* Ultra-small screens */
+@media (max-width: 480px) {
+  .section-toggle {
+    min-height: 36px;
+    border-radius: 18px;
+  }
+
+  .section-toggle.compact {
+    min-height: 26px;
+    border-radius: 14px;
+    transform: scale(0.88) translateZ(0);
+    -webkit-transform: scale(0.88) translateZ(0);
+    -moz-transform: scale(0.88) translateZ(0);
+    -ms-transform: scale(0.88) translateZ(0);
+  }
+
+  .section-toggle.ultra-compact {
+    min-height: 22px;
+    border-radius: 12px;
+    transform: scale(0.82) translateZ(0);
+    -webkit-transform: scale(0.82) translateZ(0);
+    -moz-transform: scale(0.82) translateZ(0);
+    -ms-transform: scale(0.82) translateZ(0);
+  }
+
+  .toggle-btn {
+    padding: 6px 12px;
+    font-size: 11px;
+    min-width: 60px;
+  }
+
+  .section-toggle.compact .toggle-btn {
+    padding: 4px 10px;
+    font-size: 9px;
+    min-width: 45px;
+  }
+
+  .section-toggle.ultra-compact .toggle-btn {
+    padding: 3px 8px;
+    font-size: 8px;
+    min-width: 40px;
+  }
+
+  .refresh-notification {
+    top: 75px;
+    left: 10px;
+    right: 10px;
+  }
+
+  .refresh-notification.header-compact {
+    top: 55px;
+  }
+
+  .refresh-notification.header-ultra-compact {
+    top: 45px;
+  }
+}
+
+/* Performance optimizations */
+.section-toggle {
+  contain: layout style;
+}
+
+.section-toggle.transitioning {
+  will-change: transform, opacity;
+}
+
+.section-toggle:not(.transitioning) {
+  will-change: auto;
+}
+
+/* Enhanced accessibility */
 @media (prefers-reduced-motion: reduce) {
+  .section-toggle,
   .toggle-indicator,
-  .refresh-overlay,
-  .progress-ring,
-  .refresh-notification,
+  .toggle-btn,
   .refresh-spinner,
-  .toggle-btn.refreshing::after {
-    animation: none;
-    transition: none;
+  .multi-click-indicator,
+  .refresh-notification {
+    transition: none !important;
+    animation: none !important;
   }
 }
 
-/* Focus states for accessibility */
+/* Focus states with compact awareness */
 .toggle-btn:focus-visible {
   outline: 2px solid rgb(52 71 178);
   outline-offset: 2px;
-  border-radius: 23px;
+  border-radius: 22px;
+}
+
+.section-toggle.compact .toggle-btn:focus-visible {
+  outline-width: 1px;
+  outline-offset: 1px;
+  border-radius: 16px;
+}
+
+.section-toggle.ultra-compact .toggle-btn:focus-visible {
+  outline-width: 1px;
+  outline-offset: 1px;
+  border-radius: 13px;
 }
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
-  .toggle-btn {
-    border: 1px solid transparent;
+  .section-toggle {
+    border: 2px solid rgba(255, 255, 255, 0.3);
   }
-  
+
+  .section-toggle.compact {
+    border-width: 1px;
+  }
+
   .toggle-btn.active {
-    border-color: #fff;
+    background: rgba(52, 71, 178, 0.2);
+    border: 1px solid rgba(52, 71, 178, 0.5);
   }
 
-  .refresh-notification-content {
-    border: 2px solid #fff;
-  }
-
-  .multi-click-indicator {
-    border: 2px solid rgba(52, 71, 178, 0.8);
+  /* High contrast gradient fallback */
+  .toggle-indicator {
+    background: linear-gradient(180deg, #181c41 0%, #05143b 100%);
   }
 }
 
@@ -326,23 +632,56 @@
 @media (hover: none) and (pointer: coarse) {
   .toggle-btn:hover {
     color: #888;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    -ms-transform: translateZ(0);
   }
   
   .toggle-btn.active:hover {
     color: #fff;
   }
 
-  /* Enhanced touch targets for mobile */
+  .toggle-btn:active {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(0.98) translateZ(0);
+    -webkit-transform: scale(0.98) translateZ(0);
+    -moz-transform: scale(0.98) translateZ(0);
+    -ms-transform: scale(0.98) translateZ(0);
+  }
+
+  .section-toggle.compact .toggle-btn:active {
+    transform: scale(0.96) translateZ(0);
+    -webkit-transform: scale(0.96) translateZ(0);
+    -moz-transform: scale(0.96) translateZ(0);
+    -ms-transform: scale(0.96) translateZ(0);
+  }
+
+  .section-toggle.ultra-compact .toggle-btn:active {
+    transform: scale(0.95) translateZ(0);
+    -webkit-transform: scale(0.95) translateZ(0);
+    -moz-transform: scale(0.95) translateZ(0);
+    -ms-transform: scale(0.95) translateZ(0);
+  }
+
+  /* Enhanced touch targets */
   .toggle-btn {
     min-height: 44px;
-    touch-action: manipulation;
+  }
+
+  .section-toggle.compact .toggle-btn {
+    min-height: 32px;
+  }
+
+  .section-toggle.ultra-compact .toggle-btn {
+    min-height: 28px;
   }
 }
 
-/* GPU acceleration for smooth animations */
+/* Smooth performance for all states */
 .toggle-indicator,
-.refresh-overlay,
-.progress-ring {
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
+.toggle-btn,
+.refresh-spinner {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

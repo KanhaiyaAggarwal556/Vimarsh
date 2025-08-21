@@ -1,6 +1,6 @@
-/* PostsStyles.css - Fixed version with proper mobile scrolling */
+/* HomePage.css - Enhanced version with compact header optimizations */
 
-/* Base Container - CRITICAL FIXES for mobile scrolling */
+/* Base Container - Enhanced for smooth scrolling and compact header */
 .posts-container {
   position: fixed;
   left: 25%;
@@ -13,42 +13,43 @@
   top: 0;
   z-index: 1;
   
-  /* FIXED: Proper mobile scrolling setup */
+  /* Enhanced mobile scrolling setup */
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
-  overscroll-behavior-y: auto; /* Allow native pull-to-refresh to be overridden */
+  overscroll-behavior-y: auto;
   
-  /* Remove problematic contain for better mobile performance */
+  /* Performance optimizations for compact header */
   contain: layout style;
-  
-  /* Ensure smooth scrolling performance */
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
 }
 
-/* CRITICAL: Prevent flash during transitions */
+/* Enhanced transition states */
 .posts-container.transitioning {
   pointer-events: none;
-  overflow-y: auto; /* Keep scrolling enabled during transitions */
+  overflow-y: auto;
+}
+
+.posts-container.fast-scrolling {
+  scroll-behavior: auto; /* Disable smooth scrolling during fast scroll */
 }
 
 .posts-container.transitioning .section {
   will-change: transform, opacity;
 }
 
-/* Content Styles - Enhanced for smooth transitions and mobile */
+/* Content Styles - Optimized for compact header */
 .posts-content {
   position: relative;
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
-  min-height: calc(100vh - 80px);
+  min-height: calc(100vh - 50px); /* Adjusted for compact header */
   background-color: #000;
-  
-  /* Ensure no scrolling interference */
   transform: none;
 }
 
+/* Enhanced section transitions */
 .section {
   position: absolute;
   top: 0;
@@ -61,13 +62,13 @@
   padding: 20px;
   box-sizing: border-box;
   
-  /* Hardware acceleration without scroll interference */
+  /* Enhanced hardware acceleration */
   will-change: transform, opacity;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   background-color: #000;
   
-  /* IMPORTANT: Don't interfere with container scrolling */
+  /* Preserve scroll behavior */
   touch-action: inherit;
 }
 
@@ -112,27 +113,71 @@
   scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
 }
 
-/* Prevent layout shift */
-.posts-content::before {
-  content: '';
+/* Header-specific enhancements */
+.dynamic-header {
+  /* Enhanced backdrop effects */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.header-backdrop {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #000;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
   z-index: -1;
 }
 
-/* Responsive Design */
+.scroll-progress-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    rgba(56, 189, 248, 0) 0%, 
+    rgba(56, 189, 248, 0.7) 50%, 
+    rgba(56, 189, 248, 0) 100%);
+  transform-origin: left center;
+  transition: transform 0.1s ease, opacity 0.3s ease;
+  z-index: 1;
+}
+
+.scroll-indicator {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  background: rgba(56, 189, 248, 0.7);
+  border-radius: 50%;
+  margin-left: 8px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Enhanced responsive design for compact header */
 @media (max-width: 1024px) {
   .posts-container {
     left: 20%;
     width: 60%;
   }
+  
+  .posts-content {
+    min-height: calc(100vh - 45px);
+  }
 }
 
-/* CRITICAL MOBILE FIXES */
+/* ENHANCED MOBILE FIXES with compact header support */
 @media (max-width: 768px) {
   .posts-container {
     position: fixed;
@@ -141,36 +186,37 @@
     top: 0;
     height: 100%;
     
-    /* CRITICAL: Proper mobile scrolling */
+    /* Critical mobile scrolling */
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: auto;
-    scroll-behavior: auto; /* Let mobile handle smooth scrolling */
+    scroll-behavior: auto;
     
     /* Remove problematic transforms */
     -webkit-transform: none;
     transform: none;
-    
-    /* Better mobile performance */
     contain: none;
     will-change: auto;
+  }
+
+  .posts-content {
+    min-height: calc(100vh - 40px); /* Compact header on mobile */
   }
 
   .section {
     padding: 15px;
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    
-    /* CRITICAL: Don't interfere with mobile scrolling */
     touch-action: pan-y;
     -webkit-overflow-scrolling: inherit;
   }
 
-  /* Mobile scrollbar - thinner */
-  .posts-container::-webkit-scrollbar {
-    width: 3px;
+  .scroll-progress-indicator {
+    height: 1px; /* Thinner on mobile */
   }
-  
-  .posts-container::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+
+  .scroll-indicator {
+    width: 3px;
+    height: 3px;
+    margin-left: 6px;
   }
 }
 
@@ -182,11 +228,14 @@
     top: 0;
     height: 100%;
     
-    /* Ultra-optimized for small screens */
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: auto;
     transform: none;
     -webkit-transform: none;
+  }
+
+  .posts-content {
+    min-height: calc(100vh - 35px); /* Ultra-compact header */
   }
 
   .section {
@@ -196,22 +245,17 @@
   }
 }
 
-/* iOS Safari specific fixes */
+/* Enhanced iOS Safari specific fixes */
 @supports (-webkit-touch-callout: none) {
   .posts-container {
-    /* Critical iOS fixes */
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: auto;
     transform: none;
     -webkit-transform: none;
-    
-    /* Prevent momentum scrolling issues */
     overflow: auto;
-    -webkit-overflow-scrolling: touch;
   }
   
   .section {
-    /* Remove transforms that cause iOS scroll issues */
     -webkit-transform: none;
     backface-visibility: visible;
     -webkit-backface-visibility: visible;
@@ -221,62 +265,30 @@
     -webkit-transform: none;
     transform: none;
   }
-}
 
-/* Android Chrome specific fixes */
-@media screen and (-webkit-min-device-pixel-ratio: 0) {
-  .posts-container {
-    /* Android Chrome optimizations */
-    overscroll-behavior-y: auto;
-    scroll-behavior: auto;
-    -webkit-overflow-scrolling: touch;
+  .header-backdrop {
+    -webkit-backdrop-filter: blur(10px);
   }
 }
 
-/* Dark theme support */
-.posts-container {
-  color-scheme: dark;
-}
-
-/* Accessibility improvements */
-@media (prefers-reduced-motion: reduce) {
-  .section {
-    transition: opacity 0.2s ease;
-    transform: none !important;
-    -webkit-transform: none !important;
-  }
-  
-  .posts-container {
-    scroll-behavior: auto;
-  }
-}
-
-/* Touch device optimizations - MOST IMPORTANT */
+/* Touch device optimizations - ENHANCED */
 @media (hover: none) and (pointer: coarse) {
   .posts-container {
-    /* CRITICAL: Perfect mobile scrolling setup */
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: auto;
     scroll-behavior: auto;
-    
-    /* Remove ALL transforms that interfere */
     transform: none !important;
     -webkit-transform: none !important;
     will-change: auto;
-    
-    /* Let mobile browser handle momentum */
     contain: none;
   }
   
   .section {
-    /* Remove GPU acceleration that causes issues */
     transform: none !important;
     -webkit-transform: none !important;
     will-change: auto;
     backface-visibility: visible;
     -webkit-backface-visibility: visible;
-    
-    /* Only transition opacity for mobile */
     transition: opacity 0.3s ease;
   }
   
@@ -291,12 +303,63 @@
     transform: none !important;
     -webkit-transform: none !important;
   }
+
+  /* Enhanced touch feedback for header */
+  .header-title:active {
+    background: rgba(255, 255, 255, 0.08);
+    transform: scale(0.98);
+    transition: all 0.1s ease;
+  }
 }
 
-/* High refresh rate display optimizations */
+/* Performance optimizations for compact header transitions */
+.dynamic-header.fast-scrolling {
+  transition: none; /* Disable transitions during fast scrolling */
+}
+
+.dynamic-header.scrolling-up {
+  /* Optional: Hide header when scrolling up fast */
+  /* transform: translateY(-100%); */
+}
+
+.dynamic-header.scrolling-down {
+  /* Ensure header is visible when scrolling down */
+  transform: translateY(0);
+}
+
+.dynamic-header.deeply-scrolled {
+  /* Additional styles for deep scroll states */
+  background: rgba(0, 0, 0, 0.99);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Enhanced accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .section,
+  .dynamic-header,
+  .header-backdrop,
+  .scroll-progress-indicator {
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  .posts-container {
+    scroll-behavior: auto;
+  }
+
+  .scroll-indicator {
+    animation: none;
+  }
+}
+
+/* High refresh rate display enhancements */
 @media (min-resolution: 120dpi) {
   .posts-container {
     will-change: scroll-position;
+  }
+  
+  .dynamic-header {
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
   
   .section {
@@ -304,25 +367,39 @@
   }
 }
 
-/* Prevent white flash during section changes */
-*, *::before, *::after {
-  box-sizing: border-box;
+/* Dark theme enhancements */
+.posts-container {
+  color-scheme: dark;
 }
 
 html, body {
   background-color: #000;
 }
 
-/* Performance optimizations for content */
-.section * {
-  /* Only apply backface-visibility on desktop */
-  backface-visibility: visible;
-  -webkit-backface-visibility: visible;
+/* Prevent layout shift during header compacting */
+.posts-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #000;
+  z-index: -1;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .section * {
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-  }
+/* Enhanced scroll-to-top button positioning for compact header */
+.scroll-to-top-button.is-compact {
+  bottom: 80px; /* Adjust for compact header */
+  transform: scale(0.9);
+}
+
+/* Ultra-smooth performance optimizations */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.posts-container * {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

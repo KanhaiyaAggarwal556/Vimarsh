@@ -13,7 +13,7 @@
   -webkit-overflow-scrolling: touch;
 }
 
-/* Pull-to-refresh spinner - Enhanced visibility */
+/* Pull-to-refresh spinner - Ultra-smooth and responsive */
 .pull-refresh-spinner {
   position: fixed;
   top: 20px;
@@ -21,7 +21,7 @@
   transform: translateX(-50%);
   z-index: 9999;
   pointer-events: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Faster response */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -29,12 +29,12 @@
 
 .pull-refresh-spinner.visible {
   opacity: 1;
-  transform: translateX(-50%) scale(1);
+  transform: translateX(-50%) scale(1) translateY(0);
 }
 
 .pull-refresh-spinner.hidden {
   opacity: 0;
-  transform: translateX(-50%) scale(0.8);
+  transform: translateX(-50%) scale(0.9) translateY(-5px);
 }
 
 .spinner-container {
@@ -42,25 +42,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Ultra-fast response */
   background: rgba(0, 0, 0, 0.9);
   backdrop-filter: blur(12px);
   border: 2px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
-  min-width: 50px;
-  min-height: 50px;
+  min-width: 56px;
+  min-height: 56px;
 }
 
 .spinner-container.can-refresh {
   background: rgba(52, 71, 178, 0.95);
   border-color: rgba(52, 71, 178, 0.8);
   box-shadow: 0 8px 32px rgba(52, 71, 178, 0.6);
-  transform: scale(1.1);
+  transform: scale(1.05); /* Slight scale for feedback */
 }
 
 .spinner-container.not-ready {
   background: rgba(100, 100, 100, 0.9);
   border-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1);
 }
 
 .spinner-container.refreshing {
@@ -73,18 +74,18 @@
 .spinner-icon {
   color: #fff;
   font-weight: bold;
-  transition: transform 0.3s ease;
+  transition: transform 0.1s ease; /* Ultra-fast rotation */
   line-height: 1;
-  font-size: 20px;
+  font-size: 22px;
 }
 
 .spinner-loading {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border: 3px solid rgba(255, 255, 255, 0.3);
   border-top-color: #fff;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 0.8s linear infinite; /* Faster spin */
 }
 
 @keyframes spin {
@@ -92,10 +93,10 @@
   to { transform: rotate(360deg); }
 }
 
-/* Container pull states - Fixed to not interfere with scrolling */
+/* Container pull states - Ultra-smooth and responsive */
 .home-section.pulling {
-  /* Remove transform that interferes with scrolling */
   position: relative;
+  transition: none; /* Remove transition for instant response */
 }
 
 .home-section.pulling::before {
@@ -105,15 +106,14 @@
   left: 0;
   right: 0;
   height: var(--pull-distance, 0px);
-  background: linear-gradient(to bottom, rgba(52, 71, 178, 0.1), transparent);
+  background: linear-gradient(to bottom, rgba(52, 71, 178, 0.15), transparent);
   pointer-events: none;
   z-index: 1;
-  transition: all 0.2s ease-out;
+  transition: all 0.1s ease-out; /* Ultra-fast visual feedback */
 }
 
 .home-section.not-pulling {
-  /* Smooth return to normal state */
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Faster return */
 }
 
 /* Regular refresh indicator */
@@ -440,34 +440,39 @@
   }
 
   .spinner-container {
-    min-width: 56px;
-    min-height: 56px;
+    min-width: 64px;
+    min-height: 64px;
     background: rgba(0, 0, 0, 0.95);
     backdrop-filter: blur(12px);
     border: 3px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+    transition: all 0.1s ease; /* Ultra-fast mobile response */
   }
 
   .spinner-container.can-refresh {
     background: rgba(52, 71, 178, 0.98);
     box-shadow: 0 12px 40px rgba(52, 71, 178, 0.7);
     border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.08);
   }
 
   .spinner-container.refreshing {
     background: rgba(34, 197, 94, 0.98);
     box-shadow: 0 12px 40px rgba(34, 197, 94, 0.7);
     border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.12);
   }
 
   .spinner-icon {
-    font-size: 24px;
+    font-size: 26px;
+    transition: transform 0.05s ease; /* Instant rotation response */
   }
 
   .spinner-loading {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-width: 4px;
+    animation: spin 0.7s linear infinite; /* Even faster on mobile */
   }
 }
 
@@ -610,12 +615,4 @@
   contain: layout style;
   transform: none;
   backface-visibility: visible;
-}
-
-@supports (content-visibility: auto) {
-  .posts-list > * {
-    content-visibility: auto;
-    contain-intrinsic-size: 0 300px;
-  }
-
 }

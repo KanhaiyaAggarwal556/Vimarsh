@@ -53,8 +53,8 @@ const HomeSection = ({
         setInternalRefreshing(false);
       }
     },
-    threshold: 70, // Slightly higher threshold for better UX
-    resistance: 2.2, // More resistance for natural feel
+    threshold: 45, // Lower threshold for easier triggering
+    resistance: 1.5, // Less resistance for smoother feel
     enabled: isActive && postList.length > 0 && !fetching,
     refreshing: fetching || internalRefreshing
   });
@@ -66,15 +66,15 @@ const HomeSection = ({
     }
   }, [fetching, internalRefreshing]);
 
-  // Calculate enhanced pull-to-refresh visual effects
-  const pullProgress = Math.min(pullDistance / threshold, 1);
-  const spinnerSize = 24 + (pullProgress * 16); // Larger spinner
-  const spinnerOpacity = Math.min(pullProgress * 1.5, 1);
+  // Calculate enhanced pull-to-refresh visual effects - More responsive
+  const pullProgress = Math.min(pullDistance / (threshold * 0.7), 1); // Reach 100% earlier
+  const spinnerSize = 28 + (pullProgress * 20); // Start bigger, grow more
+  const spinnerOpacity = Math.min(pullProgress * 2, 1); // Fade in faster
 
-  // Enhanced spinner visibility logic
+  // Enhanced spinner visibility logic - Show immediately
   const actuallyRefreshing = isRefreshing || internalRefreshing;
   const showSpinner = pullToRefreshEnabled && (isPulling || actuallyRefreshing) && isActive;
-  const spinnerVisible = showSpinner && (spinnerOpacity > 0.1 || actuallyRefreshing);
+  const spinnerVisible = showSpinner && (spinnerOpacity > 0.05 || actuallyRefreshing); // Show almost immediately
 
   // Error state with retry option
   if (error && postList.length === 0) {
@@ -124,7 +124,7 @@ const HomeSection = ({
       }`}
       ref={containerRef}
       style={pullToRefreshEnabled && isPulling ? {
-        '--pull-distance': `${Math.min(pullDistance * 0.3, 40)}px`
+        '--pull-distance': `${Math.min(pullDistance * 0.5, 30)}px`
       } as React.CSSProperties : undefined}
     >
       {/* Enhanced pull-to-refresh spinner indicator */}
@@ -141,8 +141,8 @@ const HomeSection = ({
               actuallyRefreshing ? 'refreshing' : ''
             }`}
             style={{
-              width: `${Math.max(spinnerSize, 50)}px`,
-              height: `${Math.max(spinnerSize, 50)}px`
+              width: `${Math.max(spinnerSize, 56)}px`,
+              height: `${Math.max(spinnerSize, 56)}px`
             }}
           >
             {actuallyRefreshing ? (
@@ -160,7 +160,7 @@ const HomeSection = ({
             )}
           </div>
           
-          {/* Enhanced feedback text */}
+          {/* Enhanced feedback text - Show earlier */}
           {canRefresh && !actuallyRefreshing && (
             <div style={{
               position: 'absolute',
@@ -174,10 +174,30 @@ const HomeSection = ({
               padding: '4px 8px',
               borderRadius: '12px',
               whiteSpace: 'nowrap',
-              opacity: pullProgress > 0.8 ? 1 : 0,
+              opacity: pullProgress > 0.6 ? 1 : 0, // Show earlier
               transition: 'opacity 0.2s ease'
             }}>
               Release to refresh
+            </div>
+          )}
+          
+          {/* Pull instruction text */}
+          {isPulling && !canRefresh && !actuallyRefreshing && pullProgress > 0.2 && (
+            <div style={{
+              position: 'absolute',
+              top: '100%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              marginTop: '8px',
+              fontSize: '11px',
+              color: '#ccc',
+              background: 'rgba(100, 100, 100, 0.8)',
+              padding: '3px 6px',
+              borderRadius: '10px',
+              whiteSpace: 'nowrap',
+              opacity: 0.8
+            }}>
+              Pull to refresh
             </div>
           )}
           

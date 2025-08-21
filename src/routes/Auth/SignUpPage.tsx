@@ -6,7 +6,7 @@ import SignUpForm from "@/components/Account/SignUp/SignUpForm";
 import SocialLogin from "@/components/Account/SignUp/SocialLogin";
 import SignUpFooter from "@/components/Account/SignUp/SignUpFooter";
 import Footer from "@/components/Account/Login/Footer";
-import "./Signup.css";
+import "./SignupPage.css";
 
 interface FormData {
   name: string;
@@ -31,7 +31,7 @@ interface SignupData {
   password: string;
 }
 
-export default function Signup(): JSX.Element {
+export default function SignupPage(): JSX.Element {
   const navigate = useNavigate();
   const { register, isLoading } = useAuthStore();
 

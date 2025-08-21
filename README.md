@@ -2,10 +2,10 @@
 **"Speak your mind. Share your world."**
 
 ## 🌐 Live Site  
-🔗 [Explore Twooter](https://twooter-social.netlify.app/)
+🔗 [Explore Twooter](https://vimarsh-social.netlify.app/)
 
 ## 📖 Overview  
-Twooter is a dynamic and modern social media platform built for expression and engagement. Whether it’s a moment, a story, a news update, or a personal thought, Twooter lets users share it all. With multimedia support, trending hashtags, and seamless interactivity, it’s your space to connect and be heard.
+Vimarsh is a dynamic and modern social media platform built for expression and engagement. Whether it’s a moment, a story, a news update, or a personal thought, Twooter lets users share it all. With multimedia support, trending hashtags, and seamless interactivity, it’s your space to connect and be heard.
 
 ## ✨ Key Features  
 - 📝 Create posts with text, images, and videos  

@@ -1,11 +1,10 @@
-![image](https://github.com/user-attachments/assets/ff0ee6e2-17f3-4f45-be10-e871b808788c)# Twooter 🐦  
 **"Speak your mind. Share your world."**
 
 ## 🌐 Live Site  
-🔗 [Explore Twooter](https://twooter-social.netlify.app/)
+🔗 [Explore Vimarsh](https://vimarsh-social.netlify.app/)
 
 ## 📖 Overview  
-Twooter is a dynamic and modern social media platform built for expression and engagement. Whether it’s a moment, a story, a news update, or a personal thought, Twooter lets users share it all. With multimedia support, trending hashtags, and seamless interactivity, it’s your space to connect and be heard.
+Vimarsh is a dynamic and modern social media platform built for expression and engagement. Whether it’s a moment, a story, a news update, or a personal thought, Twooter lets users share it all. With multimedia support, trending hashtags, and seamless interactivity, it’s your space to connect and be heard.
 
 ## ✨ Key Features  
 - 📝 Create posts with text, images, and videos  
@@ -19,7 +18,7 @@ Twooter is a dynamic and modern social media platform built for expression and e
 - **Backend**: Node.js, Express.js  
 - **Database**: MongoDB  
 - **Authentication**: JWT  
-- **State Management**: Context API / Redux  
+- **State Management**: Context API / Zustand  
 
 ## 🎯 Future Enhancements  
 - 💬 Commenting system  
@@ -32,6 +31,6 @@ Twooter is a dynamic and modern social media platform built for expression and e
 
 ## 📬 Connect  
 Have suggestions or feedback? Let’s connect!  
-📧 your-kanhaiaggarwal@gmail.com
+📧 kanhaiaggarwal@gmail.com
 🌍 [Portfolio Website](https://kanhainya-portfolio.netlify.app/)
 

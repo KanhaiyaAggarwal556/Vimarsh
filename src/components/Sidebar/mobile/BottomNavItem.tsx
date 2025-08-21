@@ -1,5 +1,5 @@
-// components/mobile/BottomNavItem.tsx - Enhanced with double-tap home functionality
-import React from "react";
+// components/mobile/BottomNavItem.tsx - Fixed home button logic
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { SIDEBAR_CONFIG } from "@/config/navigationConfig";
 
@@ -9,9 +9,9 @@ interface BottomNavItemProps {
   label: string;
   pathname: string;
   onClick?: () => void;
-  onHomeTap?: () => void; // New prop for home double-tap functionality
+  onHomeTap?: () => void;
   isCreatePost?: boolean;
-  id?: string; // Add id to identify home button
+  id?: string;
 }
 
 const BottomNavItem: React.FC<BottomNavItemProps> = ({ 
@@ -25,17 +25,36 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({
   id
 }) => {
   const location = useLocation();
+  const [isHomePressed, setIsHomePressed] = useState(false);
+  
   const isActive = pathname === to || (to.includes(':') && pathname.includes(to.split('/')[1]));
+  const isHome = id === 'home';
+  const isOnHomePage = location.pathname === '/' || location.pathname === '/home';
 
-  const handleClick = (e: React.MouseEvent) => {
-    // Check if this is the home button and we're already on home page
-    if (id === 'home' && location.pathname === '/home' && onHomeTap) {
+  const handleClick = async (e: React.MouseEvent) => {
+    // Special handling for home button
+    if (isHome) {
       e.preventDefault();
-      onHomeTap();
+      e.stopPropagation();
+      
+      if (isOnHomePage && onHomeTap) {
+        // We're already on home page - trigger double-tap functionality
+        setIsHomePressed(true);
+        setTimeout(() => setIsHomePressed(false), 300); // Visual feedback
+        
+        try {
+          await onHomeTap();
+        } catch (error) {
+          console.error('Home tap failed:', error);
+        }
+      } else {
+        // Navigate to home page normally when not on home page
+        window.location.href = to;
+      }
       return;
     }
     
-    // Regular onClick handler
+    // Regular onClick handler for other buttons
     if (onClick) {
       e.preventDefault();
       onClick();
@@ -43,7 +62,7 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({
     // Otherwise let the Link handle navigation normally
   };
 
-  // Special styling for Create Post button - but keep it simple like others
+  // Special styling for Create Post button
   if (isCreatePost) {
     return (
       <Link
@@ -67,22 +86,62 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({
     );
   }
 
-  // Regular navigation item
+  // Home button - don't use Link when on home page to avoid navigation interference
+  if (isHome && isOnHomePage) {
+    return (
+      <div
+        className="d-flex flex-column align-items-center text-decoration-none"
+        style={{
+          color: isActive || isHomePressed ? SIDEBAR_CONFIG.bottomNavActiveColor : "#999",
+          transition: "all 0.2s ease",
+          fontSize: "0.75rem",
+          minWidth: "50px",
+          transform: isHomePressed ? 'scale(0.95)' : 'scale(1)',
+          opacity: isHomePressed ? 0.8 : 1,
+          cursor: 'pointer',
+        }}
+        onClick={handleClick}
+      >
+        <div style={{ 
+          marginBottom: "2px",
+          position: 'relative'
+        }}>
+          {React.cloneElement(icon, {
+            color: isActive || isHomePressed ? SIDEBAR_CONFIG.bottomNavActiveColor : "#999"
+          })}
+          
+
+        </div>
+        <span style={{ fontSize: "0.7rem" }}>{label}</span>
+        
+        {/* Add CSS animation styles */}
+        <style>{`
+        `}</style>
+      </div>
+    );
+  }
+
+  // Regular navigation item with Link
   return (
     <Link
       to={to}
       className="d-flex flex-column align-items-center text-decoration-none"
       style={{
-        color: isActive ? SIDEBAR_CONFIG.bottomNavActiveColor : "#999",
-        transition: "color 0.3s",
+        color: isActive || isHomePressed ? SIDEBAR_CONFIG.bottomNavActiveColor : "#999",
+        transition: "all 0.2s ease",
         fontSize: "0.75rem",
         minWidth: "50px",
+        transform: isHomePressed ? 'scale(0.95)' : 'scale(1)',
+        opacity: isHomePressed ? 0.8 : 1,
       }}
       onClick={handleClick}
     >
-      <div style={{ marginBottom: "2px" }}>
+      <div style={{ 
+        marginBottom: "2px",
+        position: 'relative'
+      }}>
         {React.cloneElement(icon, {
-          color: isActive ? SIDEBAR_CONFIG.bottomNavActiveColor : "#999"
+          color: isActive || isHomePressed ? SIDEBAR_CONFIG.bottomNavActiveColor : "#999"
         })}
       </div>
       <span style={{ fontSize: "0.7rem" }}>{label}</span>

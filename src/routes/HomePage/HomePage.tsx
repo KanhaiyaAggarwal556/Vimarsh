@@ -1,9 +1,10 @@
-// HomePage.tsx - Optimized to eliminate flash during transitions
+// HomePage.tsx - Fixed with proper debugging and state management
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSection } from "@/hooks/useSection";
 import { useScrollDetection } from "@/hooks/useScrollDetection";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { useHomeContext } from "@/contexts/HomeContext";
 import { PostService } from "@/services/postService";
 import {
   Post,
@@ -33,6 +34,9 @@ const HomePage = () => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const transitionTimeoutRef = useRef<NodeJS.Timeout>();
 
+  // Get HomeContext to register functions
+  const { registerRefreshFunction, registerScrollFunction } = useHomeContext();
+
   // Sync URL with active section on mount and when location changes
   useEffect(() => {
     const currentPath = location.pathname;
@@ -43,6 +47,98 @@ const HomePage = () => {
       setActiveSection(SECTIONS.MESSAGES);
     }
   }, [location.pathname, setActiveSection]);
+
+  // Enhanced scroll to top function
+  const handleScrollToTop = useCallback(() => {
+    console.log('Scrolling to top');
+    if (containerRef.current) {
+      containerRef.current.scrollTo({ 
+        top: 0, 
+        behavior: 'smooth' 
+      });
+    } else {
+      // Fallback to window scroll
+      window.scrollTo({ 
+        top: 0, 
+        behavior: 'smooth' 
+      });
+    }
+  }, []);
+
+  // TanStack Query infinite query for fetching posts
+  const {
+    data,
+    isLoading: fetching,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    refetch,
+    isRefetching,
+  } = useInfiniteQuery({
+    queryKey: ["infinite-posts", refreshCountRef.current],
+    queryFn: async ({ pageParam }: { pageParam: number }) => {
+      console.log(`Fetching page ${pageParam} with refresh count ${refreshCountRef.current}`);
+      const params: InfinitePostsParams = {
+        page: pageParam,
+        limit: pageParam === 1 ? 20 : 10,
+        sortBy: "random",
+        sortOrder: "desc",
+        isFirstLoad: pageParam === 1,
+      };
+      
+      return await postService.fetchInfinitePosts(params);
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: InfinitePostsResponse) => {
+      return lastPage.hasNextPage ? lastPage.nextPage : undefined;
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
+    retry: (failureCount) => failureCount < 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
+  });
+
+  // Enhanced refetch - reset seed and get fresh content
+  const handleRefetch = useCallback(async (): Promise<void> => {
+    console.log('Starting refresh process...');
+    try {
+      // Reset the seed for new random content
+      postService.resetSeed();
+      
+      // Increment refresh count to invalidate cache
+      refreshCountRef.current += 1;
+      console.log(`New refresh count: ${refreshCountRef.current}`);
+      
+      // Force refetch with new query key
+      const result = await refetch();
+      console.log('Refetch completed:', result);
+      
+      // Don't return the result, just void
+    } catch (error) {
+      console.error("Error refetching posts:", error);
+      throw error;
+    }
+  }, [refetch, postService]);
+
+  // Register functions with HomeContext - FIXED: Use new simplified context
+  useEffect(() => {
+    const currentPath = location.pathname;
+    console.log('Registering functions with HomeContext for path:', currentPath);
+    
+    if (currentPath === '/' || currentPath === '/home' || currentPath === '/messages') {
+      console.log('Registering refresh and scroll functions in context');
+      registerRefreshFunction(handleRefetch);
+      registerScrollFunction(handleScrollToTop);
+    }
+
+    // Cleanup when component unmounts or path changes
+    return () => {
+      // No explicit cleanup needed - refs will be overwritten
+    };
+  }, [location.pathname, handleRefetch, handleScrollToTop, registerRefreshFunction, registerScrollFunction]);
 
   // Optimized section toggle with transition management
   const handleSectionToggle = useCallback((section: typeof activeSection) => {
@@ -89,41 +185,6 @@ const HomePage = () => {
     };
   }, []);
 
-  // TanStack Query infinite query for fetching posts
-  const {
-    data,
-    isLoading: fetching,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    refetch,
-    isRefetching,
-  } = useInfiniteQuery({
-    queryKey: ["infinite-posts", refreshCountRef.current],
-    queryFn: async ({ pageParam }: { pageParam: number }) => {
-      const params: InfinitePostsParams = {
-        page: pageParam,
-        limit: pageParam === 1 ? 20 : 10,
-        sortBy: "random",
-        sortOrder: "desc",
-        isFirstLoad: pageParam === 1,
-      };
-      
-      return await postService.fetchInfinitePosts(params);
-    },
-    initialPageParam: 1,
-    getNextPageParam: (lastPage: InfinitePostsResponse) => {
-      return lastPage.hasNextPage ? lastPage.nextPage : undefined;
-    },
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: true,
-    retry: (failureCount) => failureCount < 2,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
-  });
-
   // Use infinite scroll hook
   const { sentinelRef } = useInfiniteScroll({
     loading: isFetchingNextPage,
@@ -133,36 +194,23 @@ const HomePage = () => {
     enabled: isSection(SECTIONS.HOME) && !isTransitioning,
   });
 
-  // Enhanced refetch - reset seed and get fresh content
-  const handleRefetch = useCallback(async () => {
-    try {
-      postService.resetSeed();
-      refreshCountRef.current += 1;
-      await refetch();
-    } catch (error) {
-      console.error("Error refetching posts:", error);
-      throw error;
-    }
-  }, [refetch]);
-
-  // Simplified home refresh handler - only for double-tap refresh
+  // Simplified home refresh handler - only for header double-tap refresh
   const handleHomeRefresh = useCallback(async () => {
     if (!isSection(SECTIONS.HOME) || isTransitioning) {
       return;
     }
 
+    console.log('Header refresh triggered');
     try {
       await handleRefetch();
       
       // Scroll to top using the container ref
-      if (containerRef.current) {
-        containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+      handleScrollToTop();
       
     } catch (error) {
       console.error("Home refresh failed:", error);
     }
-  }, [isSection, handleRefetch, isTransitioning]);
+  }, [isSection, handleRefetch, handleScrollToTop, isTransitioning]);
 
   // Flatten all pages data and convert to PostDataExtended
   const postList: PostDataExtended[] = (data?.pages || [])
@@ -179,6 +227,17 @@ const HomePage = () => {
 
       return convertToPostDataExtended(normalizedPost);
     });
+
+  // Debug current state
+  useEffect(() => {
+    console.log('HomePage State:', {
+      fetching,
+      isRefetching,
+      postsCount: postList.length,
+      refreshCount: refreshCountRef.current,
+      error: error?.message
+    });
+  }, [fetching, isRefetching, postList.length, error]);
   
   return (
     <>

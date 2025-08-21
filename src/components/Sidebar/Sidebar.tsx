@@ -1,32 +1,18 @@
-// components/Sidebar.tsx - Enhanced with double-tap home functionality
-import React, { useState, useEffect, useCallback } from "react";
+// components/Sidebar.tsx - Updated to use simplified HomeContext
+import React, { useState, useCallback } from "react";
 import DesktopSidebar from "./desktop/DesktopSidebar";
 import TabletSidebar from "./tablet/TabletSidebar";
 import BottomNavigation from "./mobile/BottomNavigation";
 import MoreModal from "./mobile/MoreModal";
 import { useResponsiveBreakpoint } from "@/hooks/useResponsiveBreakpoint";
-import { useDoubleTapHome } from "@/hooks/useDoubleTapHome";
+import { useHomeContext } from "@/contexts/HomeContext";
 
-// Define interface for home refresh handler
-interface SidebarProps {
-  onHomeRefresh?: () => Promise<void> | void;
-}
-
-const Sidebar: React.FC<SidebarProps> = ({ onHomeRefresh }) => {
+const Sidebar: React.FC = () => {
   const [showMoreModal, setShowMoreModal] = useState(false);
   const { isMobile, isTablet, isDesktop } = useResponsiveBreakpoint();
-
-  const { handleHomeTap, cleanup } = useDoubleTapHome({
-    onRefresh: onHomeRefresh,
-    doubleTapDelay: 300
-  });
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      cleanup();
-    };
-  }, [cleanup]);
+  
+  // Get home functionality from simplified context
+  const { handleHomeTap } = useHomeContext();
 
   const handleMoreClick = useCallback(() => {
     setShowMoreModal(true);
@@ -47,14 +33,89 @@ const Sidebar: React.FC<SidebarProps> = ({ onHomeRefresh }) => {
             onHomeTap={handleHomeTap}
           />
           <MoreModal isOpen={showMoreModal} onClose={handleCloseModal} />
-          {/* Add padding bottom to prevent content from being hidden behind bottom nav */}
+          
+          {/* Mobile spacing styles */}
           <style>{`
-            body { 
-              padding-bottom: 70px; 
+            /* Main content wrapper spacing */
+            .main-content,
+            .container-fluid,
+            .app-container {
+              padding-bottom: 80px !important;
             }
+            
+            /* Page containers */
+            .page-container,
+            .home-container,
+            .profile-container,
+            .search-container {
+              padding-bottom: 80px !important;
+              min-height: calc(100vh - 80px) !important;
+            }
+            
+            /* Scrollable areas */
+            .scroll-container,
+            .posts-container,
+            .content-area {
+              padding-bottom: 80px !important;
+            }
+            
+            /* Body spacing for mobile only */
+            @media (max-width: 767px) {
+              body {
+                padding-bottom: 0 !important;
+              }
+              
+              /* Main app wrapper */
+              #root,
+              .app {
+                padding-bottom: 0 !important;
+              }
+              
+              /* Specific page layouts */
+              .home-section {
+                padding-bottom: 90px !important;
+              }
+              
+              .profile-section {
+                padding-bottom: 80px !important;
+              }
+              
+              .search-section {
+                padding-bottom: 80px !important;
+              }
+              
+              /* Any other main sections */
+              .main-section {
+                padding-bottom: 80px !important;
+              }
+            }
+            
+            /* Desktop and tablet - no extra padding */
             @media (min-width: 768px) {
-              body { 
-                padding-bottom: 0; 
+              body,
+              #root,
+              .app,
+              .main-content,
+              .container-fluid,
+              .app-container,
+              .page-container,
+              .home-container,
+              .profile-container,
+              .search-container,
+              .scroll-container,
+              .posts-container,
+              .content-area {
+                padding-bottom: 0 !important;
+              }
+            }
+            
+            /* Ensure bottom nav doesn't interfere with content */
+            @media (max-width: 767px) {
+              .bottom-navigation {
+                z-index: 1050 !important;
+                background-color: rgba(0, 0, 0, 0.95) !important;
+                backdrop-filter: blur(10px) !important;
+                border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
               }
             }
           `}</style>

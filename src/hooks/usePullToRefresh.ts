@@ -1,4 +1,4 @@
-// hooks/usePullToRefresh.ts - Ultra-smooth and responsive version
+// hooks/usePullToRefresh.ts - Enhanced with visual pull-to-refresh indicators
 import { useEffect, useCallback, useRef, useState } from 'react';
 
 interface UsePullToRefreshOptions {
@@ -14,12 +14,13 @@ interface PullToRefreshState {
   pullDistance: number;
   isRefreshing: boolean;
   canRefresh: boolean;
+  showIndicator: boolean;
 }
 
 export const usePullToRefresh = ({
   onRefresh,
-  threshold = 45, // Much lower threshold for easier triggering
-  resistance = 1.5, // Less resistance for smoother feel
+  threshold = 80,
+  resistance = 2.5,
   enabled = true,
   refreshing = false
 }: UsePullToRefreshOptions) => {
@@ -27,18 +28,19 @@ export const usePullToRefresh = ({
     isPulling: false,
     pullDistance: 0,
     isRefreshing: false,
-    canRefresh: false
+    canRefresh: false,
+    showIndicator: false
   });
 
   const containerRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef<number>(0);
   const currentYRef = useRef<number>(0);
   const isActiveRef = useRef<boolean>(false);
-  const animationFrameRef = useRef<number>(0);
   const velocityRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
   const lastYRef = useRef<number>(0);
   const initialScrollRef = useRef<number>(0);
+  const hasRefreshedRef = useRef<boolean>(false);
 
   // Enhanced mobile detection
   const isTouchDevice = useCallback(() => {
@@ -49,48 +51,35 @@ export const usePullToRefresh = ({
     );
   }, []);
 
-  // Much more lenient scroll position check
+  // Check if at top of scroll
   const isAtTop = useCallback(() => {
     const container = containerRef.current;
     if (!container) return false;
     
-    // Check the actual scrolling container
     const scrollingContainer = container.closest('.posts-container') as HTMLElement;
     if (scrollingContainer) {
-      return scrollingContainer.scrollTop <= 10; // More lenient
+      return scrollingContainer.scrollTop <= 5;
     }
     
-    return container.scrollTop <= 10;
+    return container.scrollTop <= 5;
   }, []);
 
-  // Ultra-smooth update function
+  // Enhanced update function with visual feedback
   const updatePullDistance = useCallback((distance: number, velocity: number = 0) => {
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-    }
-
-    animationFrameRef.current = requestAnimationFrame(() => {
-      // Much smoother resistance curve
-      const resistanceCurve = (dist: number) => {
-        const base = dist / resistance;
-        // Minimal dampening for ultra-smooth feel
-        const dampening = isTouchDevice() ? 0.8 : 0.6;
-        return base - (base * base * dampening) / (threshold * 3);
-      };
-      
-      const adjustedDistance = Math.max(0, resistanceCurve(distance));
-      const canRefresh = adjustedDistance >= threshold * 0.7; // Even easier to trigger
-      
-      velocityRef.current = velocity;
-      
-      setState(prev => ({
-        ...prev,
-        pullDistance: adjustedDistance,
-        canRefresh,
-        isPulling: adjustedDistance > 2 // Show immediately on any pull
-      }));
-    });
-  }, [resistance, threshold, isTouchDevice]);
+    const adjustedDistance = Math.max(0, distance / resistance);
+    const canRefresh = adjustedDistance >= threshold;
+    const showIndicator = adjustedDistance > 20; // Show indicator after 20px pull
+    
+    velocityRef.current = velocity;
+    
+    setState(prev => ({
+      ...prev,
+      pullDistance: adjustedDistance,
+      canRefresh,
+      isPulling: adjustedDistance > 0,
+      showIndicator
+    }));
+  }, [resistance, threshold]);
 
   const handleTouchStart = useCallback((e: TouchEvent) => {
     if (!enabled || !isTouchDevice() || refreshing) return;
@@ -98,21 +87,20 @@ export const usePullToRefresh = ({
     const touch = e.touches[0];
     if (!touch) return;
 
-    // Store all initial values
     startYRef.current = touch.clientY;
     currentYRef.current = startYRef.current;
     lastYRef.current = startYRef.current;
     lastTimeRef.current = Date.now();
     isActiveRef.current = false;
     velocityRef.current = 0;
+    hasRefreshedRef.current = false;
 
-    // Store initial scroll position
     const container = containerRef.current?.closest('.posts-container') as HTMLElement;
     initialScrollRef.current = container ? container.scrollTop : 0;
   }, [enabled, isTouchDevice, refreshing]);
 
   const handleTouchMove = useCallback((e: TouchEvent) => {
-    if (!enabled || refreshing) return;
+    if (!enabled || refreshing || hasRefreshedRef.current) return;
 
     const touch = e.touches[0];
     if (!touch) return;
@@ -121,10 +109,9 @@ export const usePullToRefresh = ({
     const currentY = touch.clientY;
     const timeDiff = now - lastTimeRef.current;
     
-    // Enhanced velocity calculation
     if (timeDiff > 0) {
       const newVelocity = (currentY - lastYRef.current) / timeDiff;
-      velocityRef.current = newVelocity * 0.3 + velocityRef.current * 0.7; // Smooth velocity
+      velocityRef.current = newVelocity * 0.5 + velocityRef.current * 0.5;
     }
     
     currentYRef.current = currentY;
@@ -132,71 +119,46 @@ export const usePullToRefresh = ({
     lastTimeRef.current = now;
     
     const diff = currentYRef.current - startYRef.current;
-
-    // Much more responsive activation
-    const isPullingDown = diff > 3; // Activate on tiny movement
+    const isPullingDown = diff > 10;
     const isAtTopPosition = isAtTop();
-    const startedFromTop = initialScrollRef.current <= 10;
+    const startedFromTop = initialScrollRef.current <= 5;
 
     if (isPullingDown && isAtTopPosition && startedFromTop) {
       if (!isActiveRef.current) {
         isActiveRef.current = true;
-        
-        // Minimal body interference
-        if (isTouchDevice()) {
-          document.body.style.overscrollBehavior = 'none';
-        }
       }
       
-      // Prevent scrolling much earlier
-      if (diff > 8) {
+      // Prevent default scrolling when pulling
+      if (diff > 15) {
         e.preventDefault();
         e.stopPropagation();
       }
       
       updatePullDistance(diff, velocityRef.current);
     } else if (diff <= 0 || !isAtTopPosition) {
-      // Quick reset
       if (isActiveRef.current) {
         isActiveRef.current = false;
-        document.body.style.overscrollBehavior = '';
         updatePullDistance(0, 0);
       }
     }
-  }, [enabled, refreshing, isAtTop, updatePullDistance, isTouchDevice]);
+  }, [enabled, refreshing, isAtTop, updatePullDistance]);
 
   const handleTouchEnd = useCallback(async () => {
-    if (!enabled) {
-      document.body.style.overscrollBehavior = '';
-      return;
-    }
+    if (!enabled) return;
 
-    const wasActive = isActiveRef.current;
-    const wasCanRefresh = state.canRefresh;
-    const velocity = velocityRef.current;
-    const distance = state.pullDistance;
-    
     isActiveRef.current = false;
-    document.body.style.overscrollBehavior = '';
     
-    // Much more generous refresh triggering
-    const velocityBoost = velocity > 0.2 ? 25 : 0; // Lower velocity threshold
-    const effectiveDistance = distance + velocityBoost;
-    const minRefreshDistance = threshold * 0.4; // Much lower requirement
-    
-    // Multiple ways to trigger refresh
-    const shouldRefresh = (
-      (wasCanRefresh && wasActive) ||
-      (effectiveDistance >= minRefreshDistance && wasActive) ||
-      (velocity > 0.5 && distance > 20 && wasActive) // Velocity-based trigger
-    );
-    
-    if (shouldRefresh && !refreshing) {
+    // Check if should trigger refresh
+    if (state.canRefresh && !hasRefreshedRef.current) {
+      hasRefreshedRef.current = true;
+      
+      // Set refreshing state
       setState(prev => ({ 
         ...prev, 
         isRefreshing: true,
         isPulling: false,
-        pullDistance: threshold * 0.6
+        showIndicator: true,
+        pullDistance: threshold // Keep indicator at threshold level during refresh
       }));
       
       try {
@@ -204,36 +166,37 @@ export const usePullToRefresh = ({
       } catch (error) {
         console.error('Refresh failed:', error);
       } finally {
-        // Quick reset
+        // Smooth hide animation
         setTimeout(() => {
           setState(prev => ({
             ...prev,
             isPulling: false,
             pullDistance: 0,
             isRefreshing: false,
-            canRefresh: false
+            canRefresh: false,
+            showIndicator: false
           }));
-        }, 200); // Faster reset
+        }, 300);
       }
-    } else if (wasActive) {
-      // Quick return animation
+    } else {
+      // Quick reset with animation
       setState(prev => ({
         ...prev,
         isPulling: false,
         pullDistance: 0,
-        canRefresh: false
+        canRefresh: false,
+        showIndicator: false
       }));
     }
-  }, [enabled, state.canRefresh, state.pullDistance, refreshing, onRefresh, threshold]);
+  }, [enabled, state.canRefresh, onRefresh, threshold]);
 
-  // Optimized event listeners
+  // Event listeners
   useEffect(() => {
     const container = containerRef.current;
     if (!container || !enabled || !isTouchDevice()) {
       return;
     }
 
-    // Ultra-responsive event options
     const passiveOptions: AddEventListenerOptions = { passive: true };
     const activeOptions: AddEventListenerOptions = { passive: false, capture: true };
 
@@ -247,12 +210,10 @@ export const usePullToRefresh = ({
       container.removeEventListener('touchmove', handleTouchMove);
       container.removeEventListener('touchend', handleTouchEnd);
       container.removeEventListener('touchcancel', handleTouchEnd);
-      
-      document.body.style.overscrollBehavior = '';
     };
   }, [enabled, isTouchDevice, handleTouchStart, handleTouchMove, handleTouchEnd]);
 
-  // Auto-reset when refreshing changes
+  // Auto-reset when refreshing prop changes
   useEffect(() => {
     if (!refreshing && state.isRefreshing) {
       setState(prev => ({
@@ -260,25 +221,20 @@ export const usePullToRefresh = ({
         isRefreshing: false,
         isPulling: false,
         pullDistance: 0,
-        canRefresh: false
+        canRefresh: false,
+        showIndicator: false
       }));
     }
   }, [refreshing, state.isRefreshing]);
-
-  // Cleanup
-  useEffect(() => {
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-      document.body.style.overscrollBehavior = '';
-    };
-  }, []);
 
   return {
     containerRef,
     ...state,
     threshold,
-    isEnabled: enabled && isTouchDevice()
+    isEnabled: enabled && isTouchDevice(),
+    // Calculate progress for smooth animations
+    progress: Math.min(state.pullDistance / threshold, 1),
+    // Calculate transform for posts container
+    postsTransform: state.showIndicator ? Math.min(state.pullDistance, threshold) : 0
   };
 };

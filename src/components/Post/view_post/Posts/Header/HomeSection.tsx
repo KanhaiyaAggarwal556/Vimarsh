@@ -1,4 +1,4 @@
-// components/Post/view_post/Posts/Header/HomeSection.tsx - Fixed version
+// components/Post/view_post/Posts/Header/HomeSection.tsx - FIXED
 import { RefObject, useState, useEffect } from 'react';
 import { HomeSectionProps } from '@/types';
 import { createToggleClass } from '@/utils/classNames';
@@ -15,6 +15,30 @@ interface ExtendedHomeSectionProps extends HomeSectionProps {
   sentinelRef?: RefObject<HTMLDivElement>;
   error?: Error | null;
 }
+
+// Mobile-optimized spinner component
+const MobileSpinner = () => {
+  return (
+    <svg 
+      width="20" 
+      height="20" 
+      viewBox="0 0 20 20"
+      className="mobile-spinner"
+    >
+      <circle
+        cx="10"
+        cy="10"
+        r="8"
+        stroke="#3447b2"
+        strokeWidth="3"
+        fill="none"
+        strokeLinecap="round"
+        strokeDasharray="31.416"
+        strokeDashoffset="31.416"
+      />
+    </svg>
+  );
+};
 
 const HomeSection = ({
   isActive,
@@ -33,15 +57,16 @@ const HomeSection = ({
     scrollToTop();
   };
 
-  // Enhanced pull-to-refresh functionality
-  const {
-    containerRef,
-    isPulling,
+  // Enhanced pull-to-refresh with visual indicators
+  const { 
+    containerRef, 
+    isPulling, 
+    isRefreshing, 
+    canRefresh, 
+    showIndicator,
     pullDistance,
-    isRefreshing,
-    canRefresh,
-    threshold,
-    isEnabled: pullToRefreshEnabled
+    progress,
+    postsTransform
   } = usePullToRefresh({
     onRefresh: async () => {
       setInternalRefreshing(true);
@@ -53,8 +78,8 @@ const HomeSection = ({
         setInternalRefreshing(false);
       }
     },
-    threshold: 45, // Lower threshold for easier triggering
-    resistance: 1.5, // Less resistance for smoother feel
+    threshold: 80,
+    resistance: 2.5,
     enabled: isActive && postList.length > 0 && !fetching,
     refreshing: fetching || internalRefreshing
   });
@@ -66,17 +91,7 @@ const HomeSection = ({
     }
   }, [fetching, internalRefreshing]);
 
-  // Calculate enhanced pull-to-refresh visual effects - More responsive
-  const pullProgress = Math.min(pullDistance / (threshold * 0.7), 1); // Reach 100% earlier
-  const spinnerSize = 28 + (pullProgress * 20); // Start bigger, grow more
-  const spinnerOpacity = Math.min(pullProgress * 2, 1); // Fade in faster
-
-  // Enhanced spinner visibility logic - Show immediately
-  const actuallyRefreshing = isRefreshing || internalRefreshing;
-  const showSpinner = pullToRefreshEnabled && (isPulling || actuallyRefreshing) && isActive;
-  const spinnerVisible = showSpinner && (spinnerOpacity > 0.05 || actuallyRefreshing); // Show almost immediately
-
-  // Error state with retry option
+  // Error state
   if (error && postList.length === 0) {
     return (
       <div className={createToggleClass('section home-section', isActive)}>
@@ -119,120 +134,57 @@ const HomeSection = ({
 
   return (
     <div 
-      className={`${createToggleClass('section home-section', isActive)} ${
-        pullToRefreshEnabled && isPulling ? 'pulling' : 'not-pulling'
-      }`}
+      className={createToggleClass('section home-section', isActive)}
       ref={containerRef}
-      style={pullToRefreshEnabled && isPulling ? {
-        '--pull-distance': `${Math.min(pullDistance * 0.5, 30)}px`
-      } as React.CSSProperties : undefined}
     >
-      {/* Enhanced pull-to-refresh spinner indicator */}
-      {showSpinner && (
+      {/* Pull-to-refresh indicator */}
+      {showIndicator && (
         <div 
-          className={`pull-refresh-spinner ${spinnerVisible ? 'visible' : 'hidden'}`}
+          className="pull-refresh-indicator"
           style={{
-            opacity: actuallyRefreshing ? 1 : spinnerOpacity,
-            display: actuallyRefreshing || spinnerVisible ? 'flex' : 'none'
+            transform: `translateY(${Math.min(pullDistance - 20, 60)}px)`,
+            WebkitTransform: `translateY(${Math.min(pullDistance - 20, 60)}px)`,
+            opacity: Math.min(progress * 2, 1)
           }}
         >
-          <div 
-            className={`spinner-container ${canRefresh || actuallyRefreshing ? 'can-refresh' : 'not-ready'} ${
-              actuallyRefreshing ? 'refreshing' : ''
-            }`}
-            style={{
-              width: `${Math.max(spinnerSize, 56)}px`,
-              height: `${Math.max(spinnerSize, 56)}px`
-            }}
-          >
-            {actuallyRefreshing ? (
-              <div className="spinner-loading" />
+          <div className="pull-refresh-content">
+            {isRefreshing ? (
+              <>
+                <div className="refresh-spinner"></div>
+                <span className="refresh-text">Refreshing...</span>
+              </>
+            ) : canRefresh ? (
+              <>
+                <div className="refresh-icon ready">↻</div>
+                <span className="refresh-text">Release to refresh</span>
+              </>
             ) : (
-              <div 
-                className="spinner-icon"
-                style={{
-                  fontSize: `${Math.max(spinnerSize * 0.4, 20)}px`,
-                  transform: `rotate(${pullProgress * 180}deg)`
-                }}
-              >
-                ↓
-              </div>
+              <>
+                <div 
+                  className="refresh-icon"
+                  style={{ 
+                    transform: `rotate(${progress * 180}deg)`,
+                    WebkitTransform: `rotate(${progress * 180}deg)`
+                  }}
+                >
+                  ↓
+                </div>
+                <span className="refresh-text">Pull to refresh</span>
+              </>
             )}
           </div>
-          
-          {/* Enhanced feedback text - Show earlier */}
-          {canRefresh && !actuallyRefreshing && (
-            <div style={{
-              position: 'absolute',
-              top: '100%',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              marginTop: '8px',
-              fontSize: '12px',
-              color: '#fff',
-              background: 'rgba(52, 71, 178, 0.9)',
-              padding: '4px 8px',
-              borderRadius: '12px',
-              whiteSpace: 'nowrap',
-              opacity: pullProgress > 0.6 ? 1 : 0, // Show earlier
-              transition: 'opacity 0.2s ease'
-            }}>
-              Release to refresh
-            </div>
-          )}
-          
-          {/* Pull instruction text */}
-          {isPulling && !canRefresh && !actuallyRefreshing && pullProgress > 0.2 && (
-            <div style={{
-              position: 'absolute',
-              top: '100%',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              marginTop: '8px',
-              fontSize: '11px',
-              color: '#ccc',
-              background: 'rgba(100, 100, 100, 0.8)',
-              padding: '3px 6px',
-              borderRadius: '10px',
-              whiteSpace: 'nowrap',
-              opacity: 0.8
-            }}>
-              Pull to refresh
-            </div>
-          )}
-          
-          {actuallyRefreshing && (
-            <div style={{
-              position: 'absolute',
-              top: '100%',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              marginTop: '8px',
-              fontSize: '12px',
-              color: '#fff',
-              background: 'rgba(34, 197, 94, 0.9)',
-              padding: '4px 8px',
-              borderRadius: '12px',
-              whiteSpace: 'nowrap'
-            }}>
-              Refreshing...
-            </div>
-          )}
         </div>
       )}
 
-      {/* Regular refresh indicator for non-mobile or non-pull refresh */}
-      {fetching && postList.length > 0 && !isPulling && !actuallyRefreshing && (
-        <div className="refresh-indicator">
-          <div className="refresh-content">
-            <LoadingSpinner size="small" />
-            <span>Refreshing content...</span>
-          </div>
-        </div>
-      )}
-
-      {/* Posts list with better structure */}
-      <div className="posts-list">
+      {/* Posts list with transform for pull effect */}
+      <div 
+        className="posts-list"
+        style={{
+          transform: `translateY(${postsTransform}px)`,
+          WebkitTransform: `translateY(${postsTransform}px)`,
+          transition: isPulling ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+        }}
+      >
         {postList.map((post, index) => (
           <Post 
             key={`${post._id}-${index}`}
@@ -247,24 +199,41 @@ const HomeSection = ({
           ref={sentinelRef} 
           className="infinite-scroll-sentinel"
           style={{ 
-            height: '20px',
-            margin: '40px 0',
-            background: 'transparent' 
+            height: '10px',
+            margin: '20px 0',
+            background: 'transparent',
+            transform: `translateY(${postsTransform}px)`,
+            WebkitTransform: `translateY(${postsTransform}px)`,
+            transition: isPulling ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
           }}
         />
       )}
       
-      {/* Loading indicator for next page */}
+      {/* FIXED: Mobile-optimized loading indicator */}
       {isFetchingNextPage && (
-        <div className="infinite-loading">
-          <LoadingSpinner size="small" />
+        <div 
+          className="infinite-loading-mobile"
+          style={{
+            transform: `translateY(${postsTransform}px)`,
+            WebkitTransform: `translateY(${postsTransform}px)`,
+            transition: isPulling ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+          }}
+        >
+          <MobileSpinner />
           <span>Loading more posts...</span>
         </div>
       )}
       
-      {/* Error state for additional pages */}
+      {/* Error state for load more */}
       {error && postList.length > 0 && (
-        <div className="load-more-error">
+        <div 
+          className="load-more-error"
+          style={{
+            transform: `translateY(${postsTransform}px)`,
+            WebkitTransform: `translateY(${postsTransform}px)`,
+            transition: isPulling ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+          }}
+        >
           <div className="error-content">
             <span className="error-message">
               Failed to load more posts
@@ -281,7 +250,14 @@ const HomeSection = ({
       
       {/* End of content indicator */}
       {!hasNextPage && !isFetchingNextPage && postList.length > 0 && (
-        <div className="end-of-content">
+        <div 
+          className="end-of-content"
+          style={{
+            transform: `translateY(${postsTransform}px)`,
+            WebkitTransform: `translateY(${postsTransform}px)`,
+            transition: isPulling ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+          }}
+        >
           <div className="end-content-line"></div>
           <span className="end-content-text">
             <span className="end-emoji">🎉</span>

@@ -252,7 +252,7 @@
   height: 2px;
   bottom: -2px;
   left: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(180deg, #6d7197f3 0%, #002486ec 100%);
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -456,7 +456,7 @@
   height: 2px;
   bottom: -2px;
   left: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(180deg, #6d7197f3 0%, #002486ec 100%);
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

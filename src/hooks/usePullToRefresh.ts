@@ -1,4 +1,4 @@
-// hooks/usePullToRefresh.ts - Optimized with spinner UI and better mobile performance
+// hooks/usePullToRefresh.ts - Enhanced mobile visibility and better detection
 import { useEffect, useCallback, useRef, useState } from 'react';
 
 interface UsePullToRefreshOptions {
@@ -39,45 +39,59 @@ export const usePullToRefresh = ({
   const lastTimeRef = useRef<number>(0);
   const lastYRef = useRef<number>(0);
 
-  // Check if device supports touch
+  // Enhanced mobile/touch device detection
   const isTouchDevice = useCallback(() => {
-    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    return (
+      'ontouchstart' in window || 
+      navigator.maxTouchPoints > 0 ||
+      // @ts-ignore - DocumentTouch is legacy but still used in some browsers
+      (typeof window.DocumentTouch !== 'undefined' && document instanceof window.DocumentTouch) ||
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    );
   }, []);
 
-  // Enhanced scroll position check
+  // Enhanced scroll position check with multiple fallbacks
   const isAtTop = useCallback(() => {
     const container = containerRef.current;
     if (!container) return false;
     
-    // Check multiple scroll positions for better accuracy
+    // Check multiple scroll positions for better accuracy across devices
     const containerScrollTop = container.scrollTop;
     const documentScrollTop = document.documentElement.scrollTop;
     const bodyScrollTop = document.body.scrollTop;
     const windowScrollY = window.scrollY;
     
-    // Allow small threshold for better UX
-    const scrollThreshold = 2;
+    // More lenient threshold for mobile devices
+    const scrollThreshold = isTouchDevice() ? 5 : 2;
     
-    return (
+    const isAtTopPosition = (
       containerScrollTop <= scrollThreshold &&
       documentScrollTop <= scrollThreshold &&
       bodyScrollTop <= scrollThreshold &&
       windowScrollY <= scrollThreshold
     );
-  }, []);
 
-  // Optimized update function with velocity tracking
+    // Additional check for iOS Safari and Chrome mobile
+    if (!isAtTopPosition && container.scrollTop === 0) {
+      return true;
+    }
+    
+    return isAtTopPosition;
+  }, [isTouchDevice]);
+
+  // Optimized update function with enhanced velocity tracking
   const updatePullDistance = useCallback((distance: number, velocity: number = 0) => {
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
     }
 
     animationFrameRef.current = requestAnimationFrame(() => {
-      // Apply resistance curve for more natural feel
+      // Enhanced resistance curve for more natural mobile feel
       const resistanceCurve = (dist: number) => {
         const base = dist / resistance;
-        // Apply diminishing returns for smoother feel
-        return base - (base * base) / (threshold * 2);
+        // Apply smoother diminishing returns for better mobile UX
+        const dampening = isTouchDevice() ? 1.2 : 1.0;
+        return base - (base * base * dampening) / (threshold * 2);
       };
       
       const adjustedDistance = Math.max(0, resistanceCurve(distance));
@@ -86,14 +100,18 @@ export const usePullToRefresh = ({
       // Store velocity for release calculations
       velocityRef.current = velocity;
       
+      // Ensure minimum visibility on mobile
+      const minVisibleDistance = isTouchDevice() ? 5 : 0;
+      const finalDistance = Math.max(adjustedDistance, distance > 0 ? minVisibleDistance : 0);
+      
       setState(prev => ({
         ...prev,
-        pullDistance: adjustedDistance,
+        pullDistance: finalDistance,
         canRefresh,
-        isPulling: adjustedDistance > 0
+        isPulling: finalDistance > 0
       }));
     });
-  }, [resistance, threshold]);
+  }, [resistance, threshold, isTouchDevice]);
 
   const handleTouchStart = useCallback((e: TouchEvent) => {
     if (!enabled || !isTouchDevice()) return;
@@ -101,12 +119,18 @@ export const usePullToRefresh = ({
     const touch = e.touches[0];
     if (!touch) return;
 
+    // Enhanced start position tracking
     startYRef.current = touch.clientY;
     currentYRef.current = startYRef.current;
     lastYRef.current = startYRef.current;
     lastTimeRef.current = Date.now();
     isActiveRef.current = false;
     velocityRef.current = 0;
+
+    // Debug log for mobile testing
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Touch start detected at:', touch.clientY);
+    }
   }, [enabled, isTouchDevice]);
 
   const handleTouchMove = useCallback((e: TouchEvent) => {
@@ -130,60 +154,91 @@ export const usePullToRefresh = ({
     
     const diff = currentYRef.current - startYRef.current;
 
+    // Enhanced activation logic for better mobile UX
+    const activationThreshold = isTouchDevice() ? 5 : 8;
+    const isScrollingDown = diff > activationThreshold;
+    const isAtTopPosition = isAtTop();
+    
+    // Debug logs for mobile testing
+    if (process.env.NODE_ENV === 'development' && diff > 0) {
+      console.log('Pull distance:', diff, 'At top:', isAtTopPosition, 'Active:', isActiveRef.current);
+    }
+
     // Only activate pull-to-refresh if we're pulling down and at the top
-    if (diff > 8 && isAtTop()) {
+    if (isScrollingDown && isAtTopPosition) {
       if (!isActiveRef.current) {
         isActiveRef.current = true;
-        // Only prevent overscroll, don't disable all scrolling
+        // Prevent overscroll more aggressively on mobile
         document.body.style.overscrollBehavior = 'none';
+        document.body.style.touchAction = 'pan-x pinch-zoom';
+        
+        // Debug log
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Pull-to-refresh activated');
+        }
       }
       
-      // Only prevent default for significant pull distances
-      if (diff > 25) {
+      // Prevent default for mobile browsers more aggressively
+      const preventThreshold = isTouchDevice() ? 15 : 25;
+      if (diff > preventThreshold) {
         e.preventDefault();
+        e.stopPropagation();
       }
       
       updatePullDistance(diff, velocityRef.current);
-    } else if (diff <= 0) {
+    } else if (diff <= 0 || !isAtTopPosition) {
       // Reset if user starts scrolling up or scrolling normally
       if (isActiveRef.current) {
         isActiveRef.current = false;
         document.body.style.overscrollBehavior = '';
+        document.body.style.touchAction = '';
         updatePullDistance(0, 0);
-      }
-    } else if (diff > 0 && diff <= 8 && !isAtTop()) {
-      // Allow normal scrolling when not at top
-      if (isActiveRef.current) {
-        isActiveRef.current = false;
-        document.body.style.overscrollBehavior = '';
-        updatePullDistance(0, 0);
+        
+        // Debug log
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Pull-to-refresh deactivated');
+        }
       }
     }
-  }, [enabled, refreshing, isAtTop, updatePullDistance]);
+  }, [enabled, refreshing, isAtTop, updatePullDistance, isTouchDevice]);
 
   const handleTouchEnd = useCallback(async () => {
-    if (!enabled || !isActiveRef.current) {
+    if (!enabled) {
       document.body.style.overscrollBehavior = '';
+      document.body.style.touchAction = '';
       return;
     }
 
+    const wasActive = isActiveRef.current;
     const wasCanRefresh = state.canRefresh;
     const velocity = velocityRef.current;
     
     isActiveRef.current = false;
     document.body.style.overscrollBehavior = '';
+    document.body.style.touchAction = '';
     
-    // Consider velocity for better UX - if user has high downward velocity, trigger refresh even if slightly under threshold
-    const velocityBoost = velocity > 0.5 ? 10 : 0;
+    // Debug log
+    if (process.env.NODE_ENV === 'development' && wasActive) {
+      console.log('Touch end - Can refresh:', wasCanRefresh, 'Distance:', state.pullDistance, 'Velocity:', velocity);
+    }
+    
+    // Enhanced refresh trigger with velocity consideration for mobile
+    const velocityBoost = velocity > (isTouchDevice() ? 0.3 : 0.5) ? 15 : 0;
     const effectiveDistance = state.pullDistance + velocityBoost;
+    const refreshThreshold = isTouchDevice() ? threshold * 0.7 : threshold * 0.8;
     
-    if ((wasCanRefresh || effectiveDistance >= threshold * 0.8) && !refreshing) {
+    if ((wasCanRefresh || effectiveDistance >= refreshThreshold) && !refreshing && wasActive) {
       setState(prev => ({ 
         ...prev, 
         isRefreshing: true,
         isPulling: false,
         pullDistance: threshold // Keep at threshold during refresh
       }));
+      
+      // Debug log
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Triggering refresh');
+      }
       
       try {
         await onRefresh();
@@ -201,7 +256,7 @@ export const usePullToRefresh = ({
           }));
         }, 300);
       }
-    } else {
+    } else if (wasActive) {
       // Animate back to original position with elastic effect
       setState(prev => ({
         ...prev,
@@ -210,23 +265,48 @@ export const usePullToRefresh = ({
         canRefresh: false
       }));
     }
-  }, [enabled, state.canRefresh, state.pullDistance, refreshing, onRefresh, threshold]);
+  }, [enabled, state.canRefresh, state.pullDistance, refreshing, onRefresh, threshold, isTouchDevice]);
 
-  // Improved event listener setup with better passive/active handling
+  // Enhanced event listener setup with better mobile support
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || !enabled || !isTouchDevice()) return;
+    if (!container || !enabled || !isTouchDevice()) {
+      return;
+    }
 
-    // Use passive for all events initially, only prevent default when necessary
+    // More aggressive event listener options for mobile
     const passiveOptions: AddEventListenerOptions = { passive: true };
-    // Only use active for touchmove when we actually need to prevent default
-    const conditionalActiveOptions: AddEventListenerOptions = { passive: false };
+    const activeOptions: AddEventListenerOptions = { passive: false };
 
+    // Add event listeners with enhanced mobile support
     container.addEventListener('touchstart', handleTouchStart, passiveOptions);
-    // Use passive for touchmove initially - we'll handle preventDefault conditionally
-    container.addEventListener('touchmove', handleTouchMove, conditionalActiveOptions);
+    container.addEventListener('touchmove', handleTouchMove, activeOptions);
     container.addEventListener('touchend', handleTouchEnd, passiveOptions);
     container.addEventListener('touchcancel', handleTouchEnd, passiveOptions);
+
+    // Additional mobile-specific event listeners
+    if (isTouchDevice()) {
+      // Prevent pull-to-refresh on the document to avoid conflicts
+      const preventDocumentPull = (e: TouchEvent) => {
+        if (isActiveRef.current) {
+          e.preventDefault();
+        }
+      };
+      
+      document.addEventListener('touchmove', preventDocumentPull, { passive: false });
+      
+      return () => {
+        container.removeEventListener('touchstart', handleTouchStart);
+        container.removeEventListener('touchmove', handleTouchMove);
+        container.removeEventListener('touchend', handleTouchEnd);
+        container.removeEventListener('touchcancel', handleTouchEnd);
+        document.removeEventListener('touchmove', preventDocumentPull);
+        
+        // Cleanup any body styles
+        document.body.style.overscrollBehavior = '';
+        document.body.style.touchAction = '';
+      };
+    }
 
     return () => {
       container.removeEventListener('touchstart', handleTouchStart);
@@ -236,6 +316,7 @@ export const usePullToRefresh = ({
       
       // Cleanup any body styles
       document.body.style.overscrollBehavior = '';
+      document.body.style.touchAction = '';
     };
   }, [enabled, isTouchDevice, handleTouchStart, handleTouchMove, handleTouchEnd]);
 
@@ -259,6 +340,7 @@ export const usePullToRefresh = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
       document.body.style.overscrollBehavior = '';
+      document.body.style.touchAction = '';
     };
   }, []);
 

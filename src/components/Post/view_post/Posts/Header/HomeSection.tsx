@@ -1,4 +1,4 @@
-// components/Post/view_post/Posts/Header/HomeSection.tsx - Updated with spinner-style pull-to-refresh
+// components/Post/view_post/Posts/Header/HomeSection.tsx - Cleaned version with CSS-only styles
 import { RefObject } from 'react';
 import { HomeSectionProps } from '@/types';
 import { createToggleClass } from '@/utils/classNames';
@@ -52,8 +52,12 @@ const HomeSection = ({
 
   // Calculate pull-to-refresh visual effects
   const pullProgress = Math.min(pullDistance / threshold, 1);
-  const spinnerSize = 20 + (pullProgress * 8); // Grows from 20px to 28px
+  const spinnerSize = 20 + (pullProgress * 12);
   const spinnerOpacity = Math.min(pullProgress * 2, 1);
+
+  // Enhanced spinner visibility logic
+  const showSpinner = pullToRefreshEnabled && (isPulling || isRefreshing);
+  const spinnerVisible = showSpinner && (spinnerOpacity > 0.1 || isRefreshing);
 
   // Error state with retry option
   if (error && postList.length === 0) {
@@ -64,7 +68,7 @@ const HomeSection = ({
           <h3>Something went wrong</h3>
           <p>Unable to load posts. Please check your connection and try again.</p>
           <button 
-            className="retry-button"
+            className={`retry-button ${fetching ? 'loading' : ''}`}
             onClick={handleGetPostClick}
             disabled={fetching}
           >
@@ -106,16 +110,22 @@ const HomeSection = ({
         '--pull-distance': `${Math.min(pullDistance * 0.5, 30)}px`
       } as React.CSSProperties : undefined}
     >
-      {/* Compact spinner-style pull-to-refresh indicator */}
-      {pullToRefreshEnabled && (isPulling || isRefreshing) && (
-        <div className={`pull-refresh-spinner ${spinnerOpacity > 0 ? 'visible' : 'hidden'}`}>
+      {/* Pull-to-refresh spinner indicator */}
+      {showSpinner && (
+        <div 
+          className={`pull-refresh-spinner ${spinnerVisible ? 'visible' : 'hidden'}`}
+          style={{
+            opacity: isRefreshing ? 1 : spinnerOpacity,
+            display: isRefreshing || spinnerVisible ? 'flex' : 'none'
+          }}
+        >
           <div 
             className={`spinner-container ${canRefresh || isRefreshing ? 'can-refresh' : 'not-ready'} ${
               isRefreshing ? 'refreshing' : ''
             }`}
             style={{
-              width: `${spinnerSize}px`,
-              height: `${spinnerSize}px`
+              width: `${Math.max(spinnerSize, 40)}px`,
+              height: `${Math.max(spinnerSize, 40)}px`
             }}
           >
             {isRefreshing ? (
@@ -124,7 +134,7 @@ const HomeSection = ({
               <div 
                 className="spinner-icon"
                 style={{
-                  fontSize: `${spinnerSize * 0.5}px`,
+                  fontSize: `${Math.max(spinnerSize * 0.5, 16)}px`,
                   transform: `rotate(${pullProgress * 180}deg)`
                 }}
               >
@@ -160,69 +170,27 @@ const HomeSection = ({
         <div 
           ref={sentinelRef} 
           className="infinite-scroll-sentinel"
-          style={{ height: '20px', margin: '20px 0' }}
         />
       )}
       
       {/* Loading indicator for next page */}
       {isFetchingNextPage && (
-        <div 
-          className="infinite-loading"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '20px'
-          }}
-        >
+        <div className="infinite-loading">
           <LoadingSpinner size="small" />
-          <span style={{ fontSize: '14px', color: '#888' }}>
-            Loading more posts...
-          </span>
+          <span>Loading more posts...</span>
         </div>
       )}
       
       {/* Error state for additional pages */}
       {error && postList.length > 0 && (
-        <div 
-          className="load-more-error"
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            padding: '20px'
-          }}
-        >
-          <div 
-            className="error-content"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '12px 20px',
-              background: '#fef2f2',
-              border: '1px solid #fecaca',
-              borderRadius: '8px'
-            }}
-          >
-            <span 
-              className="error-message"
-              style={{ fontSize: '14px', color: '#dc2626' }}
-            >
+        <div className="load-more-error">
+          <div className="error-content">
+            <span className="error-message">
               Failed to load more posts
             </span>
             <button 
               className="retry-button small"
               onClick={() => onRefetch?.()}
-              style={{
-                padding: '6px 12px',
-                fontSize: '12px',
-                background: '#dc2626',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
             >
               Try Again
             </button>
@@ -232,50 +200,17 @@ const HomeSection = ({
       
       {/* End of content indicator */}
       {!hasNextPage && !isFetchingNextPage && postList.length > 0 && (
-        <div 
-          className="end-of-content"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px',
-            padding: '40px 20px',
-            justifyContent: 'center'
-          }}
-        >
-          <div 
-            className="end-content-line"
-            style={{
-              flex: '1',
-              height: '1px',
-              background: 'linear-gradient(to right, transparent, #d1d5db, transparent)'
-            }}
-          ></div>
-          <span 
-            className="end-content-text"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              fontSize: '14px',
-              color: '#888',
-              whiteSpace: 'nowrap'
-            }}
-          >
+        <div className="end-of-content">
+          <div className="end-content-line"></div>
+          <span className="end-content-text">
             <span className="end-emoji">🎉</span>
             You've reached the end!
           </span>
-          <div 
-            className="end-content-line"
-            style={{
-              flex: '1',
-              height: '1px',
-              background: 'linear-gradient(to left, transparent, #d1d5db, transparent)'
-            }}
-          ></div>
+          <div className="end-content-line"></div>
         </div>
       )}
     </div>
   );
 };
 
-export default HomeSection; 
+export default HomeSection;

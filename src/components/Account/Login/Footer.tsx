@@ -16,7 +16,14 @@ const Footer = () => {
                 <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-105 group-hover:rotate-y-180">
                   <img src={logo} alt="Vimarsh Logo" className="w-8 h-8 " />
                 </div>
-                <span className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
+                                <span 
+                  className="text-xl font-bold bg-clip-text text-transparent"
+                  style={{
+                    background: 'linear-gradient(180deg, #6d7197f3 0%, #002486ec 100%)',
+                    WebkitBackgroundClip: 'text',
+                    backgroundClip: 'text'
+                  }}
+                >
                   Vimarsh
                 </span>
               </div>

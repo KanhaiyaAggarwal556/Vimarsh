@@ -17,9 +17,11 @@ import SearchPageLayout from "./routes/Layout/SearchPageLayout";
 import Notification from "./routes/Notification/Notification";
 import ContactPage from "./routes/ContactPage/ContactPage";
 import PhotoPage from "./routes/PhotoPage/PhotoPage";
-import SignUpPage from "./routes/Auth/SignUpPage";
+import SignUpPage from "./routes/Auth/SignupPage";
 import ForgotPasswordPage from "./routes/Auth/PasswordResetSystem";
 import UserProfilePage from "./routes/UserProfilePage/UsersProfile";
+import FeaturesPage from "./routes/FeaturesPage/FeaturesPage";
+import About from "./routes/AboutPage/About";
 
 // Import auth components
 import AuthProvider from "./auth/AuthProvider";
@@ -83,6 +85,8 @@ createRoot(rootElement).render(
               <Route path="/notifications" element={<Notification />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/search" element={<SearchPage />} />
+              <Route path="/featurePanel" element={<FeaturesPage />} />
+              <Route path="/about" element={<About/>}/>
 
               {/* Profile routes */}
               <Route path="/:username" element={<UserProfilePage />} />

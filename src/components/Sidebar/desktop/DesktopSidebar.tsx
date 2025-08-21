@@ -1,8 +1,13 @@
+// components/desktop/DesktopSidebar.tsx - Enhanced with double-tap home functionality
 import React from "react";
+import { SIDEBAR_CONFIG } from "@/config/navigationConfig";
 import SidebarContent from "./SidebarContent";
-import { SIDEBAR_CONFIG } from "../config/sidebarConfig";
 
-const DesktopSidebar: React.FC = () => (
+interface DesktopSidebarProps {
+  onHomeTap?: () => void;
+}
+
+const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ onHomeTap }) => (
   <div
     className="sidebar d-none d-lg-flex p-3 flex-column flex-shrink-0"
     style={{
@@ -15,7 +20,7 @@ const DesktopSidebar: React.FC = () => (
       zIndex: 1050,
       justifyContent: "center",
       overflow: "hidden",
-      borderRight: "2px solid #333", // Right border separator
+      borderRight: "2px solid #333",
     }}
   >
     <div
@@ -27,7 +32,7 @@ const DesktopSidebar: React.FC = () => (
         paddingBottom: "2rem",
       }}
     >
-      <SidebarContent />
+      <SidebarContent onHomeTap={onHomeTap} />
     </div>
   </div>
 );

@@ -169,11 +169,11 @@ const RightSidebar: React.FC = () => {
       </div>
 
       {/* ChatBot for Desktop */}
-      <ChatBot
+      {/* <ChatBot
         isOpen={isChatBotOpen}
         onToggle={handleChatBotToggle}
         position="bottom-right"
-      />
+      /> */}
     </>
   );
 };

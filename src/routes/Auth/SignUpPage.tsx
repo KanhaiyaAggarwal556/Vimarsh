@@ -6,7 +6,7 @@ import SignUpForm from "@/components/Account/SignUp/SignUpForm";
 import SocialLogin from "@/components/Account/SignUp/SocialLogin";
 import SignUpFooter from "@/components/Account/SignUp/SignUpFooter";
 import Footer from "@/components/Account/Login/Footer";
-import "./SignUp.css";
+import "./Signup.css";
 
 interface FormData {
   name: string;

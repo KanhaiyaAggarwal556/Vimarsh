@@ -18,15 +18,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
   const { user } = useAuth();
 
   return (
-    <div
-      className="d-lg-none fixed-bottom d-flex justify-content-around align-items-center py-2"
-      style={{
-        backgroundColor: SIDEBAR_CONFIG.bottomNavBackgroundColor,
-        borderTop: "1px solid #333",
-        height: "60px",
-        zIndex: 1000,
-      }}
-    >
+    <div className="lg:hidden fixed w-full bottom-0 flex justify-around items-center py-2 h-[60px] z-[1000] border-t border-gray-700" style={{ backgroundColor: SIDEBAR_CONFIG.bottomNavBackgroundColor }}>
       {MOBILE_NAV_ITEMS.map(({ id, to, icon, label }) => {
         let href = to;
         let onClick: (() => void) | undefined;

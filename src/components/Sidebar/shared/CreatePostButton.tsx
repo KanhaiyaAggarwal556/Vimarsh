@@ -14,35 +14,23 @@ const CreatePostButton: React.FC<CreatePostButtonProps> = ({
   onLinkClick, 
   isResponsive = false 
 }) => (
-  <div
-    className="d-flex justify-content-center pe-3"
-    style={{
-      marginLeft: isResponsive ? 0 : "11rem",
-      width: "100%",
-      justifyContent: "center",
-      marginTop: "0", // Removed margin to eliminate gap with navigation
-    }}
-  >
+  <div className="flex justify-center pe-3 w-full justify-center mt-0" style={{ marginLeft: isResponsive ? 0 : "11rem" }}>
     <Link
       to="/createpost"
-      className="btn fw-bold d-flex align-items-center justify-content-center"
+      className="btn fw-bold flex items-center justify-center min-h-[52px] max-w-[200px] px-6 transition-all duration-300"
       style={{
         backgroundColor:
-          pathname === "/createpost" // Fixed: changed from "/create-post" to "/createpost"
+          pathname === "/createpost"
             ? SIDEBAR_CONFIG.createPostActiveColor 
             : "#fff",
-        color: pathname === "/createpost" ? "#fff" : "#3949ab", // Fixed: changed from "/create-post" to "/createpost"
+        color: pathname === "/createpost" ? "#fff" : "#3949ab",
         border: "none",
         fontWeight: "bold",
         borderRadius: SIDEBAR_CONFIG.createPostBorderRadius,
-        transition: "background-color 0.3s, color 0.3s, border-radius 0.3s, box-shadow 0.3s",
         boxShadow:
-          pathname === "/createpost" // Fixed: changed from "/create-post" to "/createpost"
+          pathname === "/createpost"
             ? "0 0 0 0.2rem rgba(57, 72, 171, 0.22)"
             : "none",
-        minHeight: 52,
-        maxWidth: 200,
-        padding: "0rem 1.5rem",
       }}
       onClick={onLinkClick}
     >

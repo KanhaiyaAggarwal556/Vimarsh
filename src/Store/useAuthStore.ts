@@ -1,9 +1,8 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { AuthStore } from '../types/auth';
-import { createAuthActions } from './authActions';
+import { createAuthActions, AUTH_CACHE_DURATION } from './authActions';
 
-const AUTH_CACHE_DURATION = 3 * 60 * 1000; // 3 minutes cache for auth checks
 
 const useAuthStore = create<AuthStore>()(
   persist(

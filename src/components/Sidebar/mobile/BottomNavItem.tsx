@@ -43,7 +43,7 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({
         setTimeout(() => setIsHomePressed(false), 300); // Visual feedback
         
         try {
-          await onHomeTap();
+          onHomeTap();
         } catch (error) {
           console.error('Home tap failed:', error);
         }
@@ -67,21 +67,18 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({
     return (
       <Link
         to={to}
-        className="d-flex flex-column align-items-center text-decoration-none"
+        className="flex flex-col items-center no-underline text-xs min-w-[50px] transition-colors duration-300"
         style={{
           color: isActive ? SIDEBAR_CONFIG.bottomNavActiveColor : "#999",
-          transition: "color 0.3s",
-          fontSize: "0.75rem",
-          minWidth: "50px",
         }}
         onClick={handleClick}
       >
-        <div style={{ marginBottom: "2px" }}>
+        <div className="mb-0.5">
           {React.cloneElement(icon, {
             color: isActive ? SIDEBAR_CONFIG.bottomNavActiveColor : "#999"
           })}
         </div>
-        <span style={{ fontSize: "0.7rem" }}>{label}</span>
+        <span className="text-[0.7rem]">{label}</span>
       </Link>
     );
   }
@@ -90,33 +87,21 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({
   if (isHome && isOnHomePage) {
     return (
       <div
-        className="d-flex flex-column align-items-center text-decoration-none"
+        className="flex flex-col items-center no-underline text-xs min-w-[50px] cursor-pointer transition-all duration-200 ease-in-out"
         style={{
           color: isActive || isHomePressed ? SIDEBAR_CONFIG.bottomNavActiveColor : "#999",
-          transition: "all 0.2s ease",
-          fontSize: "0.75rem",
-          minWidth: "50px",
           transform: isHomePressed ? 'scale(0.95)' : 'scale(1)',
           opacity: isHomePressed ? 0.8 : 1,
-          cursor: 'pointer',
         }}
         onClick={handleClick}
       >
-        <div style={{ 
-          marginBottom: "2px",
-          position: 'relative'
-        }}>
+        <div className="mb-0.5 relative">
           {React.cloneElement(icon, {
             color: isActive || isHomePressed ? SIDEBAR_CONFIG.bottomNavActiveColor : "#999"
           })}
-          
-
         </div>
-        <span style={{ fontSize: "0.7rem" }}>{label}</span>
-        
-        {/* Add CSS animation styles */}
-        <style>{`
-        `}</style>
+        <span className="text-[0.7rem]">{label}</span>
+        <style>{``}</style>
       </div>
     );
   }
@@ -125,26 +110,20 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({
   return (
     <Link
       to={to}
-      className="d-flex flex-column align-items-center text-decoration-none"
+      className="flex flex-col items-center no-underline text-xs min-w-[50px] transition-all duration-200 ease-in-out"
       style={{
         color: isActive || isHomePressed ? SIDEBAR_CONFIG.bottomNavActiveColor : "#999",
-        transition: "all 0.2s ease",
-        fontSize: "0.75rem",
-        minWidth: "50px",
         transform: isHomePressed ? 'scale(0.95)' : 'scale(1)',
         opacity: isHomePressed ? 0.8 : 1,
       }}
       onClick={handleClick}
     >
-      <div style={{ 
-        marginBottom: "2px",
-        position: 'relative'
-      }}>
+      <div className="mb-0.5 relative">
         {React.cloneElement(icon, {
           color: isActive || isHomePressed ? SIDEBAR_CONFIG.bottomNavActiveColor : "#999"
         })}
       </div>
-      <span style={{ fontSize: "0.7rem" }}>{label}</span>
+      <span className="text-[0.7rem]">{label}</span>
     </Link>
   );
 };

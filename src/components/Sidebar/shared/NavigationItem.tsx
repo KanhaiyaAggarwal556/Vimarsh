@@ -63,32 +63,25 @@ const NavigationItem: React.FC<NavigationItemProps> = ({
   // Home button - don't use Link when on home page to avoid navigation interference
   if (isHome && isOnHomePage) {
     return (
-      <li className="w-100">
+      <li className="w-full">
         <div
-          className={`nav-link text-white w-100 d-flex align-items-center justify-content-center ${
+          className={`nav-link text-white w-full flex items-center justify-center min-h-[48px] cursor-pointer transition-all duration-200 ease-in-out ${
             isHomePressed ? 'home-pressed' : ''
           }`}
           style={{
             backgroundColor: isActive ? SIDEBAR_CONFIG.activeColor : "transparent",
-            color: "#fff",
             fontWeight: isActive ? "bold" : "normal",
             borderRadius: SIDEBAR_CONFIG.itemBorderRadius,
-            transition: "all 0.2s ease",
-            minHeight: 48,
             transform: isHomePressed ? 'scale(0.95)' : 'scale(1)',
             opacity: isHomePressed ? 0.8 : 1,
-            cursor: 'pointer',
           }}
           onClick={handleClick}
         >
           {icon}
           {label}
-
         </div>
         
-        {/* Add CSS animation styles */}
         <style>{`
-          
           .nav-link.home-pressed {
             background-color: ${SIDEBAR_CONFIG.activeColor} !important;
           }
@@ -99,19 +92,16 @@ const NavigationItem: React.FC<NavigationItemProps> = ({
 
   // Regular navigation item with Link
   return (
-    <li className="w-100">
+    <li className="w-full">
       <Link
         to={to}
-        className={`nav-link text-white w-100 d-flex align-items-center justify-content-center ${
+        className={`nav-link text-white w-full flex items-center justify-center min-h-[48px] transition-all duration-200 ease-in-out ${
           isHomePressed ? 'home-pressed' : ''
         }`}
         style={{
           backgroundColor: isActive ? SIDEBAR_CONFIG.activeColor : "transparent",
-          color: "#fff",
           fontWeight: isActive ? "bold" : "normal",
           borderRadius: SIDEBAR_CONFIG.itemBorderRadius,
-          transition: "all 0.2s ease",
-          minHeight: 48,
           transform: isHomePressed ? 'scale(0.95)' : 'scale(1)',
           opacity: isHomePressed ? 0.8 : 1,
         }}

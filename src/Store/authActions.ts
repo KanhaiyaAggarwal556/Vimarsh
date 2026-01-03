@@ -8,7 +8,7 @@ import {
 } from "../types/auth";
 import { AuthApiService } from "../services/AuthApiService";
 
-const AUTH_CACHE_DURATION = 3 * 60 * 1000; // 3 minutes cache for auth checks
+export const AUTH_CACHE_DURATION = 3 * 60 * 1000; // 3 minutes cache for auth checks
 
 export const createAuthActions = (
   set: (partial: Partial<AuthState>) => void,
@@ -88,15 +88,9 @@ export const createAuthActions = (
         return { success: false, message: errorMsg };
       }
 
-      console.log("🔐 Starting login process for:", emailOrUsername);
-
       const result = await AuthApiService.login(emailOrUsername, password);
 
-      console.log("📋 Login API result:", result);
-
       if (result.success && result.user) {
-        console.log("✅ Login successful for:", result.user.userName);
-        console.log("👤 Setting user in store:", result.user);
 
         // Set user data in store
         set({
@@ -115,7 +109,6 @@ export const createAuthActions = (
           message: result.message || "Login successful",
         };
       } else {
-        console.log("❌ Login failed:", result.message);
 
         set({
           isLoading: false,
@@ -215,7 +208,6 @@ export const createAuthActions = (
       const result = await AuthApiService.register(userData);
 
       if (result.success && result.user) {
-        console.log("✅ Registration successful for:", result.user.userName);
         set({
           currentUser: result.user,
           isAuthenticated: true,
@@ -224,7 +216,6 @@ export const createAuthActions = (
           lastAuthCheck: Date.now(),
         });
       } else {
-        console.log("❌ Registration failed:", result.message);
         set({
           isLoading: false,
           error: result.message,
@@ -280,7 +271,6 @@ export const createAuthActions = (
       state.isAuthenticated;
 
     if (shouldUseCache) {
-      console.log("📦 Using cached user data");
       return {
         success: true,
         user: state.currentUser || undefined,
@@ -404,14 +394,6 @@ export const createAuthActions = (
   initializeAuth: async () => {
     const state = get();
 
-    console.log("🔄 initializeAuth called with state:", {
-      isInitializing: state.isInitializing,
-      isLoading: state.isLoading,
-      hasUser: !!state.currentUser,
-      isAuthenticated: state.isAuthenticated,
-      lastAuthCheck: state.lastAuthCheck,
-    });
-
     // Skip if not in initializing state (prevents infinite loops)
     if (!state.isInitializing) {
       console.log("⚠️ initializeAuth: Not in initializing state, skipping");
@@ -423,8 +405,6 @@ export const createAuthActions = (
       console.log("⚠️ initializeAuth: Already loading, skipping");
       return;
     }
-
-    console.log("🚀 Starting authentication initialization...");
 
     try {
       // Set loading but keep initializing true until we're done
@@ -449,25 +429,22 @@ export const createAuthActions = (
 
       // If we have a cached user but cache is old, verify with server
       if (hasCachedUser) {
-        console.log("🔍 Verifying cached user with server...");
-        const result = await get().getCurrentUser();
+        const result = await state.getCurrentUser();
 
         if (result.success && result.user) {
           console.log("✅ Cached user verified with server");
         } else {
           console.log("❌ Cached user invalid, clearing...");
-          get().removeAllUser();
+          state.removeAllUser();
         }
       } else {
         // No cached user, check with server
         console.log("🔍 No cached user, checking with server...");
-        await get().getCurrentUser();
+        await state.getCurrentUser();
       }
     } catch (error) {
-      console.error("❌ Auth initialization failed:", error);
-
       // Clear auth state on initialization error
-      get().removeAllUser();
+      state.removeAllUser();
 
       set({
         error:

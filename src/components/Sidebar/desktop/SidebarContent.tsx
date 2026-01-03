@@ -16,8 +16,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({ onHomeTap }) => {
   return (
     <>
       <SidebarLogo />
-      {/* Group navigation and create post together to eliminate gap */}
-      <div className="d-flex flex-column align-items-center" style={{ flex: 1 }}>
+      <div className="flex flex-col items-center flex-1">
         <NavigationList pathname={pathname} onHomeTap={onHomeTap} />
         <CreatePostButton pathname={pathname} />
       </div>

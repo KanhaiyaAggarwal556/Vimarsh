@@ -1,6 +1,5 @@
 // MainLayoutPage.tsx - Enhanced with HomeContext for home button functionality
 import "./MainLayoutPage.css";
-import "bootstrap/dist/css/bootstrap.min.css";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { Outlet } from "react-router-dom";
 import RightSidebar from "../../components/RightSidebar/RightSidebar";

@@ -12,17 +12,7 @@ const NavigationList: React.FC<NavigationListProps> = ({
   pathname, 
   onHomeTap 
 }) => (
-  <ul
-    className="nav nav-pills flex-column mb-auto w-100"
-    style={{
-      gap: "0.5rem",
-      marginTop: "2rem",
-      marginBottom: "0", // Removed margin to eliminate gap with Create Post
-      alignItems: "center",
-      paddingRight: "1rem",
-      paddingLeft: "11rem",
-    }}
-  >
+  <ul className="nav nav-pills flex-col mb-auto w-full gap-2 mt-8 mb-0 items-center pr-4 pl-44">
     {NAV_ITEMS.map(({ to, icon, label, id }) => (
       <NavigationItem
         key={id}

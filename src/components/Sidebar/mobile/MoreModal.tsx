@@ -13,56 +13,32 @@ const MoreModal: React.FC<MoreModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div
-      className="position-fixed top-0 start-0 w-100 h-100"
-      style={{
-        background: "rgba(0,0,0,0.8)",
-        zIndex: 2000,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
+      className="fixed inset-0 w-full h-full flex items-center justify-center z-[2000]"
+      style={{ background: "rgba(0,0,0,0.8)" }}
       onClick={onClose}
     >
       <div
-        className="rounded-4 shadow-lg d-flex flex-column"
-        style={{
-          backgroundColor: SIDEBAR_CONFIG.backgroundColor,
-          width: "90%",
-          maxWidth: "400px",
-          padding: "2rem",
-          border: "1px solid #333",
-        }}
+        className="rounded-2xl shadow-lg flex flex-col w-[90%] max-w-[400px] p-8 border border-gray-700"
+        style={{ backgroundColor: SIDEBAR_CONFIG.backgroundColor }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="d-flex justify-content-between align-items-center mb-3">
+        <div className="flex justify-between items-center mb-3">
           <h5 className="text-white mb-0">More Options</h5>
           <button
-            className="btn btn-outline-light btn-sm"
+            className="btn btn-outline-light btn-sm border-0"
             onClick={onClose}
-            style={{ border: "none" }}
           >
             <AiOutlineClose size={20} />
           </button>
         </div>
         
-        <div className="d-flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           {MORE_ITEMS.map(({ id, to, icon, label }) => (
             <Link
               key={id}
               to={to}
-              className="nav-link text-white d-flex align-items-center p-3 rounded"
-              style={{
-                backgroundColor: "rgba(255,255,255,0.1)",
-                transition: "background-color 0.3s",
-                textDecoration: "none",
-              }}
+              className="nav-link text-white flex items-center p-3 rounded no-underline bg-white/10 transition-colors duration-300 hover:bg-white/20"
               onClick={onClose}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.2)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.1)";
-              }}
             >
               <span className="me-3">{React.cloneElement(icon, { size: 20 })}</span>
               {label}

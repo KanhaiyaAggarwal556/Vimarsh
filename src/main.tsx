@@ -29,9 +29,6 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 import PublicRoute from "./auth/PublicRoute";
 import OAuthSuccessHandler from "./auth/OAuthSuccessHandler";
 
-// Import styles
-import "bootstrap/dist/css/bootstrap.min.css";
-
 // Enhanced QueryClient configuration
 const queryClient = new QueryClient({
   defaultOptions: {

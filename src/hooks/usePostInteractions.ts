@@ -14,7 +14,7 @@ import type {
   ViewTrackingResponse,
   ViewTrackingOptions,
 } from "../types/postInteraction";
-import useAuthStore from "@store/useAuthStore";
+import useAuthStore from "@/store/useAuthStore";
 import { useEffect } from "react";
 
 // FIXED: Add missing type definition

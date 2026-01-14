@@ -1,5 +1,5 @@
 import React, { useEffect, ReactNode } from 'react';
-import useAuthStore from '../Store/useAuthStore';
+import useAuthStore from '../store/useAuthStore';
 import { useLocation } from 'react-router-dom';
 
 interface AuthProviderProps {

@@ -2,7 +2,7 @@
 import React from "react";
 import UserAvatar from "../UI/UserAvatar";
 import PostDropdown from "./PostDropdown";
-import useAuthStore from "@store/useAuthStore";
+import useAuthStore from "@/store/useAuthStore";
 import { usePostMutations } from "@/hooks/usePostMutations";
 import { useFollowState } from "@/hooks/useFollowState";
 import { PostHeaderProps } from "@/types/postTypes";
@@ -94,15 +94,6 @@ export default function PostHeader({
   const currentUser = useAuthStore((state) => state.currentUser) as AuthUser | null;
   const isOwnPost = currentUser && currentUser._id === post.user._id;
 
-  // Debug: Log current user and post data
-  console.log('🔍 PostHeader Debug:', {
-    currentUser: currentUser?._id,
-    postUserId: post.user._id,
-    isOwnPost,
-    originalFollowState: post.user.isFollowing,
-    onFollowProvided: !!onFollow,
-    followPending
-  });
 
   // Use the centralized mutations hook for other functionality
   const {
@@ -124,14 +115,6 @@ export default function PostHeader({
   const actualFollowPending = followPending ?? followPendingState;
   const actualDeletePending = deletePending ?? isDeletingPost;
 
-  // Debug: Log follow states
-  console.log('🔄 Follow States:', {
-    originalFollowState: post.user.isFollowing,
-    currentFollowState,
-    followPendingState,
-    actualFollowPending,
-    parentFollowPending: followPending
-  });
 
   const handleUserClick = (e: React.MouseEvent<HTMLElement>): void => {
     e.stopPropagation();
@@ -250,15 +233,6 @@ export default function PostHeader({
     : isFollowing 
       ? "Following" 
       : "Follow";
-
-  // Debug: Log final button state
-  console.log('🎯 Final Follow Button State:', {
-    isFollowing,
-    followButtonText,
-    actualFollowPending,
-    disabled: actualFollowPending,
-    visible: !isOwnPost
-  });
 
   return (
     <div className="post-header" onClick={handleHeaderClick}>

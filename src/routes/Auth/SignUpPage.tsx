@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import useAuthStore from "@store/useAuthStore";
+import useAuthStore from "@/store/useAuthStore";
 import SignUpHeader from "@/components/Account/SignUp/SignUpHeader";
 import SignUpForm from "@/components/Account/SignUp/SignUpForm";
 import SocialLogin from "@/components/Account/SignUp/SocialLogin";

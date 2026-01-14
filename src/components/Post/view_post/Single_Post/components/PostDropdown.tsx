@@ -1,6 +1,6 @@
 // components/Single_Post/components/PostDropdown.tsx
 import { useRef, useEffect, useState, useCallback, useMemo } from "react";
-import useAuthStore from "@store/useAuthStore";
+import useAuthStore from "@/store/useAuthStore";
 import { usePostMutations } from "@/hooks/usePostMutations";
 import { 
   PostDropdownProps, 

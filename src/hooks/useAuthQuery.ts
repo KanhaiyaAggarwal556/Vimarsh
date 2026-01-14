@@ -1,6 +1,6 @@
 // hooks/useAuthQuery.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import useAuthStore, { User } from '@store/useAuthStore';
+import useAuthStore, { User } from '@/store/useAuthStore';
 import { useCallback, useEffect } from 'react';
 
 // Query keys for consistent cache management

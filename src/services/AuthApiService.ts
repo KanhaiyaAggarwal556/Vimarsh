@@ -1,6 +1,8 @@
 // services/AuthApiService.ts
 
 import { User, RegisterData, AuthResponse } from "../types/auth";
+import { apiClient } from "./ApiClient";
+import { BackendAuthResponse, BackendUserDTO } from "../types/backendAuth";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
 const API_TIMEOUT = 15000;
@@ -10,102 +12,6 @@ interface ApiError {
   status?: number;
   code?: string;
 }
-
-interface BackendAuthResponse {
-  success: boolean;
-  message: string;
-  data?: {
-    user?: any;
-    accessToken?: string;
-    refreshToken?: string;
-    resetToken?: string;
-    token?: string;
-  };
-  user?: any;
-  resetToken?: string;
-}
-
-class ApiClient {
-  private baseURL: string;
-  private timeout: number;
-
-  constructor(baseURL: string, timeout: number = API_TIMEOUT) {
-    this.baseURL = baseURL;
-    this.timeout = timeout;
-  }
-
-  private async fetchWithTimeout(url: string, options: RequestInit = {}): Promise<Response> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-
-    try {
-      const response = await fetch(url, {
-        ...options,
-        signal: controller.signal,
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          ...options.headers,
-        },
-      });
-
-      clearTimeout(timeoutId);
-      return response;
-    } catch (error) {
-      clearTimeout(timeoutId);
-
-      if (error instanceof Error && error.name === "AbortError") {
-        throw new Error("Request timeout - server may be slow or down");
-      }
-
-      if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
-        throw new Error("Cannot connect to server. Please check if the backend is running on port 4000");
-      }
-
-      throw error;
-    }
-  }
-
-  private async handleResponse<T>(response: Response): Promise<T> {
-    const contentType = response.headers.get("content-type");
-
-    if (!contentType?.includes("application/json")) {
-      const textResponse = await response.text();
-      throw new Error(`Server returned ${response.status}: ${response.statusText}. Response: ${textResponse}`);
-    }
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      const error: ApiError = {
-        message: data.message || data.error || "Request failed",
-        status: response.status,
-        code: data.code,
-      };
-      throw error;
-    }
-
-    return data;
-  }
-
-  async get<T>(endpoint: string): Promise<T> {
-    const url = `${this.baseURL}${endpoint}`;
-    const response = await this.fetchWithTimeout(url, { method: "GET" });
-    return this.handleResponse<T>(response);
-  }
-
-  async post<T>(endpoint: string, data?: any): Promise<T> {
-    const url = `${this.baseURL}${endpoint}`;
-    const response = await this.fetchWithTimeout(url, {
-      method: "POST",
-      body: data ? JSON.stringify(data) : undefined,
-    });
-    return this.handleResponse<T>(response);
-  }
-}
-
-const apiClient = new ApiClient(API_BASE_URL);
 
 export class AuthApiService {
   /**
@@ -173,7 +79,12 @@ export class AuthApiService {
         userName: userData.userName.trim(),
         fullName: userData.fullName.trim(),
       };
-
+      if (!requestPayload.email || !requestPayload.userName || !requestPayload.fullName) {
+        return {
+          success: false,
+          message: "Email, username, and full name are required"
+        };
+      }
       const response = await apiClient.post<BackendAuthResponse>("/auth/register", requestPayload);
 
       if (response.success) {
@@ -451,10 +362,17 @@ export class AuthApiService {
       if (userResponse.success && userResponse.user) {
         const returnUrl = sessionStorage.getItem('oauth_return_url');
         if (returnUrl) {
-          sessionStorage.removeItem('oauth_return_url');
-          setTimeout(() => {
-            window.location.href = returnUrl;
-          }, 1000);
+          try {
+            const url = new URL(returnUrl);
+            if (url.origin === window.location.origin) {
+              sessionStorage.removeItem('oauth_return_url');
+              setTimeout(() => {
+                window.location.href = returnUrl;
+              }, 1000);
+            }
+          } catch {
+            console.log("Invalid return URL, skipping redirect");
+          }
         }
         
         return userResponse;
@@ -523,7 +441,7 @@ export class AuthApiService {
   /**
    * Sanitize user data to ensure consistent structure
    */
-  private static sanitizeUser(user: any): User {
+  private static sanitizeUser(user: BackendUserDTO): User {
     if (!user) {
       throw new Error("User data is required for sanitization");
     }

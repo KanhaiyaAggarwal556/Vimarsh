@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useAuthStore from "@store/useAuthStore";
+import useAuthStore from "@/store/useAuthStore";
 import EmailStep from "@/components/Account/ForgotPassword/EmailStep";
 import OtpStep from "@/components/Account/ForgotPassword/OtpStep";
 import ResetStep from "@/components/Account/ForgotPassword/ResetStep";

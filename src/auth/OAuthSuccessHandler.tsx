@@ -1,19 +1,19 @@
 // FIX 1: Update OAuthSuccessHandler.tsx - Fix method name and remove unused variable
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAuthStore from '../Store/useAuthStore';
+import useAuthStore from '../store/useAuthStore';
 import toast from 'react-hot-toast';
-import './OAuthSuccessHandler.css';
+import Spinner from '../components/common/spinner';
 
 const OAuthSuccessHandler: React.FC = () => {
   const navigate = useNavigate();
   const { handleOAuthCallback, setInitializing, setOAuthInProgress } = useAuthStore(); // Fixed: setOAuthInProgress (capital O)
   const [progress, setProgress] = useState(0);
 
+  const oAuthProcessInitiated = useRef(false);
   useEffect(() => {
     const processOAuthSuccess = async () => {
       try {
-        console.log('Processing OAuth success...');
         
         // Set OAuth in progress to prevent AuthProvider interference
         setOAuthInProgress(true); // Fixed: setOAuthInProgress (capital O)
@@ -39,7 +39,7 @@ const OAuthSuccessHandler: React.FC = () => {
         setProgress(100);
         
         // Small delay to show completion
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 300));
         
         if (result.success && result.user) {
           console.log('OAuth authentication successful:', result.user);
@@ -77,44 +77,45 @@ const OAuthSuccessHandler: React.FC = () => {
       }
     };
 
-    // Start the OAuth processing
+    if (oAuthProcessInitiated.current) {
+      return;
+    }
+
+    oAuthProcessInitiated.current = true;
+
     processOAuthSuccess();
   }, [handleOAuthCallback, navigate, setInitializing, setOAuthInProgress]); // Fixed: setOAuthInProgress
 
   // Always show loading (removed unused isProcessing variable)
   return (
-    <div className="oauth-success-container">
-      <div className="oauth-success-content">
-        <div className="loading-animation">
-          <div className="loading-spinner"></div>
-          <div className="loading-progress">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-black to-neutral-900 font-sans text-white">
+      <div className="w-full max-w-md p-8 text-center">
+        <div className="mb-8">
+          <div className="mb-6 flex justify-center">
+            <Spinner />
+          </div>
+          <div className="mb-4 h-1 w-full overflow-hidden rounded bg-white/10">
             <div 
-              className="progress-bar" 
+              className="h-full rounded bg-gradient-to-r from-sky-500 to-blue-700 transition-all duration-300 ease-out" 
               style={{ width: `${progress}%` }}
             ></div>
           </div>
         </div>
-        
-        <h4 className="loading-title">Completing Authentication</h4>
-        <p className="loading-subtitle">Please wait while we verify your login...</p>
-        
-        <div className="loading-steps">
-          <div className={`step ${progress > 20 ? 'completed' : 'active'}`}>
-            <div className="step-icon">✓</div>
-            <span>Verifying credentials</span>
+        <div className="mb-8 space-y-4">
+          <div className="text-lg font-semibold">
+            {progress < 20 && "Verifying Credentials..."}
+            {progress >= 20 && progress < 60 && "Setting Up Session..."}
+            {progress >= 60 && "Redirecting to App..."}
           </div>
-          <div className={`step ${progress > 60 ? 'completed' : progress > 20 ? 'active' : ''}`}>
-            <div className="step-icon">✓</div>
-            <span>Setting up session</span>
-          </div>
-          <div className={`step ${progress > 90 ? 'completed' : progress > 60 ? 'active' : ''}`}>
-            <div className="step-icon">✓</div>
-            <span>Redirecting to app</span>
+          <div className="text-sm text-gray-400">
+            {progress < 20 && "Checking your credentials with the authentication provider."}
+            {progress >= 20 && progress < 60 && "Configuring your session for a seamless experience."}
+            {progress >= 60 && "Taking you to the app.  This might take a moment."}
           </div>
         </div>
         
-        <div className="loading-footer">
-          <small>This may take a few seconds</small>
+        <div className="text-xs text-gray-500">
+          <small>Please wait, this process may take a few seconds.</small>
         </div>
       </div>
     </div>

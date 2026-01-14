@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import useAuthStore from '../Store/useAuthStore';
-import './ProtectedRoute.css';
+import useAuthStore from '../store/useAuthStore';
+import Spinner from '../components/common/spinner';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -15,22 +15,17 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { isAuthenticated, isInitializing, currentUser } = useAuthStore();
   const location = useLocation();
 
-  console.log('🔒 ProtectedRoute check:', { isAuthenticated, isInitializing, hasUser: !!currentUser, path: location.pathname });
-
   // Don't redirect during initialization
   if (isInitializing) {
     return (
-      <div className="protected-route-loading">
-        <div className="loading-spinner" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
+      <div className="flex min-h-screen items-center justify-center">
+        <Spinner />
       </div>
     );
   }
 
   // Redirect to login if not authenticated
   if (!isAuthenticated || !currentUser) {
-    console.log('🔒 ProtectedRoute: Redirecting to login');
     // Save the intended destination
     return (
       <Navigate 
@@ -40,8 +35,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       />
     );
   }
-
-  console.log('🔒 ProtectedRoute: Access granted');
   return <>{children}</>;
 };
 

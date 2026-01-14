@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { User, LogIn, UserPlus, LogOut, Settings, Loader2, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import UserAvatar from "../Post/view_post/Single_Post/UI/UserAvatar";
-import useAuthStore, { User as UserType } from "@store/useAuthStore";
+import useAuthStore, { User as UserType } from "@/store/useAuthStore";
 import "./styles/UserAccount.css";
 
 interface UserAccountProps {

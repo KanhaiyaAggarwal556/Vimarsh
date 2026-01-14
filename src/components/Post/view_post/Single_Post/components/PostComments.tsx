@@ -8,7 +8,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import "../style/PostComments.css";
 import UserAvatar from "../UI/UserAvatar";
-import useAuthStore from "@store/useAuthStore";
+import useAuthStore from "@/store/useAuthStore";
 
 // Import separated types
 import {

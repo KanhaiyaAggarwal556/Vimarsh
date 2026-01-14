@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import { useViewTracking } from './usePostInteractions';
-import useAuthStore from '@store/useAuthStore';
+import useAuthStore from '@/store/useAuthStore';
 
 interface UseAutoViewTrackingOptions {
   minViewDuration?: number;
@@ -167,10 +167,8 @@ export const useIntersectionViewTracking = (
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            console.log(`Post ${postId} became visible`);
             startViewTracking();
           } else {
-            console.log(`Post ${postId} became invisible`);
             stopViewTracking();
           }
         });

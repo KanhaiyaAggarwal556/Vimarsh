@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import useAuthStore from "@store/useAuthStore";
+import useAuthStore from "@/store/useAuthStore";
 import { 
   usePostInteraction, 
   useToggleLike, 
@@ -390,15 +390,6 @@ const PostActions: React.FC<PostActionsProps> = ({
   // Debug info in development
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      console.log(`PostActions for ${post._id}:`, {
-        enableViewTracking,
-        hasViewBeenTracked,
-        isTracking,
-        currentViewCount: state.viewCount,
-        originalViewCount: post.views,
-        userAuthenticated: !!currentUser,
-        referralSource
-      });
     }
   }, [post._id, enableViewTracking, hasViewBeenTracked, isTracking, state.viewCount, post.views, currentUser, referralSource]);
 

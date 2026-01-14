@@ -37,7 +37,6 @@ const useAuthStore = create<AuthStore>()(
       }),
       version: 8, // Increment version to trigger migration
       migrate: (persistedState: any, version: number) => {
-        console.log("🔄 Migrating auth store from version", version);
 
         // Clear old data and start fresh for problematic versions
         if (version < 8) {
@@ -57,13 +56,6 @@ const useAuthStore = create<AuthStore>()(
       },
       onRehydrateStorage: () => (state) => {
         if (state) {
-          console.log("💾 Auth store rehydrated:", {
-            hasUser: !!state.currentUser,
-            isAuthenticated: state.isAuthenticated,
-            lastAuthCheck: state.lastAuthCheck,
-            lastActivity: state.lastActivity,
-            sessionExpiry: state.sessionExpiry,
-          });
 
           // Always reset these on rehydration
           state.isLoading = false;
@@ -90,13 +82,6 @@ const useAuthStore = create<AuthStore>()(
             state.isInitializing = needsInitialization;
             state.isAuthenticated = !!state.currentUser;
           }
-
-          console.log(
-            "🔄 Rehydration complete - isInitializing:",
-            state.isInitializing,
-            "isSessionExpired:",
-            isSessionExpired
-          );
         }
       },
     }
